@@ -80,7 +80,7 @@
                                 <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#94A3B8"/>
                             </Button.Resources>
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE72C;" />
+                                <FontIcon Glyph="&#xE72C;"/>
                                 <TextBlock Text="تحديث"/>
                             </StackPanel>
                         </Button>
@@ -96,7 +96,7 @@
                                 <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#94A3B8"/>
                             </Button.Resources>
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE70D;" />
+                                <FontIcon Glyph="&#xE70D;"/>
                                 <TextBlock Text="توسيع الكل"/>
                             </StackPanel>
                         </Button>
@@ -112,7 +112,7 @@
                                 <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#94A3B8"/>
                             </Button.Resources>
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE70E;" />
+                                <FontIcon Glyph="&#xE70E;"/>
                                 <TextBlock Text="طي الكل"/>
                             </StackPanel>
                         </Button>
@@ -167,10 +167,45 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBox Grid.Row="0"
-                             Width="320"
-                             PlaceholderText="بحث بالكود أو الاسم..."
-                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <!-- ✅ شريط البحث واضح وبارز -->
+                    <Border Grid.Row="0"
+            Background="#EFF6FF"
+            BorderBrush="#BFDBFE"
+            BorderThickness="1"
+            CornerRadius="12"
+            Padding="12,10">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <FontIcon Grid.Column="0"
+                      Glyph="&#xE721;"
+                      FontSize="16"
+                      Foreground="#2563EB"
+                      VerticalAlignment="Center"/>
+
+                            <TextBox Grid.Column="1"
+                     PlaceholderText="بحث بالكود أو الاسم..."
+                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     VerticalAlignment="Center"
+                     FontSize="14"/>
+
+                            <!-- ✅ زر مسح البحث -->
+                            <Button Grid.Column="2"
+                    Visibility="{Binding SearchText, Converter={StaticResource EmptyToCollapsedConverter}}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="4"
+                    VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="#64748B"/>
+                            </Button>
+                        </Grid>
+                    </Border>
 
                     <TreeView x:Name="AccountsTreeView"
                               Grid.Row="1"
@@ -180,10 +215,24 @@
                         <TreeView.ItemTemplate>
                             <DataTemplate>
                                 <TreeViewItem ItemsSource="{Binding Children}">
+
+                                    <!-- ✅ ContextFlyout واحد فقط -->
                                     <TreeViewItem.ContextFlyout>
                                         <MenuFlyout>
+                                            <MenuFlyoutItem Text="إضافة حساب ابن"
+                                                            Click="AddChildAccount_Click"
+                                                            Tag="{Binding}">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE710;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutSeparator/>
                                             <MenuFlyoutItem Text="تفاصيل"
-                                                            Click="AccountDetails_Click"/>
+                                                            Click="AccountDetails_Click">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xE946;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
                                         </MenuFlyout>
                                     </TreeViewItem.ContextFlyout>
 
@@ -203,8 +252,7 @@
 
                                             <!-- Icon -->
                                             <Border Grid.Column="0"
-                                                    Width="30"
-                                                    Height="30"
+                                                    Width="30" Height="30"
                                                     Background="#EEF2FF"
                                                     CornerRadius="8"
                                                     VerticalAlignment="Center">
@@ -233,7 +281,6 @@
                                                            FontSize="14"
                                                            FontWeight="{Binding TypeText, Converter={StaticResource AccountFontWeightConverter}}"
                                                            Foreground="{Binding TypeText, Converter={StaticResource AccountNameBrushConverter}}"/>
-
                                                 <TextBlock Text="{Binding Id}"
                                                            Visibility="Collapsed"/>
                                             </StackPanel>

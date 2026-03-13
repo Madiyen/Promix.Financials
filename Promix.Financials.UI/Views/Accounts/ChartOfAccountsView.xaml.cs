@@ -9,6 +9,7 @@ using Promix.Financials.UI.Dialogs.Accounts;
 using Promix.Financials.UI.ViewModels.Accounts;
 using Promix.Financials.UI.ViewModels.Accounts.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace Promix.Financials.UI.Views.Accounts;
 
@@ -19,10 +20,8 @@ public sealed partial class ChartOfAccountsView : Page
     public ChartOfAccountsView()
     {
         InitializeComponent();
-
         var app = (App)Microsoft.UI.Xaml.Application.Current;
         _vm = app.Services.GetRequiredService<ChartOfAccountsViewModel>();
-
         DataContext = _vm;
         Loaded += OnLoaded;
     }
@@ -31,29 +30,46 @@ public sealed partial class ChartOfAccountsView : Page
     {
         var app = (App)Microsoft.UI.Xaml.Application.Current;
         var userContext = app.Services.GetRequiredService<IUserContext>();
-
         var companyId = userContext.CompanyId ?? Guid.Empty;
         if (companyId == Guid.Empty) return;
-
         await _vm.InitializeAsync(companyId);
     }
 
     private async void NewAccount_Click(object sender, RoutedEventArgs e)
+        => await OpenNewAccountDialogAsync(preselectedParentCode: null);
+
+    private async void AddChildAccount_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuFlyoutItem item) return;
+        if (item.Tag is not AccountNodeVm parentNode) return;
+        await OpenNewAccountDialogAsync(preselectedParentCode: parentNode.Code);
+    }
+
+    private async Task OpenNewAccountDialogAsync(string? preselectedParentCode)
     {
         var app = (App)Microsoft.UI.Xaml.Application.Current;
-
         var userContext = app.Services.GetRequiredService<IUserContext>();
         var companyId = userContext.CompanyId ?? Guid.Empty;
         if (companyId == Guid.Empty) return;
 
-        // ✅ Scoped لتجنب تعارض DbContext
         using var scope = app.Services.CreateScope();
         var vm = scope.ServiceProvider.GetRequiredService<NewAccountDialogViewModel>();
         await vm.InitializeAsync(companyId);
 
+        if (!string.IsNullOrWhiteSpace(preselectedParentCode))
+        {
+            foreach (var p in vm.ParentAccounts)
+            {
+                if (p.Code == preselectedParentCode)
+                {
+                    vm.SelectedParentAccount = p;
+                    break;
+                }
+            }
+        }
+
         var dialog = new NewAccountDialog(vm) { XamlRoot = this.XamlRoot };
         var result = await dialog.ShowAsync();
-
         if (result != ContentDialogResult.Primary) return;
 
         var draft = vm.BuildDraft();
@@ -61,9 +77,7 @@ public sealed partial class ChartOfAccountsView : Page
 
         try
         {
-            var createService = scope.ServiceProvider
-                .GetRequiredService<CreateAccountService>();
-
+            var createService = scope.ServiceProvider.GetRequiredService<CreateAccountService>();
             var command = new CreateAccountCommand(
                 CompanyId: draft.CompanyId,
                 ParentId: draft.ParentId,
@@ -77,10 +91,7 @@ public sealed partial class ChartOfAccountsView : Page
                 IsActive: draft.IsActive,
                 Notes: draft.Notes
             );
-
             await createService.CreateAsync(command);
-
-            // ✅ تحديث الشجرة بعد الحفظ الناجح
             await _vm.InitializeAsync(companyId);
         }
         catch (Promix.Financials.Domain.Exceptions.BusinessRuleException ex)
@@ -93,7 +104,6 @@ public sealed partial class ChartOfAccountsView : Page
         }
     }
 
-    // ✅ اشتقاق AccountNature من كود الحساب
     private static AccountNature DeriveNature(string code)
     {
         var root = code?.Split('.')[0] ?? "";
@@ -104,7 +114,7 @@ public sealed partial class ChartOfAccountsView : Page
         };
     }
 
-    private async System.Threading.Tasks.Task ShowErrorAsync(string title, string message)
+    private async Task ShowErrorAsync(string title, string message)
     {
         var dlg = new ContentDialog
         {
@@ -120,7 +130,6 @@ public sealed partial class ChartOfAccountsView : Page
     {
         if (sender is not MenuFlyoutItem item) return;
         if (item.DataContext is not AccountNodeVm account) return;
-
         var dialog = new ContentDialog
         {
             Title = "تفاصيل الحساب",
@@ -131,21 +140,25 @@ public sealed partial class ChartOfAccountsView : Page
         _ = dialog.ShowAsync();
     }
 
+    // ✅ الحل الصحيح: استخدام VisualTree بدل RootNodes
     private void ExpandAll_Click(object sender, RoutedEventArgs e)
-        => SetExpandStateForAllTreeItems(AccountsTreeView, true);
+        => SetExpandStateAll(AccountsTreeView, true);
 
     private void CollapseAll_Click(object sender, RoutedEventArgs e)
-        => SetExpandStateForAllTreeItems(AccountsTreeView, false);
+        => SetExpandStateAll(AccountsTreeView, false);
 
-    private static void SetExpandStateForAllTreeItems(
-        DependencyObject parent, bool isExpanded)
+    private static void SetExpandStateAll(DependencyObject parent, bool isExpanded)
     {
-        if (parent is TreeViewItem tvi)
-            tvi.IsExpanded = isExpanded;
-
         var count = VisualTreeHelper.GetChildrenCount(parent);
         for (int i = 0; i < count; i++)
-            SetExpandStateForAllTreeItems(
-                VisualTreeHelper.GetChild(parent, i), isExpanded);
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+
+            if (child is TreeViewItem tvi)
+                tvi.IsExpanded = isExpanded;
+
+            // تطبيق recursive على كل الأبناء
+            SetExpandStateAll(child, isExpanded);
+        }
     }
 }

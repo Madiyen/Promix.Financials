@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Promix.Financials.Application.Features.Accounts; // IChartOfAccountsQuery + AccountFlatDto
+using Promix.Financials.Application.Features.Accounts;
 using Promix.Financials.UI.ViewModels.Accounts.Models;
 
 namespace Promix.Financials.UI.ViewModels.Accounts;
@@ -19,9 +19,7 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
     public ObservableCollection<AccountNodeVm> AccountTree { get; } = new();
     public AccountKpisVm Kpis { get; } = new();
 
-    // الكاش الأساسي الذي نفلتر منه
     private List<AccountNodeVm> _fullTree = new();
-
     private Guid? _companyId;
 
     private bool _isBusy;
@@ -58,7 +56,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
             if (_selectedFiscalYear == value) return;
             _selectedFiscalYear = value;
             OnPropertyChanged();
-            // لاحقاً: تحميل حسب السنة المالية
         }
     }
 
@@ -81,23 +78,15 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
     public ChartOfAccountsViewModel(IChartOfAccountsQuery query)
     {
         _query = query;
-
         RefreshCommand = new AsyncRelayCommand(RefreshAsync, () => !IsBusy && _companyId is not null);
-        NewAccountCommand = new RelayCommand(() => { /* لاحقاً */ });
-
+        NewAccountCommand = new RelayCommand(() => { });
         UpdateKpis();
     }
 
-    /// <summary>
-    /// المدخل الأساسي من View عند فتح الصفحة
-    /// </summary>
     public async Task InitializeAsync(Guid companyId)
     {
         _companyId = companyId;
-
-        // (اختياري) FiscalYears لاحقاً
         FiscalYears.Clear();
-
         RefreshCommand.RaiseCanExecuteChanged();
         await LoadAsync(companyId);
     }
@@ -106,7 +95,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
     {
         if (IsBusy) return;
         if (_companyId is null) return;
-
         await LoadAsync(_companyId.Value);
     }
 
@@ -118,20 +106,12 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
         try
         {
             var flat = await _query.GetAccountsAsync(companyId);
-
             _fullTree = BuildTree(flat);
 
-            // إذا في SearchText مطبق: أعد تطبيقه مباشرة بعد التحميل
             if (string.IsNullOrWhiteSpace(SearchText))
-            {
                 RebindTree(_fullTree);
-            }
             else
-            {
-                var search = SearchText.Trim();
-                var filtered = FilterTree(_fullTree, search);
-                RebindTree(filtered);
-            }
+                RebindTree(FilterTree(_fullTree, SearchText.Trim()));
 
             UpdateKpis();
         }
@@ -140,8 +120,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
             AccountTree.Clear();
             _fullTree = new List<AccountNodeVm>();
             UpdateKpis();
-
-            // رسالة نظيفة (بدون StackTrace)
             ErrorMessage = ex.Message;
         }
         finally
@@ -152,31 +130,19 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
 
     private static List<AccountNodeVm> BuildTree(IReadOnlyList<AccountFlatDto> flat)
     {
-        // إنشاء عقد
         var map = flat.ToDictionary(
             x => x.Id,
-            x =>
-            {
-                var name = string.IsNullOrWhiteSpace(x.ArabicName) ? "—" : x.ArabicName;
+            x => new AccountNodeVm(
+                x.Id, x.Code,
+                string.IsNullOrWhiteSpace(x.ArabicName) ? "—" : x.ArabicName,
+                x.IsPosting, x.IsSystem, x.IsActive, x.ParentId));
 
-                return new AccountNodeVm(
-                    x.Id,
-                    x.Code,
-                    name,
-                    x.IsPosting,
-                    x.IsSystem,
-                    x.IsActive,
-                    x.ParentId);
-            });
-
-        // ربط الأبناء
         foreach (var node in map.Values)
         {
             if (node.ParentId is Guid pid && map.TryGetValue(pid, out var parent))
                 parent.Children.Add(node);
         }
 
-        // الجذور
         var roots = map.Values
             .Where(x => x.ParentId is null)
             .OrderBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
@@ -194,10 +160,8 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
                     var sorted = n.Children
                         .OrderBy(x => x.Code, StringComparer.OrdinalIgnoreCase)
                         .ToList();
-
                     n.Children.Clear();
                     foreach (var s in sorted) n.Children.Add(s);
-
                     SortRecursively(sorted);
                 }
             }
@@ -239,12 +203,12 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
             return;
         }
 
-        var search = SearchText.Trim();
-        var filtered = FilterTree(_fullTree, search);
+        var filtered = FilterTree(_fullTree, SearchText.Trim());
         RebindTree(filtered);
         UpdateKpis();
     }
 
+    // ✅ دالة واحدة فقط — بدون تكرار
     private static List<AccountNodeVm> FilterTree(IEnumerable<AccountNodeVm> source, string search)
     {
         var result = new List<AccountNodeVm>();
@@ -257,30 +221,27 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
                 node.Code.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                 node.ArabicName.Contains(search, StringComparison.OrdinalIgnoreCase);
 
-            if (selfMatch || childrenMatch.Count > 0)
-            {
-                // نسخة جديدة للحفاظ على الشجرة الأصلية
-                var copy = new AccountNodeVm(
-                    node.Id,
-                    node.Code,
-                    node.ArabicName,
-                    node.IsPosting,
-                    node.IsSystem,
-                    node.IsActive,
-                    node.ParentId);
+            if (!selfMatch && childrenMatch.Count == 0) continue;
 
-                foreach (var child in childrenMatch)
-                    copy.Children.Add(child);
+            var copy = new AccountNodeVm(
+                node.Id, node.Code, node.ArabicName,
+                node.IsPosting, node.IsSystem, node.IsActive, node.ParentId);
 
-                result.Add(copy);
-            }
+            // إذا تطابق العقدة نفسها: أظهر كل أبنائها
+            var childrenToShow = selfMatch
+                ? (IEnumerable<AccountNodeVm>)node.Children
+                : childrenMatch;
+
+            foreach (var child in childrenToShow)
+                copy.Children.Add(child);
+
+            result.Add(copy);
         }
 
         return result;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
@@ -300,14 +261,9 @@ internal sealed class RelayCommand : ICommand
     public void Execute(object? parameter) => _execute();
 
     public event EventHandler? CanExecuteChanged;
-
-    public void RaiseCanExecuteChanged()
-        => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }
 
-/// <summary>
-/// Async Command: يمنع تداخل التنفيذ ويعطي CanExecute صحيح.
-/// </summary>
 public sealed class AsyncRelayCommand : ICommand
 {
     private readonly Func<Task> _execute;
@@ -320,18 +276,13 @@ public sealed class AsyncRelayCommand : ICommand
         _canExecute = canExecute;
     }
 
-    public bool CanExecute(object? parameter)
-        => !_isExecuting && (_canExecute?.Invoke() ?? true);
+    public bool CanExecute(object? parameter) => !_isExecuting && (_canExecute?.Invoke() ?? true);
 
-    public async void Execute(object? parameter)
-    {
-        await ExecuteAsync();
-    }
+    public async void Execute(object? parameter) => await ExecuteAsync();
 
     public async Task ExecuteAsync()
     {
         if (!CanExecute(null)) return;
-
         try
         {
             _isExecuting = true;
@@ -346,7 +297,5 @@ public sealed class AsyncRelayCommand : ICommand
     }
 
     public event EventHandler? CanExecuteChanged;
-
-    public void RaiseCanExecuteChanged()
-        => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }

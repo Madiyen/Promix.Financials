@@ -1,157 +1,302 @@
 <ContentDialog
     x:Class="Promix.Financials.UI.Dialogs.Accounts.NewAccountDialog"
-    xmlns:converters="using:Promix.Financials.UI.Converters"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:Promix.Financials.UI.Converters"
     mc:Ignorable="d"
+    FlowDirection="RightToLeft"
     Title="إنشاء حساب جديد"
-    PrimaryButtonText="إنشاء"
+    PrimaryButtonText="✔ إنشاء"
     CloseButtonText="إلغاء"
     DefaultButton="Primary"
-    CornerRadius="16">
+    CornerRadius="16"
+    MinWidth="800">
 
     <ContentDialog.Resources>
         <converters:BoolToCollapsedVisibilityConverter x:Key="BoolToCollapsedVisibilityConverter"/>
+
+        <!-- ✅ Style موحد لكل TextBox في الديالوج -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#94A3B8"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="MinHeight" Value="42"/>
+        </Style>
+
+        <!-- ✅ Style موحد لكل ComboBox في الديالوج -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#94A3B8"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="MinHeight" Value="42"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
     </ContentDialog.Resources>
 
-    <Grid RowSpacing="14" MinWidth="720">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="580">
+        <StackPanel Spacing="0">
 
-        <!-- Header helper -->
-        <Border CornerRadius="12"
-                Background="{ThemeResource SystemFillColorAttentionBackgroundBrush}"
-                Padding="12">
-            <StackPanel Spacing="4">
-                <TextBlock Text="إنشاء حساب جديد ضمن شجرة الحسابات"
-                           FontWeight="SemiBold"/>
-                <TextBlock Text="يتم اقتراح الكود تلقائياً حسب الحساب الأب. اسم الحساب بالعربية إلزامي."
-                           Opacity="0.75"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Main form -->
-        <Grid Grid.Row="1" ColumnSpacing="14" RowSpacing="12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.2*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <!-- Left column -->
-            <StackPanel Grid.Column="0" Spacing="12">
-
-                <!-- Parent -->
-                <StackPanel Spacing="6">
-                    <TextBlock Text="الحساب الأب" Opacity="0.75"/>
-                    <ComboBox
-                        ItemsSource="{Binding ParentAccounts}"
-                        SelectedItem="{Binding SelectedParentAccount, Mode=TwoWay}"
-                        DisplayMemberPath="DisplayName"
-                        PlaceholderText="اختر الحساب الأب (اختياري للجذر)"/>
-                </StackPanel>
-
-                <!-- Code (read-only) -->
-                <StackPanel Spacing="6">
-                    <TextBlock Text="كود الحساب" Opacity="0.75"/>
-                    <TextBox Text="{Binding SuggestedCode}" IsReadOnly="True" Opacity="0.9"/>
-                    <TextBlock Text="الكود يتم توليده تلقائياً ولا يمكن تعديله."
-                               Opacity="0.6"
-                               FontSize="12"/>
-                </StackPanel>
-
-                <!-- Names -->
-                <Grid ColumnSpacing="12">
+            <!-- Banner أزرق -->
+            <Border Background="#2563EB"
+                    CornerRadius="12,12,0,0"
+                    Padding="20,16">
+                <Grid ColumnSpacing="14">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" Spacing="6">
-                        <TextBlock Text="اسم الحساب (عربي) *" Opacity="0.75"/>
-                        <TextBox Text="{Binding ArabicName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 PlaceholderText="مثال: صندوق رئيسي"/>
-                        <TextBlock Text="{Binding ArabicNameError}"
-                                   Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                                   FontSize="12"
-                                   Visibility="{Binding IsArabicNameValid, Converter={StaticResource BoolToCollapsedVisibilityConverter}}"/>
-                    </StackPanel>
+                    <Border Grid.Column="0"
+                            Width="46" Height="46"
+                            Background="#FFFFFF22"
+                            CornerRadius="12"
+                            VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE80F;"
+                                  FontSize="22"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
 
-                    <StackPanel Grid.Column="1" Spacing="6">
-                        <TextBlock Text="اسم الحساب (إنجليزي) (اختياري)" Opacity="0.75"/>
-                        <TextBox Text="{Binding EnglishName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 PlaceholderText="اختياري"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                        <TextBlock Text="إنشاء حساب جديد"
+                                   Foreground="White"
+                                   FontSize="17"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="الكود يُولَّد تلقائياً من الحساب الأب • الاسم العربي إلزامي"
+                                   Foreground="#BFDBFE"
+                                   FontSize="12"/>
                     </StackPanel>
                 </Grid>
-            </StackPanel>
+            </Border>
 
-            <!-- Right column -->
-            <StackPanel Grid.Column="1" Spacing="12">
+            <!-- ✅ Body — خلفية رمادية واضحة -->
+            <Border Background="#F1F5F9"
+                    BorderBrush="#CBD5E1"
+                    BorderThickness="1,0,1,1"
+                    CornerRadius="0,0,12,12"
+                    Padding="20,18">
+                <StackPanel Spacing="18">
 
-                <!-- Type -->
-                <StackPanel Spacing="6">
-                    <TextBlock Text="نوع الحساب" Opacity="0.75"/>
-                    <ComboBox
-                        ItemsSource="{Binding AccountTypes}"
-                        SelectedItem="{Binding SelectedAccountType, Mode=TwoWay}"/>
-                    <TextBlock Text="ملاحظة: الحساب التجميعي لا يتم الترحيل عليه (سيتم فرضها لاحقاً)."
-                               Opacity="0.6"
-                               FontSize="12"/>
+                    <!-- Row 1: الحساب الأب + الكود -->
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="170"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- الحساب الأب -->
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon Glyph="&#xE8A0;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="الحساب الأب"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <ComboBox ItemsSource="{Binding ParentAccounts}"
+                                      SelectedItem="{Binding SelectedParentAccount, Mode=TwoWay}"
+                                      DisplayMemberPath="DisplayName"
+                                      PlaceholderText="(جذر الشجرة)"/>
+                        </StackPanel>
+
+                        <!-- الكود التلقائي -->
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon Glyph="&#xE8B3;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="الكود (تلقائي)"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <!-- ✅ كود واضح على خلفية زرقاء فاتحة -->
+                            <Border Background="White"
+                                    BorderBrush="#2563EB"
+                                    BorderThickness="2"
+                                    CornerRadius="8"
+                                    Padding="12,10"
+                                    MinHeight="42">
+                                <TextBlock Text="{Binding SuggestedCode}"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#2563EB"
+                                           Language="en-US"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Divider -->
+                    <Border Height="1" Background="#CBD5E1"/>
+
+                    <!-- Row 2: الأسماء -->
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- الاسم العربي -->
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8D2;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#374151">
+                                    <Run Text="الاسم بالعربية"/>
+                                    <Run Text=" *" Foreground="#DC2626"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBox Text="{Binding ArabicName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     PlaceholderText="مثال: الصندوق الرئيسي"/>
+                            <TextBlock Text="{Binding ArabicNameError}"
+                                       Foreground="#DC2626"
+                                       FontSize="11"
+                                       Visibility="{Binding IsArabicNameValid, Converter={StaticResource BoolToCollapsedVisibilityConverter}}"/>
+                        </StackPanel>
+
+                        <!-- الاسم الإنكليزي -->
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8D2;" FontSize="12" Foreground="#94A3B8"/>
+                                <TextBlock Text="الاسم بالإنكليزية (اختياري)"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <TextBox Text="{Binding EnglishName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     PlaceholderText="e.g. Main Cash"
+                                     FlowDirection="LeftToRight"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Divider -->
+                    <Border Height="1" Background="#CBD5E1"/>
+
+                    <!-- Row 3: النوع + ال��ملة + التصنيف -->
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- نوع الحساب -->
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE7C1;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="نوع الحساب"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <ComboBox ItemsSource="{Binding AccountTypes}"
+                                      SelectedItem="{Binding SelectedAccountType, Mode=TwoWay}"/>
+                        </StackPanel>
+
+                        <!-- العملة -->
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8EE;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="العملة"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <ComboBox ItemsSource="{Binding Currencies}"
+                                      SelectedItem="{Binding SelectedCurrency, Mode=TwoWay}"
+                                      DisplayMemberPath="DisplayName"/>
+                        </StackPanel>
+
+                        <!-- التصنيف التلقائي -->
+                        <StackPanel Grid.Column="2" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE946;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="التصنيف (تلقائي)"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <!-- ✅ Badge تصنيف واضح -->
+                            <Border Background="White"
+                                    BorderBrush="#2563EB"
+                                    BorderThickness="1.5"
+                                    CornerRadius="8"
+                                    Padding="10,10"
+                                    MinHeight="42">
+                                <TextBlock Text="{Binding DerivedCategoryText}"
+                                           Foreground="#1D4ED8"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Divider -->
+                    <Border Height="1" Background="#CBD5E1"/>
+
+                    <!-- Row 4: الدور + الحالة -->
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- دور النظام -->
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8D7;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="الدور النظامي (اختياري)"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <ComboBox ItemsSource="{Binding SystemRoles}"
+                                      SelectedItem="{Binding SelectedSystemRole, Mode=TwoWay}"
+                                      PlaceholderText="بدون"/>
+                        </StackPanel>
+
+                        <!-- الحالة -->
+                        <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Bottom">
+                            <TextBlock Text="الحالة"
+                                       FontSize="13" FontWeight="SemiBold"
+                                       Foreground="#374151"/>
+                            <!-- ✅ ToggleSwitch على خلفية بيضاء واضحة -->
+                            <Border Background="White"
+                                    BorderBrush="#CBD5E1"
+                                    BorderThickness="1.5"
+                                    CornerRadius="8"
+                                    Padding="10,4">
+                                <ToggleSwitch IsOn="{Binding IsActive, Mode=TwoWay}"
+                                             OnContent="نشط"
+                                             OffContent="غير نشط"
+                                             Margin="0"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Divider -->
+                    <Border Height="1" Background="#CBD5E1"/>
+
+                    <!-- Row 5: الملاحظات -->
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <FontIcon Glyph="&#xE70B;" FontSize="12" Foreground="#94A3B8"/>
+                            <TextBlock Text="ملاحظات (اختياري)"
+                                       FontSize="13" FontWeight="SemiBold"
+                                       Foreground="#374151"/>
+                        </StackPanel>
+                        <TextBox Text="{Binding Notes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 PlaceholderText="أي ملاحظات إضافية..."
+                                 TextWrapping="Wrap"
+                                 Height="72"
+                                 AcceptsReturn="True"/>
+                    </StackPanel>
+
                 </StackPanel>
-
-                <!-- Currency -->
-                <StackPanel Spacing="6">
-                    <TextBlock Text="العملة" Opacity="0.75"/>
-                    <ComboBox
-                        ItemsSource="{Binding Currencies}"
-                        SelectedItem="{Binding SelectedCurrency, Mode=TwoWay}"
-                        DisplayMemberPath="DisplayName"/>
-                    
-                </StackPanel>
-
-                <!-- Derived category (read-only) -->
-                <StackPanel Spacing="6">
-                    <TextBlock Text="التصنيف (تلقائي)" Opacity="0.75"/>
-                    <TextBox Text="{Binding DerivedCategoryText}" IsReadOnly="True" Opacity="0.9"/>
-                    <TextBlock Text="يتم اشتقاق التصنيف تلقائياً من الحساب الأب المختار."
-                               Opacity="0.6"
-                               FontSize="12"/>
-                </StackPanel>
-
-                <!-- Role (optional) -->
-                <StackPanel Spacing="6">
-                    <TextBlock Text="الدور النظامي (اختياري)" Opacity="0.75"/>
-                    <ComboBox
-                        ItemsSource="{Binding SystemRoles}"
-                        SelectedItem="{Binding SelectedSystemRole, Mode=TwoWay}"
-                        PlaceholderText="بدون"/>
-                    <TextBlock Text="الأدوار يجب أن تكون فريدة لكل شركة (سيتم فرضها لاحقاً)."
-                               Opacity="0.6"
-                               FontSize="12"/>
-                </StackPanel>
-
-                <!-- Active -->
-                <ToggleSwitch Header="الحساب فعال"
-                              IsOn="{Binding IsActive, Mode=TwoWay}"/>
-            </StackPanel>
-        </Grid>
-
-        <!-- Notes -->
-        <StackPanel Grid.Row="2" Spacing="6">
-            <TextBlock Text="ملاحظات" Opacity="0.75"/>
-            <TextBox Text="{Binding Notes, Mode=TwoWay}" AcceptsReturn="True" MinHeight="80"
-                     PlaceholderText="ملاحظات اختيارية لهذا الحساب"/>
+            </Border>
         </StackPanel>
-
-    </Grid>
+    </ScrollViewer>
 </ContentDialog>

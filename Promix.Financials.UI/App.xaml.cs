@@ -10,6 +10,7 @@ using Windows.Globalization;
 using Windows.Storage;
 using Promix.Financials.Infrastructure.Persistence;
 using Promix.Financials.Infrastructure.Persistence.Seeding;
+
 namespace Promix.Financials.UI;
 
 public partial class App : Microsoft.UI.Xaml.Application
@@ -44,28 +45,60 @@ public partial class App : Microsoft.UI.Xaml.Application
 
     protected override async void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        using (var scope = Services.CreateScope())
+        try
         {
-            var db = scope.ServiceProvider.GetRequiredService<PromixDbContext>();
-            var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-            await SeedData.EnsureSeedAsync(db, hasher);
+            using (var scope = Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<PromixDbContext>();
+                var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+                await SeedData.EnsureSeedAsync(db, hasher);
+            }
+
+            var bootstrapper = Services.GetRequiredService<IUserContextBootstrapper>();
+            await bootstrapper.InitializeAsync();
+
+            _window = new MainWindow();
+
+            var lang = ApplicationLanguages.PrimaryLanguageOverride;
+            if (_window.Content is FrameworkElement fe)
+            {
+                fe.FlowDirection = (!string.IsNullOrWhiteSpace(lang) && lang.StartsWith("ar"))
+                    ? FlowDirection.RightToLeft
+                    : FlowDirection.LeftToRight;
+            }
+
+            _window.Activate();
+
+            if (_window is MainWindow mainWindow)
+                mainWindow.RefreshAfterLogin();
         }
-        var bootstrapper = Services.GetRequiredService<IUserContextBootstrapper>();
-        await bootstrapper.InitializeAsync();
-
-        _window = new MainWindow();
-
-        var lang = ApplicationLanguages.PrimaryLanguageOverride;
-        if (_window.Content is FrameworkElement fe)
+        catch (Exception ex)
         {
-            fe.FlowDirection = (!string.IsNullOrWhiteSpace(lang) && lang.StartsWith("ar"))
-                ? FlowDirection.RightToLeft
-                : FlowDirection.LeftToRight;
+            // Show a dialog before crashing — prevents silent 0xC000027B exit
+            _window = new Window();
+            _window.Activate();
+
+            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+            {
+                Title = "Startup Error",
+                Content = $"The application failed to start:\n\n{ex.Message}\n\nCheck the database connection and try again.",
+                CloseButtonText = "Close",
+                XamlRoot = _window.Content?.XamlRoot
+            };
+
+            // Ensure XamlRoot is available after activation
+            _window.DispatcherQueue.TryEnqueue(async () =>
+            {
+                try
+                {
+                    dialog.XamlRoot = _window.Content?.XamlRoot;
+                    await dialog.ShowAsync();
+                }
+                finally
+                {
+                    _window.Close();
+                }
+            });
         }
-
-        _window.Activate();
-
-        if (_window is MainWindow mainWindow)
-            mainWindow.RefreshAfterLogin();
     }
 }
