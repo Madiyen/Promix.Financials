@@ -10,8 +10,7 @@
     PrimaryButtonText="إنشاء"
     CloseButtonText="إلغاء"
     DefaultButton="Primary"
-    CornerRadius="16"
-    IsPrimaryButtonEnabled="{Binding CanSubmit}">
+    CornerRadius="16">
 
     <ContentDialog.Resources>
         <converters:BoolToCollapsedVisibilityConverter x:Key="BoolToCollapsedVisibilityConverter"/>

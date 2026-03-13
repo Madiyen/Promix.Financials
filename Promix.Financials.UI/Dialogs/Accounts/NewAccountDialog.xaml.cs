@@ -5,29 +5,30 @@ namespace Promix.Financials.UI.Dialogs.Accounts;
 
 public sealed partial class NewAccountDialog : ContentDialog
 {
+    private readonly NewAccountDialogViewModel _vm;
+
     public NewAccountDialog(NewAccountDialogViewModel vm)
     {
         InitializeComponent();
+        _vm = vm;
         DataContext = vm;
 
-        PrimaryButtonClick += (_, args) =>
+        // ✅ ربط CanSubmit يدوياً لأن WinUI 3 لا يُحدّث IsPrimaryButtonEnabled تلقائياً
+        vm.PropertyChanged += (_, args) =>
         {
-            if (!vm.CanSubmit)
-            {
-                args.Cancel = true; // يمنع إغلاق الديالوج
-                vm.Validate();
-            }
+            if (args.PropertyName == nameof(vm.CanSubmit))
+                IsPrimaryButtonEnabled = vm.CanSubmit;
         };
-    }
-    private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-    {
-        if (DataContext is Promix.Financials.UI.ViewModels.Accounts.NewAccountDialogViewModel vm)
+
+        // ✅ تعيين القيمة الابتدائية
+        IsPrimaryButtonEnabled = vm.CanSubmit;
+
+        // ✅ منع إغلاق الـ Dialog إذا لم يكن صالحاً
+        PrimaryButtonClick += (_, args) =>
         {
             vm.Validate();
             if (!vm.CanSubmit)
-            {
-                args.Cancel = true; // يمنع غلق الديالوج
-            }
-        }
+                args.Cancel = true;
+        };
     }
 }
