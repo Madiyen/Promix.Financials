@@ -5,6 +5,7 @@ namespace Promix.Financials.Domain.Accounting;
 
 public sealed class DefaultCurrency : Entity<string>
 {
+    private DefaultCurrency() { } // ← EF Core
 
     public DefaultCurrency(
         string code,

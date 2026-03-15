@@ -87,6 +87,9 @@ public sealed partial class MainWindow : Window
             case SidebarDestination.Settings:
                 RootFrame.Navigate(typeof(SettingsView));
                 break;
+            case SidebarDestination.Currencies:
+                RootFrame.Navigate(typeof(Promix.Financials.UI.Views.Currencies.CompanyCurrenciesView));
+                break;
         }
     }
 

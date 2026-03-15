@@ -22,6 +22,8 @@
     <None Remove="Dialogs\Accounts\EditAccountDialog.xaml" />
     <None Remove="Dialogs\Accounts\NewAccountDialog.xaml" />
     <None Remove="Dialogs\Companies\NewCompanyDialog.xaml" />
+    <None Remove="Dialogs\Currencies\CompanyCurrenciesView.xaml" />
+    <None Remove="Dialogs\Currencies\CompanyCurrencyDialog.xaml" />
     <None Remove="Styles\Buttons.xaml" />
     <None Remove="Views\Accounts\ChartOfAccountsView.xaml" />
     <None Remove="Views\CompanySelectionView.xaml" />
@@ -54,6 +56,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.25">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7705" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
   </ItemGroup>
@@ -170,6 +176,16 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="ViewModels\Companies\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Currencies\CompanyCurrenciesView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Currencies\CompanyCurrencyDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="Dialogs\Accounts\EditAccountDialog.xaml">

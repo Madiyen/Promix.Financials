@@ -12,6 +12,7 @@ public sealed class EfCurrencyRepository : ICurrencyRepository
         _db = db;
     }
 
+    // ✅ مُصحَّح — Id هو الكود في DefaultCurrency
     public Task<bool> ExistsActiveAsync(string currencyCode, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(currencyCode))
@@ -19,6 +20,22 @@ public sealed class EfCurrencyRepository : ICurrencyRepository
 
         var normalized = currencyCode.Trim().ToUpperInvariant();
 
-        return _db.Currencies.AnyAsync(x => x.Id == normalized && x.IsActive, ct);
+        return _db.Currencies.AnyAsync(x => x.Id == normalized && x.IsActive, ct); // ✅ Id = Code
+    }
+
+    // 🆕 جلب كل العملات الفعّالة
+    public async Task<IReadOnlyList<DefaultCurrencyDto>> GetAllActiveAsync(CancellationToken ct = default)
+    {
+        return await _db.Currencies
+            .Where(x => x.IsActive)
+            .OrderBy(x => x.DisplayOrder)
+            .ThenBy(x => x.Id)
+            .Select(x => new DefaultCurrencyDto(
+                x.Id,       // Id هو الكود
+                x.NameAr,
+                x.NameEn,
+                x.Symbol,
+                x.DecimalPlaces))
+            .ToListAsync(ct);
     }
 }

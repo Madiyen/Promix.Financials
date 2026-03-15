@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Promix.Financials.Application.Abstractions;
+using Promix.Financials.Domain.Accounting;
 using Promix.Financials.Domain.Aggregates.Accounts;
 using Promix.Financials.Domain.Enums;
 using Promix.Financials.Domain.Security;
@@ -21,8 +22,39 @@ public sealed class CompanyInitializer : ICompanyInitializer
         // ✅ لا تزرع إذا موجود حسابات
         var hasAccounts = await _db.Set<Account>().AnyAsync(a => a.CompanyId == companyId, ct);
         if (hasAccounts) return;
+        // ✅ إضافة العملة الرئيسية للشركة تلقائياً إذا لم تكن موجودة
+        var hasBaseCurrency = await _db.CompanyCurrencies
+            .AnyAsync(x => x.CompanyId == companyId && x.IsBaseCurrency, ct);
 
-       
+        if (!hasBaseCurrency)
+        {
+            var company = await _db.Companies
+                .FirstOrDefaultAsync(x => x.Id == companyId, ct);
+
+            if (company is not null)
+            {
+                var defaultCurrency = await _db.Currencies
+                    .FirstOrDefaultAsync(x => x.Id == company.BaseCurrency, ct);
+
+                if (defaultCurrency is not null)
+                {
+                    var baseCurrency = new CompanyCurrency(
+                        companyId: companyId,
+                        currencyCode: defaultCurrency.Id,
+                        nameAr: defaultCurrency.NameAr,
+                        nameEn: defaultCurrency.NameEn,
+                        symbol: defaultCurrency.Symbol,
+                        decimalPlaces: defaultCurrency.DecimalPlaces,
+                        exchangeRate: 1m,
+                        isBaseCurrency: true
+                    );
+
+                    _db.CompanyCurrencies.Add(baseCurrency);
+                    await _db.SaveChangesAsync(ct);
+                }
+            }
+        }
+
 
         var template = DefaultChartOfAccountsTemplate.FromPdfV1();
 

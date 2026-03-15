@@ -23,6 +23,12 @@ public sealed partial class AppSidebar : UserControl
     private void Dashboard_Click(object sender, RoutedEventArgs e)
         => NavigateRequested?.Invoke(this, new SidebarNavigateEventArgs(SidebarDestination.Dashboard));
 
+    private void ChartOfAccounts_Click(object sender, RoutedEventArgs e)
+        => NavigateRequested?.Invoke(this, new SidebarNavigateEventArgs(SidebarDestination.ChartOfAccounts));
+
+    private void Currencies_Click(object sender, RoutedEventArgs e)
+        => NavigateRequested?.Invoke(this, new SidebarNavigateEventArgs(SidebarDestination.Currencies));
+
     private void Items_Click(object sender, RoutedEventArgs e)
         => NavigateRequested?.Invoke(this, new SidebarNavigateEventArgs(SidebarDestination.Items));
 
@@ -34,14 +40,13 @@ public sealed partial class AppSidebar : UserControl
 
     private void Logout_Click(object sender, RoutedEventArgs e)
         => LogoutRequested?.Invoke(this, EventArgs.Empty);
-    private void ChartOfAccounts_Click(object sender, RoutedEventArgs e)
-    => NavigateRequested?.Invoke(this, new SidebarNavigateEventArgs(SidebarDestination.ChartOfAccounts));
 }
 
 public enum SidebarDestination
 {
     Dashboard,
     ChartOfAccounts,
+    Currencies,   // 🆕
     Items,
     Reports,
     Settings
@@ -51,5 +56,6 @@ public sealed class SidebarNavigateEventArgs : EventArgs
 {
     public SidebarDestination Destination { get; }
 
-    public SidebarNavigateEventArgs(SidebarDestination destination) => Destination = destination;
+    public SidebarNavigateEventArgs(SidebarDestination destination)
+        => Destination = destination;
 }

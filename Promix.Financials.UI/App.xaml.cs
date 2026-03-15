@@ -8,6 +8,7 @@ using Promix.Financials.Infrastructure.Persistence;
 using Promix.Financials.Infrastructure.Persistence.Seeding;
 using Promix.Financials.UI.Security;
 using Promix.Financials.UI.ViewModels.Accounts;
+using Promix.Financials.UI.ViewModels.Currencies;
 using System;
 using Windows.Globalization;
 using Windows.Storage;
@@ -55,14 +56,14 @@ public partial class App : Microsoft.UI.Xaml.Application
                 var cs = "Server=.\\MSSQLSERVER2025;Database=PromixFinancials;Trusted_Connection=True;TrustServerCertificate=True;";
 
                 services.AddInfrastructure(cs);
-
+                services.AddTransient<CompanyCurrenciesViewModel>();
                 services.AddSingleton<ISessionStore, LocalSettingsSessionStore>();
                 services.AddTransient<ChartOfAccountsViewModel>();
                 services.AddTransient<NewAccountDialogViewModel>();
                 services.AddTransient<CreateAccountService>();        // إذا لم يكن مسجلاً
                 services.AddTransient<EditAccountService>();          // 🆕
                 services.AddTransient<DeleteAccountService>();
-                services.AddTransient<EditAccountDialogViewModel>();  // 🆕
+                services.AddTransient<EditAccountDialogViewModel>();
             })
             .Build();
     }

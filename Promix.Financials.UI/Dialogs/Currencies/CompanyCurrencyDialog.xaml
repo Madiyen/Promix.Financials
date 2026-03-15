@@ -1,0 +1,275 @@
+<ContentDialog
+    x:Class="Promix.Financials.UI.Dialogs.Currencies.CompanyCurrencyDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    FlowDirection="RightToLeft"
+    PrimaryButtonText="✔ حفظ"
+    CloseButtonText="إلغاء"
+    DefaultButton="Primary"
+    CornerRadius="16"
+    MinWidth="560">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="560">
+        <StackPanel Spacing="0">
+
+            <!-- Banner -->
+            <Border Background="#2563EB"
+                    CornerRadius="12,12,0,0"
+                    Padding="20,16">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0"
+                            Width="46" Height="46"
+                            Background="#FFFFFF22"
+                            CornerRadius="12"
+                            VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE8EE;"
+                                  FontSize="22"
+                                  Foreground="White"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                        <TextBlock x:Name="DialogTitleText"
+                                   Text="إضافة عملة للشركة"
+                                   Foreground="White"
+                                   FontSize="17"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="اختر العملة من القائمة وأدخل البيانات"
+                                   Foreground="#BFDBFE"
+                                   FontSize="12"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Body -->
+            <Border Background="#F1F5F9"
+                    BorderBrush="#CBD5E1"
+                    BorderThickness="1,0,1,1"
+                    CornerRadius="0,0,12,12"
+                    Padding="20,18">
+                <StackPanel Spacing="18">
+
+                    <!-- Row 1: اختيار العملة + الرمز -->
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- قائمة العملات -->
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8EE;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#374151">
+                                    <Run Text="العملة"/>
+                                    <Run Text=" *" Foreground="#DC2626"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <ComboBox x:Name="CurrencyComboBox"
+                                      HorizontalAlignment="Stretch"
+                                      MinHeight="42"
+                                      DisplayMemberPath="DisplayName"
+                                      PlaceholderText="اختر العملة..."
+                                      SelectionChanged="CurrencyComboBox_SelectionChanged"/>
+                        </StackPanel>
+
+                        <!-- الرمز — يملأ تلقائياً -->
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8EE;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="الرمز"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <TextBox x:Name="SymbolBox"
+                                     PlaceholderText="$"
+                                     FlowDirection="LeftToRight"
+                                     MaxLength="10"
+                                     MinHeight="42"
+                                     TextAlignment="Center"
+                                     FontSize="16"
+                                     FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- معاينة الكود المختار -->
+                    <Border x:Name="CurrencyPreviewBorder"
+                            Background="White"
+                            BorderBrush="#2563EB"
+                            BorderThickness="1.5"
+                            CornerRadius="10"
+                            Padding="14,10"
+                            Visibility="Collapsed">
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0"
+                                    Background="#EFF6FF"
+                                    CornerRadius="8"
+                                    Padding="10,6">
+                                <TextBlock x:Name="PreviewCodeText"
+                                           FontSize="18" FontWeight="Bold"
+                                           Foreground="#2563EB"
+                                           Language="en-US"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                <TextBlock x:Name="PreviewNameArText"
+                                           FontSize="14" FontWeight="SemiBold"
+                                           Foreground="#1E3A5F"/>
+                                <TextBlock x:Name="PreviewNameEnText"
+                                           FontSize="12"
+                                           Foreground="#64748B"
+                                           Language="en-US"/>
+                            </StackPanel>
+                            <Border Grid.Column="2"
+                                    Background="#F0FDF4"
+                                    BorderBrush="#BBF7D0"
+                                    BorderThickness="1"
+                                    CornerRadius="20"
+                                    Padding="10,4"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="متاحة ✔"
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="#16A34A"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <Border Height="1" Background="#CBD5E1"/>
+
+                    <!-- Row 2: الأسماء المخصصة -->
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8D2;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#374151">
+                                    <Run Text="الاسم بالعربية"/>
+                                    <Run Text=" *" Foreground="#DC2626"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBox x:Name="NameArBox"
+                                     PlaceholderText="مثال: دولار أمريكي"
+                                     MinHeight="42"
+                                     TextChanged="NameArBox_TextChanged"/>
+                            <TextBlock x:Name="NameArError"
+                                       Text="الاسم العربي مطلوب"
+                                       Foreground="#DC2626"
+                                       FontSize="11"
+                                       Visibility="Collapsed"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8D2;" FontSize="12" Foreground="#94A3B8"/>
+                                <TextBlock Text="الاسم الإنكليزي (اختياري)"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <TextBox x:Name="NameEnBox"
+                                     PlaceholderText="e.g. US Dollar"
+                                     FlowDirection="LeftToRight"
+                                     MinHeight="42"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Height="1" Background="#CBD5E1"/>
+
+                    <!-- Row 3: سعر التعادل + المنازل العشرية -->
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8F1;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="#374151">
+                                    <Run Text="سعر التعادل"/>
+                                    <Run Text=" *" Foreground="#DC2626"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <TextBox x:Name="ExchangeRateBox"
+                                     Text="1"
+                                     PlaceholderText="مثال: 3.75"
+                                     FlowDirection="LeftToRight"
+                                     MinHeight="42"
+                                     TextChanged="ExchangeRateBox_TextChanged"/>
+                            <TextBlock x:Name="ExchangeRateError"
+                                       Text="سعر التعادل يجب أن يكون أكبر من صفر"
+                                       Foreground="#DC2626"
+                                       FontSize="11"
+                                       Visibility="Collapsed"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <FontIcon Glyph="&#xE8EF;" FontSize="12" Foreground="#2563EB"/>
+                                <TextBlock Text="المنازل العشرية"
+                                           FontSize="13" FontWeight="SemiBold"
+                                           Foreground="#374151"/>
+                            </StackPanel>
+                            <ComboBox x:Name="DecimalPlacesBox"
+                                      HorizontalAlignment="Stretch"
+                                      MinHeight="42"
+                                      FlowDirection="LeftToRight"
+                                      SelectedIndex="2">
+                                <ComboBoxItem Content="0"/>
+                                <ComboBoxItem Content="1"/>
+                                <ComboBoxItem Content="2"/>
+                                <ComboBoxItem Content="3"/>
+                                <ComboBoxItem Content="4"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Height="1" Background="#CBD5E1"/>
+
+                    <!-- Row 4: العملة الرئيسية -->
+                    <Border Background="White"
+                            BorderBrush="#CBD5E1"
+                            BorderThickness="1.5"
+                            CornerRadius="10"
+                            Padding="14,12">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="3" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <FontIcon Glyph="&#xE734;" FontSize="13" Foreground="#D97706"/>
+                                    <TextBlock Text="تعيين كعملة رئيسية للشركة"
+                                               FontSize="13" FontWeight="SemiBold"
+                                               Foreground="#374151"/>
+                                </StackPanel>
+                                <TextBlock Text="سعر التعادل سيكون 1 تلقائياً ولا يمكن تغييره"
+                                           FontSize="11"
+                                           Foreground="#94A3B8"/>
+                            </StackPanel>
+                            <ToggleSwitch x:Name="IsBaseCurrencyToggle"
+                                         Grid.Column="1"
+                                         OnContent="نعم"
+                                         OffContent="لا"
+                                         Margin="0"
+                                         Toggled="IsBaseCurrencyToggle_Toggled"/>
+                        </Grid>
+                    </Border>
+
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>
