@@ -15,6 +15,9 @@ public sealed record CreateJournalEntryCommand(
     JournalEntryType Type,
     string? ReferenceNo,
     string? Description,
+    string? CurrencyCode,
+    decimal? ExchangeRate,
+    decimal? CurrencyAmount,
     bool PostNow,
     IReadOnlyList<CreateJournalEntryLineCommand> Lines
 );

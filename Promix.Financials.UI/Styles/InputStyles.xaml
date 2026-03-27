@@ -4,6 +4,7 @@
     xmlns:controls="using:Microsoft.UI.Xaml.Controls">
 
     <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
+        <Setter Property="RequestedTheme" Value="Light"/>
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="#94A3B8"/>
         <Setter Property="BorderThickness" Value="1"/>
@@ -13,9 +14,11 @@
         <Setter Property="MinHeight" Value="42"/>
         <Setter Property="Foreground" Value="#1E3A5F"/>
         <Setter Property="PlaceholderForeground" Value="#94A3B8"/>
+        <Setter Property="SelectionHighlightColor" Value="#BFDBFE"/>
     </Style>
 
     <Style x:Key="ReadOnlyTextBoxStyle" TargetType="TextBox">
+        <Setter Property="RequestedTheme" Value="Light"/>
         <Setter Property="Background" Value="#F1F5F9"/>
         <Setter Property="BorderBrush" Value="#CBD5E1"/>
         <Setter Property="BorderThickness" Value="1"/>
@@ -30,6 +33,7 @@
     </Style>
 
     <Style x:Key="MultilineTextBoxStyle" TargetType="TextBox">
+        <Setter Property="RequestedTheme" Value="Light"/>
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="#94A3B8"/>
         <Setter Property="BorderThickness" Value="1"/>
@@ -41,22 +45,56 @@
         <Setter Property="AcceptsReturn" Value="True"/>
         <Setter Property="Foreground" Value="#1E3A5F"/>
         <Setter Property="PlaceholderForeground" Value="#94A3B8"/>
+        <Setter Property="SelectionHighlightColor" Value="#BFDBFE"/>
     </Style>
 
     <Style x:Key="InputComboBoxStyle" TargetType="ComboBox">
+        <Setter Property="RequestedTheme" Value="Light"/>
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="#94A3B8"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="8"/>
-        <Setter Property="Padding" Value="10,8"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="MinHeight" Value="42"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="Foreground" Value="#1E3A5F"/>
-        <Setter Property="PlaceholderForeground" Value="#94A3B8"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="10,4"/>
+    </Style>
+
+    <Style x:Key="InputAutoSuggestBoxStyle" TargetType="AutoSuggestBox">
+        <Setter Property="RequestedTheme" Value="Light"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#94A3B8"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MinHeight" Value="42"/>
+        <Setter Property="Foreground" Value="#1E3A5F"/>
+    </Style>
+
+    <Style x:Key="InputNumberBoxStyle" TargetType="controls:NumberBox">
+        <Setter Property="RequestedTheme" Value="Light"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#94A3B8"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="MinHeight" Value="42"/>
+        <Setter Property="Foreground" Value="#1E3A5F"/>
+        <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+
+    <Style x:Key="InputDatePickerStyle" TargetType="DatePicker">
+        <Setter Property="RequestedTheme" Value="Light"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="#94A3B8"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="Foreground" Value="#1E3A5F"/>
+        <Setter Property="MinHeight" Value="42"/>
     </Style>
 
     <Style x:Key="SearchBoxStyle" TargetType="TextBox">
+        <Setter Property="RequestedTheme" Value="Light"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontSize" Value="14"/>
@@ -64,6 +102,7 @@
         <Setter Property="Padding" Value="4,0"/>
         <Setter Property="Foreground" Value="#1E3A5F"/>
         <Setter Property="PlaceholderForeground" Value="#64748B"/>
+        <Setter Property="SelectionHighlightColor" Value="#BFDBFE"/>
     </Style>
 
     <Style x:Key="FieldLabelStyle" TargetType="TextBlock">

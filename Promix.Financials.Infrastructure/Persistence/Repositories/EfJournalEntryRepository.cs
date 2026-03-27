@@ -31,6 +31,9 @@ public sealed class EfJournalEntryRepository : IJournalEntryRepository
         {
             JournalEntryType.ReceiptVoucher => "RV",
             JournalEntryType.PaymentVoucher => "PV",
+            JournalEntryType.OpeningEntry => "OPN",
+            JournalEntryType.TransferVoucher => "TRF",
+            JournalEntryType.DailyCashClosing => "CCL",
             JournalEntryType.Adjustment => "ADJ",
             _ => "JV"
         };
@@ -51,6 +54,32 @@ public sealed class EfJournalEntryRepository : IJournalEntryRepository
 
         return $"{prefix}-{current + 1:000000}";
     }
+
+    public async Task<JournalDailyMovementSummary> GetDailyMovementSummaryAsync(Guid companyId, Guid accountId, DateOnly entryDate, CancellationToken ct = default)
+    {
+        var summary = await _db.JournalEntries
+            .AsNoTracking()
+            .Where(x => x.CompanyId == companyId
+                && x.EntryDate == entryDate
+                && x.Status == JournalEntryStatus.Posted
+                && x.Type != JournalEntryType.DailyCashClosing)
+            .SelectMany(x => x.Lines.Where(line => line.AccountId == accountId))
+            .GroupBy(_ => 1)
+            .Select(group => new JournalDailyMovementSummary(
+                group.Sum(line => line.Debit),
+                group.Sum(line => line.Credit)))
+            .FirstOrDefaultAsync(ct);
+
+        return summary ?? new JournalDailyMovementSummary(0m, 0m);
+    }
+
+    public Task<bool> HasDailyCashClosingAsync(Guid companyId, Guid accountId, DateOnly entryDate, CancellationToken ct = default)
+        => _db.JournalEntries
+            .AsNoTracking()
+            .Where(x => x.CompanyId == companyId
+                && x.EntryDate == entryDate
+                && x.Type == JournalEntryType.DailyCashClosing)
+            .AnyAsync(x => x.Lines.Any(line => line.AccountId == accountId), ct);
 
     public Task SaveChangesAsync(CancellationToken ct = default)
         => _db.SaveChangesAsync(ct);

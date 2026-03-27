@@ -47,6 +47,7 @@ public static class DependencyInjection
         services.AddScoped<EditAccountService>();
         services.AddScoped<DeleteAccountService>();
         services.AddScoped<CreateJournalEntryService>();
+        services.AddScoped<CreateDailyCashClosingService>();
         services.AddScoped<PostJournalEntryService>();
         services.AddScoped<CreateCompanyService>();
         services.AddScoped<ICompanySelectionService, CompanySelectionService>();

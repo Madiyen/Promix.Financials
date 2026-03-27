@@ -19,42 +19,13 @@ public sealed class CompanyInitializer : ICompanyInitializer
 
     public async Task InitializeAsync(Guid companyId, CancellationToken ct = default)
     {
-        // ✅ لا تزرع إذا موجود حسابات
+        await EnsureBaseCurrencyAsync(companyId, ct);
+        await EnsureVoucherPostingAccountsAsync(companyId, ct);
+
+        // لا نعيد زرع دليل الحسابات إذا كان موجوداً بالفعل.
         var hasAccounts = await _db.Set<Account>().AnyAsync(a => a.CompanyId == companyId, ct);
-        if (hasAccounts) return;
-        // ✅ إضافة العملة الرئيسية للشركة تلقائياً إذا لم تكن موجودة
-        var hasBaseCurrency = await _db.CompanyCurrencies
-            .AnyAsync(x => x.CompanyId == companyId && x.IsBaseCurrency, ct);
-
-        if (!hasBaseCurrency)
-        {
-            var company = await _db.Companies
-                .FirstOrDefaultAsync(x => x.Id == companyId, ct);
-
-            if (company is not null)
-            {
-                var defaultCurrency = await _db.Currencies
-                    .FirstOrDefaultAsync(x => x.Id == company.BaseCurrency, ct);
-
-                if (defaultCurrency is not null)
-                {
-                    var baseCurrency = new CompanyCurrency(
-                        companyId: companyId,
-                        currencyCode: defaultCurrency.Id,
-                        nameAr: defaultCurrency.NameAr,
-                        nameEn: defaultCurrency.NameEn,
-                        symbol: defaultCurrency.Symbol,
-                        decimalPlaces: defaultCurrency.DecimalPlaces,
-                        exchangeRate: 1m,
-                        isBaseCurrency: true
-                    );
-
-                    _db.CompanyCurrencies.Add(baseCurrency);
-                    await _db.SaveChangesAsync(ct);
-                }
-            }
-        }
-
+        if (hasAccounts)
+            return;
 
         var template = DefaultChartOfAccountsTemplate.FromPdfV1();
 
@@ -82,6 +53,113 @@ public sealed class CompanyInitializer : ICompanyInitializer
 
             _db.Set<Account>().Add(acc);
             created[node.Code] = acc;
+        }
+
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task EnsureVoucherPostingAccountsAsync(Guid companyId, CancellationToken ct)
+    {
+        var accounts = await _db.Set<Account>()
+            .Where(x => x.CompanyId == companyId)
+            .ToListAsync(ct);
+
+        var customersParent = accounts.FirstOrDefault(x => x.Code == "121");
+        if (customersParent is not null
+            && accounts.All(x => x.ParentId != customersParent.Id)
+            && accounts.All(x => x.Code != "1211"))
+        {
+            _db.Set<Account>().Add(new Account(
+                companyId: companyId,
+                code: "1211",
+                nameAr: "عملاء متنوعون",
+                nameEn: "Misc Customers",
+                nature: AccountNature.Debit,
+                isPosting: true,
+                parentId: customersParent.Id,
+                currencyCode: null,
+                systemRole: null,
+                notes: "أضيف تلقائياً لدعم سندات القبض.",
+                isActive: true));
+        }
+
+        var suppliersParent = accounts.FirstOrDefault(x => x.Code == "221");
+        if (suppliersParent is not null
+            && accounts.All(x => x.ParentId != suppliersParent.Id)
+            && accounts.All(x => x.Code != "2211"))
+        {
+            _db.Set<Account>().Add(new Account(
+                companyId: companyId,
+                code: "2211",
+                nameAr: "موردون متنوعون",
+                nameEn: "Misc Suppliers",
+                nature: AccountNature.Credit,
+                isPosting: true,
+                parentId: suppliersParent.Id,
+                currencyCode: null,
+                systemRole: null,
+                notes: "أضيف تلقائياً لدعم سندات الصرف.",
+                isActive: true));
+        }
+
+        await _db.SaveChangesAsync(ct);
+    }
+
+    private async Task EnsureBaseCurrencyAsync(Guid companyId, CancellationToken ct)
+    {
+        var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId, ct);
+        if (company is null)
+            return;
+
+        var defaultCurrency = await _db.Currencies.FirstOrDefaultAsync(x => x.Id == company.BaseCurrency, ct);
+        if (defaultCurrency is null)
+            return;
+
+        var companyCurrencies = await _db.CompanyCurrencies
+            .Where(x => x.CompanyId == companyId)
+            .ToListAsync(ct);
+
+        var configuredBaseCurrency = companyCurrencies
+            .FirstOrDefault(x => string.Equals(x.CurrencyCode, company.BaseCurrency, StringComparison.OrdinalIgnoreCase));
+
+        var incorrectBaseCurrencies = companyCurrencies
+            .Where(x => x.IsBaseCurrency &&
+                        !string.Equals(x.CurrencyCode, company.BaseCurrency, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        foreach (var incorrectBase in incorrectBaseCurrencies)
+        {
+            _db.Entry(incorrectBase).Property(nameof(CompanyCurrency.IsBaseCurrency)).CurrentValue = false;
+        }
+
+        if (incorrectBaseCurrencies.Count > 0)
+            await _db.SaveChangesAsync(ct);
+
+        if (configuredBaseCurrency is null)
+        {
+            var baseCurrency = new CompanyCurrency(
+                companyId: companyId,
+                currencyCode: defaultCurrency.Id,
+                nameAr: defaultCurrency.NameAr,
+                nameEn: defaultCurrency.NameEn,
+                symbol: defaultCurrency.Symbol,
+                decimalPlaces: defaultCurrency.DecimalPlaces,
+                exchangeRate: 1m,
+                isBaseCurrency: true);
+
+            _db.CompanyCurrencies.Add(baseCurrency);
+        }
+        else
+        {
+            configuredBaseCurrency.Update(
+                nameAr: defaultCurrency.NameAr,
+                nameEn: defaultCurrency.NameEn,
+                symbol: defaultCurrency.Symbol,
+                decimalPlaces: defaultCurrency.DecimalPlaces);
+
+            _db.Entry(configuredBaseCurrency).Property(nameof(CompanyCurrency.ExchangeRate)).CurrentValue = 1m;
+            _db.Entry(configuredBaseCurrency).Property(nameof(CompanyCurrency.IsBaseCurrency)).CurrentValue = true;
+            _db.Entry(configuredBaseCurrency).Property(nameof(CompanyCurrency.IsActive)).CurrentValue = true;
         }
 
         await _db.SaveChangesAsync(ct);
@@ -122,14 +200,16 @@ public sealed class CompanyInitializer : ICompanyInitializer
 
             new("12", "الموجودات المتداولة", AccountNature.Debit, false),
             new("121","الزبائن", AccountNature.Debit, false),
+            new("1211","عملاء متنوعون", AccountNature.Debit, true),
             new("122","مدينون مختلفون", AccountNature.Debit, true),
             new("123","مسحوبات الشركاء", AccountNature.Debit, false),
             new("124","المخزون", AccountNature.Debit, false),
             new("1241","مخزون بضاعة جاهزة آخر المدة", AccountNature.Debit, true),
 
             new("13","الأموال الجاهزة", AccountNature.Debit, false),
-            new("131","الصندوق", AccountNature.Debit, false),
-            new("132","المصرف", AccountNature.Debit, false),
+            new("131","الصندوق", AccountNature.Debit, true),
+            new("132","المصرف", AccountNature.Debit, true),
+            new("133","الخزنة الرئيسية", AccountNature.Debit, true),
 
             new("2",  "المطاليب", AccountNature.Credit, false),
             new("21", "المطاليب الثابتة", AccountNature.Credit, false),
@@ -137,6 +217,7 @@ public sealed class CompanyInitializer : ICompanyInitializer
             new("212","القروض", AccountNature.Credit, true),
             new("22", "المطاليب المتداولة", AccountNature.Credit, false),
             new("221","الموردون", AccountNature.Credit, false),
+            new("2211","موردون متنوعون", AccountNature.Credit, true),
 
             new("3",  "صافي المشتريات", AccountNature.Debit, false),
             new("31", "المشتريات", AccountNature.Debit, true),

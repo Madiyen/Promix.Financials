@@ -14,39 +14,38 @@ namespace Promix.Financials.UI.ViewModels.Journals;
 public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
 {
     public ObservableCollection<JournalAccountOptionVm> AccountOptions { get; }
-    public ObservableCollection<JournalEntryTypeOptionVm> TypeOptions { get; } = new();
     public ObservableCollection<JournalEntryLineEditorVm> Lines { get; } = new();
 
-    private JournalEntryTypeOptionVm? _selectedType;
+    private readonly JournalEntryType _entryType;
     private DateTimeOffset _entryDate = DateTimeOffset.Now;
     private string _referenceNo = string.Empty;
     private string _description = string.Empty;
 
-    public JournalEntryEditorViewModel(IEnumerable<JournalAccountOptionVm> accountOptions)
+    public JournalEntryEditorViewModel(
+        IEnumerable<JournalAccountOptionVm> accountOptions,
+        JournalEntryType entryType,
+        string title,
+        string subtitle,
+        string noteText)
     {
         AccountOptions = new ObservableCollection<JournalAccountOptionVm>(accountOptions);
-
-        TypeOptions.Add(new JournalEntryTypeOptionVm(JournalEntryType.DailyJournal, "قيد يومية"));
-        TypeOptions.Add(new JournalEntryTypeOptionVm(JournalEntryType.ReceiptVoucher, "سند قبض"));
-        TypeOptions.Add(new JournalEntryTypeOptionVm(JournalEntryType.PaymentVoucher, "سند صرف"));
-        TypeOptions.Add(new JournalEntryTypeOptionVm(JournalEntryType.Adjustment, "قيد تسوية"));
-
-        _selectedType = TypeOptions[0];
+        _entryType = entryType;
+        Title = title;
+        Subtitle = subtitle;
+        NoteText = noteText;
 
         AddLine();
         AddLine();
     }
 
-    public JournalEntryTypeOptionVm? SelectedType
+    public string Title { get; }
+    public string Subtitle { get; }
+    public string NoteText { get; }
+    public string EntryTypeText => _entryType switch
     {
-        get => _selectedType;
-        set
-        {
-            if (_selectedType == value) return;
-            _selectedType = value;
-            OnPropertyChanged();
-        }
-    }
+        JournalEntryType.OpeningEntry => "قيد افتتاحي",
+        _ => "قيد يومية"
+    };
 
     public DateTimeOffset EntryDate
     {
@@ -149,9 +148,12 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
         command = new CreateJournalEntryCommand(
             CompanyId: companyId,
             EntryDate: DateOnly.FromDateTime(EntryDate.Date),
-            Type: SelectedType?.Value ?? JournalEntryType.DailyJournal,
+            Type: _entryType,
             ReferenceNo: ReferenceNo,
             Description: Description,
+            CurrencyCode: null,
+            ExchangeRate: null,
+            CurrencyAmount: null,
             PostNow: postNow,
             Lines: usableLines
                 .Select(x => new CreateJournalEntryLineCommand(

@@ -16,6 +16,7 @@
   <ItemGroup>
     <None Remove="Controls\AppHeader.xaml" />
     <None Remove="Controls\AppSidebar.xaml" />
+    <None Remove="Controls\Journals\AccountLookupBox.xaml" />
     <None Remove="Controls\KpiCards.xaml" />
     <None Remove="Controls\QuickActions.xaml" />
     <None Remove="Controls\TransactionsTable.xaml" />
@@ -24,7 +25,12 @@
     <None Remove="Dialogs\Companies\NewCompanyDialog.xaml" />
     <None Remove="Dialogs\Currencies\CompanyCurrenciesView.xaml" />
     <None Remove="Dialogs\Currencies\CompanyCurrencyDialog.xaml" />
-    <None Remove="Dialogs\Journals\JournalEntryDialog.xaml" />
+    <None Remove="Dialogs\Journals\DailyCashClosingDialog.xaml" />
+    <None Remove="Dialogs\Journals\DailyJournalDialog.xaml" />
+    <None Remove="Dialogs\Journals\OpeningEntryDialog.xaml" />
+    <None Remove="Dialogs\Journals\PaymentVoucherDialog.xaml" />
+    <None Remove="Dialogs\Journals\ReceiptVoucherDialog.xaml" />
+    <None Remove="Dialogs\Journals\TransferVoucherDialog.xaml" />
     <None Remove="Styles\Buttons.xaml" />
     <None Remove="Views\Accounts\ChartOfAccountsView.xaml" />
     <None Remove="Views\CompanySelectionView.xaml" />
@@ -201,7 +207,37 @@
 	  </Page>
 	</ItemGroup>
 	<ItemGroup>
-	  <Page Update="Dialogs\Journals\JournalEntryDialog.xaml">
+	  <Page Update="Controls\Journals\AccountLookupBox.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Journals\DailyCashClosingDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Journals\DailyJournalDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Journals\OpeningEntryDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Journals\PaymentVoucherDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Journals\ReceiptVoucherDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Dialogs\Journals\TransferVoucherDialog.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>

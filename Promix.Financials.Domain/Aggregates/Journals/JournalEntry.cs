@@ -15,6 +15,9 @@ public sealed class JournalEntry : AggregateRoot<Guid>
         string entryNumber,
         DateOnly entryDate,
         JournalEntryType type,
+        string currencyCode,
+        decimal exchangeRate,
+        decimal currencyAmount,
         Guid createdByUserId,
         DateTimeOffset createdAtUtc,
         string? referenceNo,
@@ -29,11 +32,23 @@ public sealed class JournalEntry : AggregateRoot<Guid>
         if (string.IsNullOrWhiteSpace(entryNumber))
             throw new BusinessRuleException("Entry number is required.");
 
+        if (string.IsNullOrWhiteSpace(currencyCode))
+            throw new BusinessRuleException("Currency code is required.");
+
+        if (exchangeRate <= 0)
+            throw new BusinessRuleException("Exchange rate must be greater than zero.");
+
+        if (currencyAmount <= 0)
+            throw new BusinessRuleException("Currency amount must be greater than zero.");
+
         Id = Guid.NewGuid();
         CompanyId = companyId;
         EntryNumber = entryNumber.Trim().ToUpperInvariant();
         EntryDate = entryDate;
         Type = type;
+        CurrencyCode = currencyCode.Trim().ToUpperInvariant();
+        ExchangeRate = decimal.Round(exchangeRate, 8, MidpointRounding.AwayFromZero);
+        CurrencyAmount = decimal.Round(currencyAmount, 4, MidpointRounding.AwayFromZero);
         Status = JournalEntryStatus.Draft;
         CreatedByUserId = createdByUserId;
         CreatedAtUtc = createdAtUtc;
@@ -45,6 +60,9 @@ public sealed class JournalEntry : AggregateRoot<Guid>
     public string EntryNumber { get; private set; } = default!;
     public DateOnly EntryDate { get; private set; }
     public JournalEntryType Type { get; private set; }
+    public string CurrencyCode { get; private set; } = default!;
+    public decimal ExchangeRate { get; private set; }
+    public decimal CurrencyAmount { get; private set; }
     public JournalEntryStatus Status { get; private set; }
     public string? ReferenceNo { get; private set; }
     public string? Description { get; private set; }

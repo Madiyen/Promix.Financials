@@ -88,5 +88,15 @@ public static class SeedData
             db.UserRoles.Add(new UserRole(admin.Id, adminRole.Id));
             await db.SaveChangesAsync();
         }
+
+        // طبعاً لا نعتمد على لحظة إنشاء الشركة فقط. نمر على جميع الشركات عند الإقلاع
+        // لضمان وجود العملة الأساسية ودليل الحسابات حتى مع قواعد بيانات قديمة.
+        var initializer = new CompanyInitializer(db);
+        var companyIds = await db.Companies
+            .Select(x => x.Id)
+            .ToListAsync();
+
+        foreach (var companyId in companyIds)
+            await initializer.InitializeAsync(companyId);
     }
 }

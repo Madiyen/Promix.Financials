@@ -1,0 +1,128 @@
+<ContentDialog
+    x:Class="Promix.Financials.UI.Dialogs.Journals.DailyCashClosingDialog"
+    x:Name="RootDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Promix.Financials.UI.Controls.Journals"
+    Title=""
+    PrimaryButtonText="إنشاء وترحيل"
+    CloseButtonText="إلغاء"
+    DefaultButton="Primary"
+    FlowDirection="RightToLeft"
+    RequestedTheme="Light"
+    MinWidth="860">
+
+    <ScrollViewer MaxHeight="700" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="18">
+            <Border CornerRadius="24" Padding="22" MinHeight="156">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#0C4A6E" Offset="0"/>
+                        <GradientStop Color="#0369A1" Offset="0.55"/>
+                        <GradientStop Color="#38BDF8" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="140"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="إقفال صندوق يومي" Foreground="White" FontSize="26" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding HintText}" Foreground="#E0F2FE" TextWrapping="WrapWholeWords" MaxWidth="560"/>
+                        <Border Background="#075985" CornerRadius="14" Padding="12,10">
+                            <TextBlock Text="يُرحَّل هذا السند مباشرةً، ويعتمد فقط على الحركات المرحّلة في التاريخ المحدد."
+                                       Foreground="White"
+                                       TextWrapping="WrapWholeWords"/>
+                        </Border>
+                    </StackPanel>
+
+                    <Border Grid.Column="1"
+                            Width="112"
+                            Height="112"
+                            CornerRadius="56"
+                            Background="#075985"
+                            HorizontalAlignment="Right">
+                        <FontIcon Glyph="&#xE8D4;"
+                                  Foreground="White"
+                                  FontSize="46"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        Background="White"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        Padding="18">
+                    <StackPanel Spacing="14">
+                        <TextBlock Text="إعداد الإقفال" FontSize="17" FontWeight="Bold"/>
+
+                        <controls:AccountLookupBox Header="الحساب المطلوب تصفيره"
+                                                   PlaceholderText="مثال: الصندوق"
+                                                   ItemsSource="{Binding AccountOptions}"
+                                                   SelectedAccountId="{Binding SelectedSourceAccountId, Mode=TwoWay}"/>
+
+                        <controls:AccountLookupBox Header="الحساب المقابل"
+                                                   PlaceholderText="مثال: الأموال الجاهزة"
+                                                   ItemsSource="{Binding AccountOptions}"
+                                                   SelectedAccountId="{Binding SelectedTargetAccountId, Mode=TwoWay}"/>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="التاريخ" Style="{StaticResource FieldLabelStyle}"/>
+                            <DatePicker Style="{StaticResource InputDatePickerStyle}"
+                                        Date="{Binding EntryDate, Mode=TwoWay}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1"
+                        Background="White"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        Padding="18">
+                    <StackPanel Spacing="14">
+                        <TextBlock Text="ملاحظات الإقفال" FontSize="17" FontWeight="Bold"/>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="رقم مرجعي" Style="{StaticResource FieldLabelStyle}"/>
+                            <TextBox Style="{StaticResource InputTextBoxStyle}"
+                                     Text="{Binding ReferenceNo, Mode=TwoWay}"
+                                     PlaceholderText="اختياري"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="البيان" Style="{StaticResource FieldLabelStyle}"/>
+                            <TextBox Style="{StaticResource MultilineTextBoxStyle}"
+                                     Text="{Binding Description, Mode=TwoWay}"
+                                     Height="120"
+                                     PlaceholderText="اتركه فارغاً ليولّد النظام وصفاً تلقائياً واضحاً"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <Border x:Name="ErrorBanner"
+                    Background="#FEF2F2"
+                    BorderBrush="#FECACA"
+                    BorderThickness="1"
+                    CornerRadius="14"
+                    Padding="14,12"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="ErrorText" Foreground="#DC2626" TextWrapping="WrapWholeWords"/>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>
