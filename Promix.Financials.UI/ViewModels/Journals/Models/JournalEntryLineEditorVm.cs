@@ -40,8 +40,14 @@ public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
         get => _debit;
         set
         {
-            if (Math.Abs(_debit - value) < 0.0001) return;
-            _debit = value < 0 ? 0 : value;
+            var normalized = value < 0 ? 0 : value;
+            if (Math.Abs(_debit - normalized) < 0.0001) return;
+            _debit = normalized;
+            if (_debit > 0 && _credit > 0)
+            {
+                _credit = 0;
+                OnPropertyChanged(nameof(Credit));
+            }
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsEmpty));
         }
@@ -52,8 +58,14 @@ public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
         get => _credit;
         set
         {
-            if (Math.Abs(_credit - value) < 0.0001) return;
-            _credit = value < 0 ? 0 : value;
+            var normalized = value < 0 ? 0 : value;
+            if (Math.Abs(_credit - normalized) < 0.0001) return;
+            _credit = normalized;
+            if (_credit > 0 && _debit > 0)
+            {
+                _debit = 0;
+                OnPropertyChanged(nameof(Debit));
+            }
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsEmpty));
         }

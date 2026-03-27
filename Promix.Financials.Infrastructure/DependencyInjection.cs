@@ -23,6 +23,7 @@ public static class DependencyInjection
         this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<PromixDbContext>(opt => opt.UseSqlServer(connectionString));
+        services.AddDbContextFactory<PromixDbContext>(opt => opt.UseSqlServer(connectionString));
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<PromixDbContext>());
 
         // Security
@@ -33,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IAccountRepository, EfAccountRepository>();
         services.AddScoped<IJournalEntryRepository, EfJournalEntryRepository>();
         services.AddScoped<ICompanyAdminRepository, EfCompanyAdminRepository>();
+        services.AddScoped<ICompanyJournalLockRepository, EfCompanyJournalLockRepository>();
         services.AddScoped<ICompanyCurrencyRepository, EfCompanyCurrencyRepository>();
         services.AddScoped<ICurrencyRepository, EfCurrencyRepository>();
         services.AddScoped<IUserRepository, EfUserRepository>();
@@ -49,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<CreateJournalEntryService>();
         services.AddScoped<CreateDailyCashClosingService>();
         services.AddScoped<PostJournalEntryService>();
+        services.AddScoped<JournalPeriodLockService>();
         services.AddScoped<CreateCompanyService>();
         services.AddScoped<ICompanySelectionService, CompanySelectionService>();
         services.AddScoped<ICompanyInitializer,

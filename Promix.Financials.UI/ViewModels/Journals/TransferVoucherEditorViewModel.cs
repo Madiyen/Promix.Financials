@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml;
 using Promix.Financials.Application.Features.Journals.Commands;
 using Promix.Financials.Application.Features.Journals.Queries;
 using Promix.Financials.Domain.Enums;
+using Promix.Financials.UI.Services.Journals;
 using Promix.Financials.UI.ViewModels.Journals.Models;
 
 namespace Promix.Financials.UI.ViewModels.Journals;
@@ -18,6 +19,7 @@ public sealed class TransferVoucherEditorViewModel : INotifyPropertyChanged
 {
     private readonly Guid _companyId;
     private readonly IJournalEntriesQuery _query;
+    private readonly IJournalQuickDefaultsStore? _quickDefaultsStore;
     private Guid? _selectedSourceAccountId;
     private Guid? _selectedTargetAccountId;
     private string? _selectedCurrencyCode;
@@ -34,10 +36,12 @@ public sealed class TransferVoucherEditorViewModel : INotifyPropertyChanged
         Guid companyId,
         IEnumerable<JournalAccountOptionVm> accounts,
         IEnumerable<JournalCurrencyOptionVm> currencies,
-        IJournalEntriesQuery query)
+        IJournalEntriesQuery query,
+        IJournalQuickDefaultsStore? quickDefaultsStore = null)
     {
         _companyId = companyId;
         _query = query;
+        _quickDefaultsStore = quickDefaultsStore;
         AccountOptions = new ObservableCollection<JournalAccountOptionVm>(accounts.OrderBy(x => x.Code));
         TransferAccountOptions = new ObservableCollection<JournalAccountOptionVm>(
             AccountOptions
@@ -51,13 +55,22 @@ public sealed class TransferVoucherEditorViewModel : INotifyPropertyChanged
         PostingPreviewLines = new ObservableCollection<VoucherPostingPreviewLineVm>();
         BalancePreviewCards = new ObservableCollection<VoucherBalancePreviewCardVm>();
 
-        _selectedSourceAccountId = JournalAccountDefaultsResolver.ResolvePreferredCashAccount(AccountOptions);
-        _selectedTargetAccountId = JournalAccountDefaultsResolver.ResolveMainTreasuryAccount(AccountOptions);
+        var savedDefaults = _quickDefaultsStore?.Load(JournalEntryType.TransferVoucher)
+            ?? new JournalQuickDefaults(null, null, null, null, null);
+
+        _selectedSourceAccountId = JournalAccountDefaultsResolver.ResolveExistingAccount(TransferAccountOptions, savedDefaults.SourceAccountId)
+            ?? JournalAccountDefaultsResolver.ResolvePreferredCashAccount(AccountOptions);
+        _selectedTargetAccountId = JournalAccountDefaultsResolver.ResolveExistingAccount(TransferAccountOptions, savedDefaults.TargetAccountId)
+            ?? JournalAccountDefaultsResolver.ResolveMainTreasuryAccount(AccountOptions);
 
         if (_selectedSourceAccountId == _selectedTargetAccountId)
             _selectedTargetAccountId = AccountOptions.FirstOrDefault(x => x.Id != _selectedSourceAccountId)?.Id;
 
-        var initialCurrency = CurrencyOptions.FirstOrDefault(x => x.IsBaseCurrency) ?? CurrencyOptions.FirstOrDefault();
+        var initialCurrency = CurrencyOptions.FirstOrDefault(x =>
+                !string.IsNullOrWhiteSpace(savedDefaults.CurrencyCode)
+                && string.Equals(x.CurrencyCode, savedDefaults.CurrencyCode, StringComparison.OrdinalIgnoreCase))
+            ?? CurrencyOptions.FirstOrDefault(x => x.IsBaseCurrency)
+            ?? CurrencyOptions.FirstOrDefault();
         if (initialCurrency is not null)
         {
             _selectedCurrencyCode = initialCurrency.CurrencyCode;
@@ -294,7 +307,21 @@ public sealed class TransferVoucherEditorViewModel : INotifyPropertyChanged
                 new CreateJournalEntryLineCommand(source.Id, 0m, amount, "الحساب المحوِّل")
             });
 
+        RememberQuickDefaults();
+
         return true;
+    }
+
+    private void RememberQuickDefaults()
+    {
+        _quickDefaultsStore?.Save(
+            JournalEntryType.TransferVoucher,
+            new JournalQuickDefaults(
+                null,
+                null,
+                SelectedSourceAccountId,
+                SelectedTargetAccountId,
+                SelectedCurrency?.CurrencyCode));
     }
 
     private void QueuePreviewRefresh()

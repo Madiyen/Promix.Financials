@@ -31,6 +31,7 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
     private string _typeFilterKey = "all";
     private string _statusFilterKey = "all";
     private string _periodFilterKey = "all";
+    private DateOnly? _lockedThroughDate;
 
     public JournalEntriesViewModel(
         IJournalEntriesQuery query,
@@ -147,6 +148,13 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         .Sum(x => x.SignedMovementAmount)
         .ToString("N0");
     public string LastRefreshedText => _lastRefreshedAt is null ? "آخر تحديث: الآن" : $"آخر تحديث: {_lastRefreshedAt.Value:HH:mm}";
+    public string QuickEntryShortcutsText => "Ctrl+S للحفظ كمسودة • Ctrl+Enter للحفظ والترحيل • Ctrl+Shift+N لإضافة سطر جديد";
+    public string PeriodLockSummaryText => _lockedThroughDate is DateOnly lockedThroughDate
+        ? $"الفترة المحاسبية مقفلة حتى {lockedThroughDate:yyyy-MM-dd}"
+        : "الفترة المحاسبية مفتوحة";
+    public string PeriodLockHintText => _lockedThroughDate is DateOnly lockedThroughDate
+        ? $"أي سند بتاريخ {lockedThroughDate:yyyy-MM-dd} أو قبله سيُمنع من الإنشاء أو الترحيل. استخدم إقفال الصندوق اليومي فقط بعد اكتمال مراجعة اليوم."
+        : "يمكنك العمل على التواريخ الحالية بحرية، وعند نهاية اليوم يمكنك قفل الفترة من خلال إقفال الصندوق اليومي.";
     public string FilterSummaryText => _allEntries.Count == 0
         ? "لا توجد سندات بعد."
         : Entries.Count == _allEntries.Count && !HasActiveFilters
@@ -241,7 +249,9 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             ErrorMessage = null;
             SuccessMessage = null;
             await _cashClosingService.CreateAsync(command);
-            SuccessMessage = "تم إنشاء سند إقفال الصندوق اليومي وترحيله بنجاح.";
+            SuccessMessage = command.LockThroughEntryDate
+                ? "تم إنشاء سند إقفال الصندوق اليومي وترحيله وإقفال الفترة حتى هذا التاريخ."
+                : "تم إنشاء سند إقفال الصندوق اليومي وترحيله بنجاح.";
             await LoadAsync();
             return true;
         }
@@ -296,6 +306,7 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             var entries = await _query.GetEntriesAsync(_companyId);
             var accounts = await _query.GetPostingAccountsAsync(_companyId);
             var currencies = await _query.GetActiveCurrenciesAsync(_companyId);
+            var periodLock = await _query.GetJournalPeriodLockAsync(_companyId);
             var trendStart = DateOnly.FromDateTime(DateTime.Today.AddDays(-6));
             var trendEnd = DateOnly.FromDateTime(DateTime.Today);
             var cashMovements = await _query.GetCashMovementSeriesAsync(_companyId, trendStart, trendEnd);
@@ -335,10 +346,14 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             }
 
             RebuildActivityBars(cashMovements, trendStart);
+            _lockedThroughDate = periodLock.LockedThroughDate;
             _lastRefreshedAt = DateTimeOffset.Now;
             ApplyFilters(SelectedEntry?.Id);
 
             OnPropertyChanged(nameof(LastRefreshedText));
+            OnPropertyChanged(nameof(PeriodLockSummaryText));
+            OnPropertyChanged(nameof(PeriodLockHintText));
+            OnPropertyChanged(nameof(QuickEntryShortcutsText));
             OnPropertyChanged(nameof(TotalEntriesText));
             OnPropertyChanged(nameof(PostedEntriesText));
             OnPropertyChanged(nameof(DraftEntriesText));

@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml;
 using Promix.Financials.Application.Features.Journals.Commands;
 using Promix.Financials.Application.Features.Journals.Queries;
 using Promix.Financials.Domain.Enums;
+using Promix.Financials.UI.Services.Journals;
 using Promix.Financials.UI.ViewModels.Journals.Models;
 
 namespace Promix.Financials.UI.ViewModels.Journals;
@@ -22,6 +23,7 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
     private readonly Guid _companyId;
     private readonly JournalEntryType _type;
     private readonly IJournalEntriesQuery _query;
+    private readonly IJournalQuickDefaultsStore? _quickDefaultsStore;
     private Guid? _selectedCashAccountId;
     private Guid? _selectedCounterpartyAccountId;
     private string? _selectedCurrencyCode;
@@ -34,6 +36,7 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
     private string _previewNoteText = "اختر الحساب النقدي والحساب المقابل وأدخل المبلغ لعرض القيد الناتج وأثره على الرصيد.";
     private string? _previewErrorMessage;
     private int _previewRequestVersion;
+    private bool _suspendPreviewRefresh;
 
     public SimpleVoucherEditorViewModel(
         Guid companyId,
@@ -42,11 +45,13 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
         string subtitle,
         IEnumerable<JournalAccountOptionVm> accounts,
         IEnumerable<JournalCurrencyOptionVm> currencies,
-        IJournalEntriesQuery query)
+        IJournalEntriesQuery query,
+        IJournalQuickDefaultsStore? quickDefaultsStore = null)
     {
         _companyId = companyId;
         _type = type;
         _query = query;
+        _quickDefaultsStore = quickDefaultsStore;
         Title = title;
         Subtitle = subtitle;
         AccountOptions = new ObservableCollection<JournalAccountOptionVm>(accounts.OrderBy(x => x.Code));
@@ -67,9 +72,19 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
         PostingPreviewLines = new ObservableCollection<VoucherPostingPreviewLineVm>();
         BalancePreviewCards = new ObservableCollection<VoucherBalancePreviewCardVm>();
 
-        _selectedCashAccountId = JournalAccountDefaultsResolver.ResolvePreferredCashAccount(AccountOptions);
+        var savedDefaults = _quickDefaultsStore?.Load(_type)
+            ?? new JournalQuickDefaults(null, null, null, null, null);
 
-        var initialCurrency = CurrencyOptions.FirstOrDefault(x => x.IsBaseCurrency) ?? CurrencyOptions.FirstOrDefault();
+        _selectedCashAccountId = JournalAccountDefaultsResolver.ResolveExistingAccount(CashAccountOptions, savedDefaults.CashAccountId)
+            ?? JournalAccountDefaultsResolver.ResolvePreferredCashAccount(AccountOptions);
+        _selectedCounterpartyAccountId = JournalAccountDefaultsResolver.ResolveExistingAccount(CounterpartyAccountOptions, savedDefaults.CounterpartyAccountId)
+            ?? JournalAccountDefaultsResolver.ResolvePreferredCounterpartyAccount(AccountOptions, _type);
+
+        var initialCurrency = CurrencyOptions.FirstOrDefault(x =>
+                !string.IsNullOrWhiteSpace(savedDefaults.CurrencyCode)
+                && string.Equals(x.CurrencyCode, savedDefaults.CurrencyCode, StringComparison.OrdinalIgnoreCase))
+            ?? CurrencyOptions.FirstOrDefault(x => x.IsBaseCurrency)
+            ?? CurrencyOptions.FirstOrDefault();
         if (initialCurrency is not null)
         {
             _selectedCurrencyCode = initialCurrency.CurrencyCode;
@@ -352,7 +367,59 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
             postNow,
             lines);
 
+        RememberQuickDefaults();
+
         return true;
+    }
+
+    public void ApplyAccountStatementDefaults(Guid accountId)
+    {
+        var selectedAccount = AccountOptions.FirstOrDefault(x => x.Id == accountId);
+        if (selectedAccount is null)
+            return;
+
+        _suspendPreviewRefresh = true;
+        try
+        {
+            if (selectedAccount.IsCashLike)
+            {
+                SelectedCashAccountId = selectedAccount.Id;
+
+                if (SelectedCounterpartyAccountId == selectedAccount.Id)
+                    SelectedCounterpartyAccountId = JournalAccountDefaultsResolver.ResolvePreferredCounterpartyAccount(AccountOptions, _type);
+
+                if (string.IsNullOrWhiteSpace(Description))
+                {
+                    Description = _type == JournalEntryType.ReceiptVoucher
+                        ? $"تحصيل نقدي على {selectedAccount.NameAr}"
+                        : $"صرف نقدي من {selectedAccount.NameAr}";
+                }
+            }
+            else
+            {
+                SelectedCounterpartyAccountId = selectedAccount.Id;
+
+                if (SelectedCashAccountId == selectedAccount.Id || SelectedCashAccountId is null)
+                    SelectedCashAccountId = CashAccountOptions.FirstOrDefault(x => x.Id != selectedAccount.Id)?.Id
+                        ?? JournalAccountDefaultsResolver.ResolvePreferredCashAccount(AccountOptions);
+
+                if (string.IsNullOrWhiteSpace(PartyName))
+                    PartyName = selectedAccount.NameAr;
+
+                if (string.IsNullOrWhiteSpace(Description))
+                {
+                    Description = _type == JournalEntryType.ReceiptVoucher
+                        ? $"تحصيل من حساب {selectedAccount.NameAr}"
+                        : $"صرف على حساب {selectedAccount.NameAr}";
+                }
+            }
+        }
+        finally
+        {
+            _suspendPreviewRefresh = false;
+        }
+
+        QueuePreviewRefresh();
     }
 
     private string BuildDescription()
@@ -370,8 +437,23 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
         return string.Join(" - ", segments);
     }
 
+    private void RememberQuickDefaults()
+    {
+        _quickDefaultsStore?.Save(
+            _type,
+            new JournalQuickDefaults(
+                SelectedCashAccountId,
+                SelectedCounterpartyAccountId,
+                null,
+                null,
+                SelectedCurrency?.CurrencyCode));
+    }
+
     private void QueuePreviewRefresh()
     {
+        if (_suspendPreviewRefresh)
+            return;
+
         RebuildPostingPreview();
         var previewVersion = Interlocked.Increment(ref _previewRequestVersion);
         _ = RefreshBalancePreviewAsync(previewVersion);

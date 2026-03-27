@@ -9,15 +9,18 @@ public sealed class PostJournalEntryService
     private readonly IJournalEntryRepository _entries;
     private readonly IUserContext _userContext;
     private readonly IDateTimeProvider _clock;
+    private readonly JournalPeriodLockService _periodLockService;
 
     public PostJournalEntryService(
         IJournalEntryRepository entries,
         IUserContext userContext,
-        IDateTimeProvider clock)
+        IDateTimeProvider clock,
+        JournalPeriodLockService periodLockService)
     {
         _entries = entries;
         _userContext = userContext;
         _clock = clock;
+        _periodLockService = periodLockService;
     }
 
     public async Task PostAsync(PostJournalEntryCommand command, CancellationToken ct = default)
@@ -28,6 +31,8 @@ public sealed class PostJournalEntryService
         var entry = await _entries.GetByIdAsync(command.CompanyId, command.EntryId, ct);
         if (entry is null)
             throw new BusinessRuleException("Journal entry not found.");
+
+        await _periodLockService.EnsureEntryDateIsOpenAsync(command.CompanyId, entry.EntryDate, ct);
 
         entry.Post(_userContext.UserId, _clock.UtcNow);
         await _entries.SaveChangesAsync(ct);

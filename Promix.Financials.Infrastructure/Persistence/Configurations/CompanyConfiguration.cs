@@ -31,6 +31,10 @@ public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.Property(x => x.IsActive)
             .IsRequired();
 
+        builder.Property(x => x.JournalLockedThroughDate);
+        builder.Property(x => x.JournalLockedByUserId);
+        builder.Property(x => x.JournalLockedAtUtc);
+
         builder.HasIndex(x => x.Code).IsUnique();
     }
 }

@@ -138,9 +138,9 @@ public sealed partial class JournalEntriesPage : Page
             return;
 
         var dialog = new DailyCashClosingDialog(_userContext.CompanyId.Value, _vm.AccountOptions.ToList()) { XamlRoot = XamlRoot };
-        var result = await dialog.ShowAsync();
+        await dialog.ShowAsync();
 
-        if (result != ContentDialogResult.Primary || dialog.ResultCommand is null)
+        if (dialog.ResultCommand is null)
             return;
 
         await _vm.CreateCashClosingAsync(dialog.ResultCommand);
@@ -169,9 +169,7 @@ public sealed partial class JournalEntriesPage : Page
 
     private async Task ShowJournalDialogAsync(ContentDialog dialog)
     {
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.None)
-            return;
+        await dialog.ShowAsync();
 
         if (dialog switch
             {

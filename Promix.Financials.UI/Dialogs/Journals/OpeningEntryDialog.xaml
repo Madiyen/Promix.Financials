@@ -11,204 +11,212 @@
     DefaultButton="Primary"
     FlowDirection="RightToLeft"
     RequestedTheme="Light"
-    MinWidth="980">
+    FullSizeDesired="True"
+    HorizontalContentAlignment="Stretch"
+    VerticalContentAlignment="Stretch">
 
-    <ScrollViewer MaxHeight="760" VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="18">
-            <Border CornerRadius="24" Padding="22" MinHeight="156">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#78350F" Offset="0"/>
-                        <GradientStop Color="#D97706" Offset="0.55"/>
-                        <GradientStop Color="#F59E0B" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
+    <Grid MaxWidth="760" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-                <Grid ColumnSpacing="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="160"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="{Binding Title}" Foreground="White" FontSize="26" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding Subtitle}" Foreground="#FEF3C7" TextWrapping="WrapWholeWords" MaxWidth="620"/>
-                        <Border Background="#92400E" CornerRadius="14" Padding="12,10">
-                            <TextBlock Text="{Binding NoteText}" Foreground="White" TextWrapping="WrapWholeWords"/>
-                        </Border>
-                    </StackPanel>
-
-                    <Border Grid.Column="1"
-                            Width="120"
-                            Height="120"
-                            CornerRadius="60"
-                            Background="#92400E"
-                            HorizontalAlignment="Right">
-                        <FontIcon Glyph="&#xE8B8;"
-                                  Foreground="White"
-                                  FontSize="54"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"/>
-                    </Border>
-                </Grid>
-            </Border>
+        <Border Grid.Row="0" CornerRadius="24" Padding="18" MinHeight="112">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#78350F" Offset="0"/>
+                    <GradientStop Color="#D97706" Offset="0.55"/>
+                    <GradientStop Color="#F59E0B" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
 
             <Grid ColumnSpacing="16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="340"/>
+                    <ColumnDefinition Width="88"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0"
-                        Background="White"
-                        BorderBrush="#E2E8F0"
-                        BorderThickness="1"
-                        CornerRadius="18"
-                        Padding="18">
-                    <StackPanel Spacing="14">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="سطور القيد الافتتاحي" FontSize="18" FontWeight="Bold"/>
-                            <Button Grid.Column="1"
-                                    Content="+ إضافة سطر"
-                                    Style="{StaticResource PrimaryActionButtonStyle}"
-                                    Click="AddLine_Click"/>
-                        </Grid>
-
-                        <ItemsControl ItemsSource="{Binding Lines}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="12"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="#FFFBEB"
-                                            BorderBrush="#FDE68A"
-                                            BorderThickness="1"
-                                            CornerRadius="18"
-                                            Padding="16">
-                                        <Grid ColumnSpacing="10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2.3*"/>
-                                                <ColumnDefinition Width="1.4*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="1*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <controls:AccountLookupBox Grid.Column="0"
-                                                                       Header="الحساب"
-                                                                       PlaceholderText="ابحث بالكود أو الاسم"
-                                                                       ItemsSource="{Binding DataContext.AccountOptions, ElementName=RootDialog}"
-                                                                       SelectedAccountId="{Binding SelectedAccountId, Mode=TwoWay}"/>
-
-                                            <StackPanel Grid.Column="1" Spacing="6">
-                                                <TextBlock Text="وصف السطر" Style="{StaticResource FieldLabelStyle}"/>
-                                                <TextBox Style="{StaticResource InputTextBoxStyle}"
-                                                         Text="{Binding Description, Mode=TwoWay}"
-                                                         PlaceholderText="شرح مختصر"/>
-                                            </StackPanel>
-
-                                            <StackPanel Grid.Column="2" Spacing="6">
-                                                <TextBlock Text="مدين" Style="{StaticResource FieldLabelStyle}"/>
-                                                <NumberBox Style="{StaticResource InputNumberBoxStyle}"
-                                                           Value="{Binding Debit, Mode=TwoWay}"/>
-                                            </StackPanel>
-
-                                            <StackPanel Grid.Column="3" Spacing="6">
-                                                <TextBlock Text="دائن" Style="{StaticResource FieldLabelStyle}"/>
-                                                <NumberBox Style="{StaticResource InputNumberBoxStyle}"
-                                                           Value="{Binding Credit, Mode=TwoWay}"/>
-                                            </StackPanel>
-
-                                            <Button Grid.Column="4"
-                                                    VerticalAlignment="Bottom"
-                                                    Content="حذف"
-                                                    Style="{StaticResource SecondaryActionButtonStyle}"
-                                                    Click="RemoveLine_Click"/>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
+                <StackPanel Spacing="6">
+                    <TextBlock Text="{Binding Title}" Foreground="White" FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Subtitle}" Foreground="#FEF3C7" TextWrapping="WrapWholeWords"/>
+                    <TextBlock Text="Ctrl+Shift+N لإضافة سطر • Ctrl+S للمسودة • Ctrl+Enter للترحيل"
+                               Foreground="White"
+                               FontSize="11"
+                               TextWrapping="WrapWholeWords"/>
+                </StackPanel>
 
                 <Border Grid.Column="1"
-                        Background="White"
-                        BorderBrush="#E2E8F0"
-                        BorderThickness="1"
-                        CornerRadius="18"
-                        Padding="18">
-                    <StackPanel Spacing="14">
-                        <TextBlock Text="بيانات القيد" FontSize="18" FontWeight="Bold"/>
-
-                        <StackPanel Spacing="6">
-                            <TextBlock Text="التاريخ" Style="{StaticResource FieldLabelStyle}"/>
-                            <DatePicker Style="{StaticResource InputDatePickerStyle}"
-                                        Date="{Binding EntryDate, Mode=TwoWay}"/>
-                        </StackPanel>
-
-                        <StackPanel Spacing="6">
-                            <TextBlock Text="رقم مرجعي" Style="{StaticResource FieldLabelStyle}"/>
-                            <TextBox Style="{StaticResource InputTextBoxStyle}"
-                                     Text="{Binding ReferenceNo, Mode=TwoWay}"
-                                     PlaceholderText="اختياري"/>
-                        </StackPanel>
-
-                        <StackPanel Spacing="6">
-                            <TextBlock Text="البيان" Style="{StaticResource FieldLabelStyle}"/>
-                            <TextBox Style="{StaticResource MultilineTextBoxStyle}"
-                                     Text="{Binding Description, Mode=TwoWay}"
-                                     Height="120"
-                                     PlaceholderText="مثال: ترحيل أرصدة افتتاحية"/>
-                        </StackPanel>
-
-                        <Grid ColumnSpacing="10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Border Grid.Column="0" Background="#FEF3C7" CornerRadius="16" Padding="14">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="المدين" Foreground="#92400E"/>
-                                    <TextBlock Text="{Binding TotalDebit}" FontSize="22" FontWeight="Bold" Foreground="#B45309"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Grid.Column="1" Background="#ECFCCB" CornerRadius="16" Padding="14">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="الدائن" Foreground="#3F6212"/>
-                                    <TextBlock Text="{Binding TotalCredit}" FontSize="22" FontWeight="Bold" Foreground="#4D7C0F"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Grid.Column="2" Background="#FEF2F2" CornerRadius="16" Padding="14">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="الفرق" Foreground="#64748B"/>
-                                    <TextBlock Text="{Binding Difference}" FontSize="22" FontWeight="Bold" Foreground="{Binding BalanceStateBrush}"/>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </StackPanel>
+                        Width="76"
+                        Height="76"
+                        CornerRadius="38"
+                        Background="#92400E"
+                        HorizontalAlignment="Right">
+                    <FontIcon Glyph="&#xE8B8;"
+                              Foreground="White"
+                              FontSize="30"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
                 </Border>
             </Grid>
+        </Border>
 
-            <Border x:Name="ErrorBanner"
-                    Background="#FEF2F2"
-                    BorderBrush="#FECACA"
-                    BorderThickness="1"
-                    CornerRadius="14"
-                    Padding="14,12"
-                    Visibility="Collapsed">
-                <TextBlock x:Name="ErrorText" Foreground="#DC2626" TextWrapping="WrapWholeWords"/>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+        <Border Grid.Row="1" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="18" Padding="18">
+            <StackPanel Spacing="12">
+                <TextBlock Text="بيانات القيد" FontSize="18" FontWeight="Bold"/>
+
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Spacing="6">
+                        <TextBlock Text="التاريخ" Style="{StaticResource FieldLabelStyle}"/>
+                        <DatePicker Style="{StaticResource InputDatePickerStyle}"
+                                    Date="{Binding EntryDate, Mode=TwoWay}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="6">
+                        <TextBlock Text="رقم مرجعي" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Style="{StaticResource InputTextBoxStyle}"
+                                 Text="{Binding ReferenceNo, Mode=TwoWay}"
+                                 PlaceholderText="اختياري"/>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="البيان" Style="{StaticResource FieldLabelStyle}"/>
+                    <TextBox Style="{StaticResource MultilineTextBoxStyle}"
+                             Text="{Binding Description, Mode=TwoWay}"
+                             Height="90"
+                             PlaceholderText="مثال: ترحيل أرصدة افتتاحية"/>
+                </StackPanel>
+
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="#FEF3C7" CornerRadius="16" Padding="14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="المدين" Foreground="#92400E"/>
+                            <TextBlock Text="{Binding TotalDebit}" FontSize="22" FontWeight="Bold" Foreground="#B45309" Language="en-US"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#ECFCCB" CornerRadius="16" Padding="14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="الدائن" Foreground="#3F6212"/>
+                            <TextBlock Text="{Binding TotalCredit}" FontSize="22" FontWeight="Bold" Foreground="#4D7C0F" Language="en-US"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#FEF2F2" CornerRadius="16" Padding="14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="الفرق" Foreground="#64748B"/>
+                            <TextBlock Text="{Binding Difference}" FontSize="22" FontWeight="Bold" Foreground="{Binding BalanceStateBrush}" Language="en-US"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border Background="#FFFBEB" BorderBrush="#FDE68A" BorderThickness="1" CornerRadius="14" Padding="14,10">
+                    <TextBlock Text="{Binding NoteText}" TextWrapping="WrapWholeWords" Foreground="#78350F"/>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="2" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="18" Padding="18">
+            <StackPanel Spacing="12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="سطور القيد الافتتاحي" FontSize="18" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding BalanceStateText}"
+                                   Foreground="{Binding BalanceStateBrush}"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="+ إضافة سطر"
+                            Style="{StaticResource PrimaryActionButtonStyle}"
+                            Click="AddLine_Click"/>
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding Lines}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="10"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#FFFBEB"
+                                    BorderBrush="#FDE68A"
+                                    BorderThickness="1"
+                                    CornerRadius="18"
+                                    Padding="16">
+                                <StackPanel Spacing="10">
+                                    <controls:AccountLookupBox Header="الحساب"
+                                                               PlaceholderText="ابحث بالكود أو الاسم"
+                                                               ItemsSource="{Binding DataContext.AccountOptions, ElementName=RootDialog}"
+                                                               SelectedAccountId="{Binding SelectedAccountId, Mode=TwoWay}"/>
+
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="وصف السطر" Style="{StaticResource FieldLabelStyle}"/>
+                                        <TextBox Style="{StaticResource InputTextBoxStyle}"
+                                                 Text="{Binding Description, Mode=TwoWay}"
+                                                 PlaceholderText="شرح مختصر"/>
+                                    </StackPanel>
+
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" Spacing="6">
+                                            <TextBlock Text="مدين" Style="{StaticResource FieldLabelStyle}"/>
+                                            <NumberBox Style="{StaticResource InputNumberBoxStyle}"
+                                                       Value="{Binding Debit, Mode=TwoWay}"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" Spacing="6">
+                                            <TextBlock Text="دائن" Style="{StaticResource FieldLabelStyle}"/>
+                                            <NumberBox Style="{StaticResource InputNumberBoxStyle}"
+                                                       Value="{Binding Credit, Mode=TwoWay}"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="2"
+                                                VerticalAlignment="Bottom"
+                                                Content="حذف"
+                                                Style="{StaticResource SecondaryActionButtonStyle}"
+                                                Click="RemoveLine_Click"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="3"
+                x:Name="ErrorBanner"
+                Background="#FEF2F2"
+                BorderBrush="#FECACA"
+                BorderThickness="1"
+                CornerRadius="14"
+                Padding="14,12"
+                Visibility="Collapsed">
+            <TextBlock x:Name="ErrorText" Foreground="#DC2626" TextWrapping="WrapWholeWords"/>
+        </Border>
+    </Grid>
 </ContentDialog>

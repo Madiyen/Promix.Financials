@@ -6,5 +6,6 @@ public sealed record CreateDailyCashClosingCommand(
     Guid SourceAccountId,
     Guid TargetAccountId,
     string? ReferenceNo,
-    string? Description
+    string? Description,
+    bool LockThroughEntryDate
 );

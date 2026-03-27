@@ -16,6 +16,7 @@ public sealed class DailyCashClosingEditorViewModel : INotifyPropertyChanged
     private DateTimeOffset _entryDate = DateTimeOffset.Now;
     private string _referenceNo = string.Empty;
     private string _description = string.Empty;
+    private bool _lockThroughEntryDate = true;
 
     public DailyCashClosingEditorViewModel(IEnumerable<JournalAccountOptionVm> accounts)
     {
@@ -85,6 +86,21 @@ public sealed class DailyCashClosingEditorViewModel : INotifyPropertyChanged
     }
 
     public string HintText => "سيقوم النظام بحساب صافي الحركة المرحلة على الحساب المحدد في هذا التاريخ، ثم يولد قيد إقفال يصفّر الحساب التشغيلي وينقل الرصيد إلى الحساب المقابل.";
+    public string LockPeriodHintText => LockThroughEntryDate
+        ? "سيعتبر هذا التاريخ آخر يوم مفتوح، ولن يسمح النظام بإنشاء أو ترحيل سندات داخل هذه الفترة بعد حفظ الإقفال."
+        : "سيُنشأ سند الإقفال فقط بدون قفل الفترة، ويمكنك متابعة الإدخال على نفس التاريخ لاحقاً.";
+
+    public bool LockThroughEntryDate
+    {
+        get => _lockThroughEntryDate;
+        set
+        {
+            if (_lockThroughEntryDate == value) return;
+            _lockThroughEntryDate = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(LockPeriodHintText));
+        }
+    }
 
     public bool TryBuildCommand(Guid companyId, out CreateDailyCashClosingCommand? command, out string error)
     {
@@ -109,7 +125,8 @@ public sealed class DailyCashClosingEditorViewModel : INotifyPropertyChanged
             SelectedSourceAccountId.Value,
             SelectedTargetAccountId.Value,
             ReferenceNo,
-            Description);
+            Description,
+            LockThroughEntryDate);
 
         return true;
     }

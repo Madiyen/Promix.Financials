@@ -53,6 +53,20 @@ public interface IJournalEntriesQuery
     Task<IReadOnlyList<JournalEntrySummaryDto>> GetEntriesAsync(Guid companyId, CancellationToken ct = default);
     Task<IReadOnlyList<JournalPostingAccountDto>> GetPostingAccountsAsync(Guid companyId, CancellationToken ct = default);
     Task<IReadOnlyList<JournalCurrencyOptionDto>> GetActiveCurrenciesAsync(Guid companyId, CancellationToken ct = default);
+    Task<IReadOnlyList<int>> GetAvailableFiscalYearsAsync(Guid companyId, CancellationToken ct = default);
+    Task<JournalPeriodLockDto> GetJournalPeriodLockAsync(Guid companyId, CancellationToken ct = default);
+    Task<AccountStatementDto?> GetAccountStatementAsync(
+        Guid companyId,
+        Guid accountId,
+        DateOnly fromDate,
+        DateOnly toDate,
+        CancellationToken ct = default);
+    Task<IReadOnlyList<TrialBalanceRowDto>> GetTrialBalanceAsync(
+        Guid companyId,
+        DateOnly fromDate,
+        DateOnly toDate,
+        bool includeZeroBalance,
+        CancellationToken ct = default);
     Task<IReadOnlyList<JournalAccountBalanceDto>> GetPostedAccountBalancesAsync(
         Guid companyId,
         IReadOnlyList<Guid> accountIds,

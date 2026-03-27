@@ -10,15 +10,18 @@ public sealed class CreateDailyCashClosingService
     private readonly IJournalEntryRepository _entries;
     private readonly IAccountRepository _accounts;
     private readonly CreateJournalEntryService _createService;
+    private readonly JournalPeriodLockService _periodLockService;
 
     public CreateDailyCashClosingService(
         IJournalEntryRepository entries,
         IAccountRepository accounts,
-        CreateJournalEntryService createService)
+        CreateJournalEntryService createService,
+        JournalPeriodLockService periodLockService)
     {
         _entries = entries;
         _accounts = accounts;
         _createService = createService;
+        _periodLockService = periodLockService;
     }
 
     public async Task<Guid> CreateAsync(CreateDailyCashClosingCommand command, CancellationToken ct = default)
@@ -100,6 +103,11 @@ public sealed class CreateDailyCashClosingService
             PostNow: true,
             Lines: new[] { targetLine, sourceLine });
 
-        return await _createService.CreateAsync(createCommand, ct);
+        var entryId = await _createService.CreateAsync(createCommand, ct);
+
+        if (command.LockThroughEntryDate)
+            await _periodLockService.LockThroughAsync(command.CompanyId, command.EntryDate, ct);
+
+        return entryId;
     }
 }

@@ -61,14 +61,14 @@ public sealed partial class AccountLookupBox : UserControl
 
     public Guid? SelectedAccountId
     {
-        get => (Guid?)GetValue(SelectedAccountIdProperty);
+        get => ReadSelectedAccountId();
         set => SetValue(SelectedAccountIdProperty, value);
     }
 
     public static readonly DependencyProperty SelectedAccountIdProperty =
         DependencyProperty.Register(
             nameof(SelectedAccountId),
-            typeof(Guid?),
+            typeof(object),
             typeof(AccountLookupBox),
             new PropertyMetadata(null, OnSelectedAccountIdChanged));
 
@@ -285,6 +285,11 @@ public sealed partial class AccountLookupBox : UserControl
 
     private void UpdateHasSelection()
         => CaptionVisibility = HasSelection ? Visibility.Visible : Visibility.Collapsed;
+
+    private Guid? ReadSelectedAccountId()
+        => GetValue(SelectedAccountIdProperty) is Guid accountId
+            ? accountId
+            : null;
 
     private void ApplySelection(JournalAccountOptionVm option)
     {

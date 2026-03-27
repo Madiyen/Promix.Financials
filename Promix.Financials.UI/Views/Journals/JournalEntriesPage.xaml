@@ -187,6 +187,38 @@
                                 Click="Refresh_Click"/>
                     </Grid>
 
+                    <Border Background="#F8FAFC"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1"
+                            CornerRadius="16"
+                            Padding="14,12">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <FontIcon Glyph="&#xE8D7;"
+                                      Foreground="#0F766E"
+                                      FontSize="18"
+                                      VerticalAlignment="Top"/>
+
+                            <StackPanel Grid.Column="1" Spacing="4">
+                                <TextBlock Text="{Binding PeriodLockSummaryText}"
+                                           FontWeight="SemiBold"
+                                           Foreground="#0F172A"/>
+                                <TextBlock Text="{Binding PeriodLockHintText}"
+                                           Foreground="{StaticResource SlateTextBrush}"
+                                           FontSize="12"
+                                           TextWrapping="WrapWholeWords"/>
+                                <TextBlock Text="{Binding QuickEntryShortcutsText}"
+                                           Foreground="#0F766E"
+                                           FontSize="12"
+                                           TextWrapping="WrapWholeWords"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
                     <ScrollViewer Grid.Row="1"
                                   HorizontalScrollBarVisibility="Auto"
                                   VerticalScrollBarVisibility="Disabled"

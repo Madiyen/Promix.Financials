@@ -14,19 +14,22 @@ public sealed class CreateJournalEntryService
     private readonly ICompanyCurrencyRepository _currencies;
     private readonly IUserContext _userContext;
     private readonly IDateTimeProvider _clock;
+    private readonly JournalPeriodLockService _periodLockService;
 
     public CreateJournalEntryService(
         IJournalEntryRepository entries,
         IAccountRepository accounts,
         ICompanyCurrencyRepository currencies,
         IUserContext userContext,
-        IDateTimeProvider clock)
+        IDateTimeProvider clock,
+        JournalPeriodLockService periodLockService)
     {
         _entries = entries;
         _accounts = accounts;
         _currencies = currencies;
         _userContext = userContext;
         _clock = clock;
+        _periodLockService = periodLockService;
     }
 
     public async Task<Guid> CreateAsync(CreateJournalEntryCommand command, CancellationToken ct = default)
@@ -39,6 +42,8 @@ public sealed class CreateJournalEntryService
 
         if (command.Lines is null || command.Lines.Count < 2)
             throw new BusinessRuleException("The journal entry must contain at least two lines.");
+
+        await _periodLockService.EnsureEntryDateIsOpenAsync(command.CompanyId, command.EntryDate, ct);
 
         var totalDebit = command.Lines.Sum(x => x.Debit);
         if (totalDebit <= 0)
