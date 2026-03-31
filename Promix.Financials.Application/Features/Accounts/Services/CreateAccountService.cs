@@ -14,7 +14,7 @@ public sealed class CreateAccountService
         _accounts = accounts;
     }
 
-    public async Task<CreateAccountResult> CreateAsync(CreateAccountCommand cmd)
+    public async Task<CreateAccountResult> CreateAsync(CreateAccountCommand cmd, CancellationToken ct = default)
     {
         if (cmd.CompanyId == Guid.Empty)
             throw new BusinessRuleException("CompanyId is required.");
@@ -27,20 +27,25 @@ public sealed class CreateAccountService
         if (string.IsNullOrWhiteSpace(nameAr))
             throw new BusinessRuleException("Arabic name is required.");
 
-        if (await _accounts.CodeExistsAsync(cmd.CompanyId, code))
+        if (await _accounts.CodeExistsAsync(cmd.CompanyId, code, ct))
             throw new BusinessRuleException("Account code already exists.");
+
+        var normalizedName = AccountNameNormalizer.Normalize(nameAr);
+        var allAccounts = await _accounts.GetAllAsync(cmd.CompanyId, ct);
+        if (allAccounts.Any(x => AccountNameNormalizer.Normalize(x.NameAr) == normalizedName))
+            throw new BusinessRuleException("يوجد حساب آخر بنفس الاسم داخل هذه الشركة.");
 
         if (!string.IsNullOrWhiteSpace(cmd.SystemRole))
         {
             var role = cmd.SystemRole.Trim();
-            if (await _accounts.SystemRoleExistsAsync(cmd.CompanyId, role))
+            if (await _accounts.SystemRoleExistsAsync(cmd.CompanyId, role, ct))
                 throw new BusinessRuleException("System role already assigned in this company.");
         }
 
         // Parent validation
         if (cmd.ParentId is not null)
         {
-            var parent = await _accounts.GetByIdAsync(cmd.ParentId.Value);
+            var parent = await _accounts.GetByIdAsync(cmd.ParentId.Value, ct);
             if (parent is null)
                 throw new BusinessRuleException("Parent account not found.");
 
@@ -62,11 +67,12 @@ public sealed class CreateAccountService
             currencyCode: cmd.CurrencyCode,
             systemRole: cmd.SystemRole,
             notes: cmd.Notes,
-            isActive: cmd.IsActive
+            isActive: cmd.IsActive,
+            origin: cmd.Origin
         );
 
-        await _accounts.AddAsync(account);
-        await _accounts.SaveChangesAsync();
+        await _accounts.AddAsync(account, ct);
+        await _accounts.SaveChangesAsync(ct);
 
         return new CreateAccountResult(account.Id);
     }

@@ -24,11 +24,18 @@ public sealed class JournalEntryConfiguration : IEntityTypeConfiguration<Journal
         builder.Property(x => x.Status).HasConversion<int>().IsRequired();
         builder.Property(x => x.ReferenceNo).HasMaxLength(50);
         builder.Property(x => x.Description).HasMaxLength(500);
+        builder.Property(x => x.TransferSettlementMode).HasConversion<int?>();
         builder.Property(x => x.CreatedByUserId).IsRequired();
         builder.Property(x => x.CreatedAtUtc).IsRequired();
+        builder.Property(x => x.ModifiedByUserId);
+        builder.Property(x => x.ModifiedAtUtc);
+        builder.Property(x => x.IsDeleted).HasDefaultValue(false);
+        builder.Property(x => x.DeletedByUserId);
+        builder.Property(x => x.DeletedAtUtc);
 
         builder.HasIndex(x => new { x.CompanyId, x.EntryNumber }).IsUnique();
         builder.HasIndex(x => new { x.CompanyId, x.EntryDate });
+        builder.HasIndex(x => new { x.CompanyId, x.IsDeleted, x.EntryDate });
 
         builder.HasMany(x => x.Lines)
             .WithOne(x => x.JournalEntry)

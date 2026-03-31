@@ -8,8 +8,12 @@ using Promix.Financials.Application.Features.Auth;
 using Promix.Financials.Application.Features.Companies;
 using Promix.Financials.Application.Features.Currencies.Queries;
 using Promix.Financials.Application.Features.Currencies.Services;
+using Promix.Financials.Application.Features.FinancialYears.Queries;
+using Promix.Financials.Application.Features.FinancialYears.Services;
 using Promix.Financials.Application.Features.Journals.Queries;
 using Promix.Financials.Application.Features.Journals.Services;
+using Promix.Financials.Application.Features.Parties.Queries;
+using Promix.Financials.Application.Features.Parties.Services;
 using Promix.Financials.Infrastructure.Persistence;
 using Promix.Financials.Infrastructure.Persistence.Queries;
 using Promix.Financials.Infrastructure.Persistence.Repositories;
@@ -33,6 +37,9 @@ public static class DependencyInjection
         // Repositories
         services.AddScoped<IAccountRepository, EfAccountRepository>();
         services.AddScoped<IJournalEntryRepository, EfJournalEntryRepository>();
+        services.AddScoped<IPartyRepository, EfPartyRepository>();
+        services.AddScoped<IFinancialYearRepository, EfFinancialYearRepository>();
+        services.AddScoped<IPartySettlementRepository, EfPartySettlementRepository>();
         services.AddScoped<ICompanyAdminRepository, EfCompanyAdminRepository>();
         services.AddScoped<ICompanyJournalLockRepository, EfCompanyJournalLockRepository>();
         services.AddScoped<ICompanyCurrencyRepository, EfCompanyCurrencyRepository>();
@@ -43,16 +50,32 @@ public static class DependencyInjection
         // Queries
         services.AddScoped<IChartOfAccountsQuery, ChartOfAccountsQuery>();
         services.AddScoped<IJournalEntriesQuery, JournalEntriesQuery>();
+        services.AddScoped<IPartyQuery, PartyQuery>();
+        services.AddScoped<IFinancialYearQuery, FinancialYearQuery>();
 
         // Services — Application
         services.AddScoped<CreateAccountService>();
         services.AddScoped<EditAccountService>();
         services.AddScoped<DeleteAccountService>();
+        services.AddScoped<AccountUsageRulesService>();
         services.AddScoped<CreateJournalEntryService>();
         services.AddScoped<CreateDailyCashClosingService>();
         services.AddScoped<PostJournalEntryService>();
+        services.AddScoped<UpdateJournalEntryService>();
+        services.AddScoped<DeleteJournalEntryService>();
         services.AddScoped<JournalPeriodLockService>();
+        services.AddScoped<PartyAccountProvisioningService>();
+        services.AddScoped<PartyPostingRulesService>();
+        services.AddScoped<RebuildPartySettlementsService>();
+        services.AddScoped<CreatePartyService>();
+        services.AddScoped<EditPartyService>();
+        services.AddScoped<ActivatePartyService>();
+        services.AddScoped<DeactivatePartyService>();
+        services.AddScoped<CreateFinancialYearService>();
+        services.AddScoped<EditFinancialYearService>();
+        services.AddScoped<ActivateFinancialYearService>();
         services.AddScoped<CreateCompanyService>();
+        services.AddScoped<ResetApplicationDataService>();
         services.AddScoped<ICompanySelectionService, CompanySelectionService>();
         services.AddScoped<ICompanyInitializer,
             Promix.Financials.Infrastructure.Persistence.Seeding.CompanyInitializer>();

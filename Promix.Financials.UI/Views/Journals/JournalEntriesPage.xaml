@@ -388,6 +388,8 @@
                                       SelectionMode="Single"
                                       Background="Transparent"
                                       BorderThickness="0"
+                                      DoubleTapped="EntriesListView_DoubleTapped"
+                                      KeyDown="EntriesListView_KeyDown"
                                       Visibility="{Binding EntriesVisibility}">
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem">
@@ -420,6 +422,7 @@
                                                 <StackPanel Grid.Column="2" Spacing="4">
                                                     <TextBlock Text="{Binding Description}" TextWrapping="WrapWholeWords" FontSize="13"/>
                                                     <TextBlock Text="{Binding MovementText}" Foreground="{Binding MovementBrush}" FontSize="11"/>
+                                                    <TextBlock Text="{Binding LifecycleText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
                                                 </StackPanel>
 
                                                 <Border Grid.Column="3" Background="{Binding TypeBackgroundBrush}" CornerRadius="14" Padding="10,6" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -428,7 +431,7 @@
 
                                                 <StackPanel Grid.Column="4" Spacing="4">
                                                     <TextBlock Text="{Binding TotalDebitText}" Foreground="#1D4ED8" FontWeight="SemiBold"/>
-                                                    <TextBlock Text="{Binding LineCountText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
+                                                    <TextBlock Text="{Binding CurrencySummaryText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Language="en-US"/>
                                                 </StackPanel>
 
                                                 <Border Grid.Column="5" Background="{Binding StatusBackgroundBrush}" CornerRadius="14" Padding="10,6" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -491,14 +494,17 @@
                                     </Border>
                                     <Border Grid.Row="0" Grid.Column="1" Background="#F8FAFC" CornerRadius="16" Padding="14">
                                         <StackPanel Spacing="4">
-                                            <TextBlock Text="تاريخ الإنشاء" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
+                                            <TextBlock Text="التسلسل الزمني" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
                                             <TextBlock Text="{Binding SelectedEntryCreatedAtText}" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding SelectedEntryPostedAtText}" FontSize="12" Foreground="{StaticResource SlateTextBrush}" TextWrapping="WrapWholeWords"/>
+                                            <TextBlock Text="{Binding SelectedEntryModifiedAtText}" FontSize="12" Foreground="{StaticResource SlateTextBrush}" TextWrapping="WrapWholeWords"/>
                                         </StackPanel>
                                     </Border>
                                     <Border Grid.Row="1" Grid.Column="0" Background="#EFF6FF" CornerRadius="16" Padding="14">
                                         <StackPanel Spacing="4">
-                                            <TextBlock Text="المدين/الدائن" Foreground="#1D4ED8" FontSize="12"/>
-                                            <TextBlock Text="{Binding SelectedEntryDebitCreditText}" FontWeight="Bold" TextWrapping="WrapWholeWords"/>
+                                            <TextBlock Text="العملة والقيمة" Foreground="#1D4ED8" FontSize="12"/>
+                                            <TextBlock Text="{Binding SelectedEntryCurrencyText}" FontWeight="Bold" TextWrapping="WrapWholeWords" Language="en-US"/>
+                                            <TextBlock Text="{Binding SelectedEntryExchangeRateText}" Foreground="{StaticResource SlateTextBrush}" FontSize="12" TextWrapping="WrapWholeWords" Language="en-US"/>
                                         </StackPanel>
                                     </Border>
                                     <Border Grid.Row="1" Grid.Column="1" Background="{Binding SelectedEntry.BalanceBackgroundBrush}" CornerRadius="16" Padding="14">
@@ -520,8 +526,10 @@
                                 <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="18" Padding="16">
                                     <StackPanel Spacing="10">
                                         <TextBlock Text="تفاصيل سريعة" FontSize="16" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding SelectedEntryDebitCreditText}" FontWeight="SemiBold" TextWrapping="WrapWholeWords"/>
                                         <TextBlock Text="{Binding SelectedEntryReferenceText}" TextWrapping="WrapWholeWords"/>
                                         <TextBlock Text="{Binding SelectedEntryLineSummaryText}" Foreground="{StaticResource SlateTextBrush}"/>
+                                        <TextBlock Text="{Binding SelectedEntryAuditText}" TextWrapping="WrapWholeWords" Foreground="{StaticResource SlateTextBrush}"/>
                                         <TextBlock Text="{Binding SelectedEntryActionText}" TextWrapping="WrapWholeWords" Foreground="{StaticResource SlateTextBrush}"/>
                                     </StackPanel>
                                 </Border>

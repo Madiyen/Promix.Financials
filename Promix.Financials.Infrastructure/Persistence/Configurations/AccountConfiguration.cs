@@ -22,8 +22,19 @@ public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(x => x.Nature)
             .HasConversion<int>()
             .IsRequired();
+        builder.Property(x => x.Classification)
+            .HasConversion<int>()
+            .IsRequired();
+        builder.Property(x => x.CloseBehavior)
+            .HasConversion<int>()
+            .IsRequired();
+        builder.Property(x => x.Origin)
+            .HasConversion<int>()
+            .IsRequired();
 
         builder.Property(x => x.IsPosting).IsRequired();
+        builder.Property(x => x.AllowManualPosting).IsRequired();
+        builder.Property(x => x.AllowChildren).IsRequired();
         builder.Property(x => x.IsSystem).IsRequired();
         builder.Property(x => x.IsActive).IsRequired();
 

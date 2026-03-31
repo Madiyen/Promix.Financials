@@ -10,60 +10,265 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Padding="18,18,18,10" Spacing="10">
-            <TextBlock Text="Promix" Foreground="White" FontSize="18" FontWeight="Bold"/>
-            <TextBlock Text="Financials" Foreground="#C7D2FE" FontSize="12"/>
-        </StackPanel>
+        <Grid Grid.Row="0"
+              Padding="24,20,24,18"
+              BorderBrush="#14FFFFFF"
+              BorderThickness="0,0,0,1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="44"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="1" Padding="12,6,12,12" Spacing="8">
-            <Button x:Name="BtnDashboard" x:Uid="Sidebar_Dashboard" Click="Dashboard_Click" Style="{StaticResource SidebarNavButtonStyle}"/>
-            <Button x:Name="BtnChartOfAccounts"
-              Content="الحسابات"
-                Click="ChartOfAccounts_Click"
-                   Style="{StaticResource SidebarNavButtonStyle}"/>
-            <Button Content="القيود والسندات"
-                    Click="Journals_Click"
-                    Style="{StaticResource SidebarNavButtonStyle}"/>
-            <Button x:Name="BtnItems" x:Uid="Sidebar_Items" Click="Items_Click" Style="{StaticResource SidebarNavButtonStyle}"/>
-            <Button x:Name="BtnReports" x:Uid="Sidebar_Reports" Click="Reports_Click" Style="{StaticResource SidebarNavButtonStyle}"/>
-            <Button x:Name="BtnSettings" x:Uid="Sidebar_Settings" Click="Settings_Click" Style="{StaticResource SidebarNavButtonStyle}"/>
-            <Button Content="💱 العملات"
-        Style="{StaticResource SidebarNavButtonStyle}"
-        Click="Currencies_Click"/>
-            <Border Height="1" Background="#2D4A76" Margin="0,10,0,6"/>
-
-            <Border Background="#24466E" CornerRadius="14" Padding="12">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="Quick Stats" Foreground="#C7D2FE" FontSize="12" FontWeight="SemiBold"/>
-                    <TextBlock Text="• Cash: —" Foreground="White" FontSize="12"/>
-                    <TextBlock Text="• Today: —" Foreground="White" FontSize="12"/>
-                </StackPanel>
+            <Border Width="40"
+                    Height="40"
+                    CornerRadius="14">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#3B82F6" Offset="0"/>
+                        <GradientStop Color="#1D4ED8" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <FontIcon Glyph="&#xE9D2;"
+                          Foreground="White"
+                          FontSize="18"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
             </Border>
-        </StackPanel>
 
-        <StackPanel Grid.Row="2" Padding="12,10,12,14" Spacing="10">
-            <Border Background="#24466E" CornerRadius="14" Padding="12">
+            <StackPanel Grid.Column="1"
+                        Margin="12,0,0,0"
+                        VerticalAlignment="Center"
+                        Spacing="2">
+                <TextBlock Text="Promix"
+                           Foreground="White"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Language="en-US"/>
+                <TextBlock Text="نظام محاسبي مكتبي"
+                           Foreground="{StaticResource SidebarMutedTextBrush}"
+                           FontSize="12"/>
+            </StackPanel>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Padding="16,18,16,16" Spacing="14">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="القائمة الرئيسية"
+                               Foreground="{StaticResource SidebarSoftTextBrush}"
+                               FontSize="10.5"
+                               FontWeight="SemiBold"
+                               CharacterSpacing="120"/>
+
+                    <Button x:Name="BtnDashboard"
+                            Click="Dashboard_Click"
+                            Style="{StaticResource SidebarNavButtonStyle}">
+                        <Grid FlowDirection="RightToLeft" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xE80F;"
+                                      FontSize="18"
+                                      Foreground="{Binding Foreground, ElementName=BtnDashboard}"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="لوحة القيادة"
+                                       Foreground="{Binding Foreground, ElementName=BtnDashboard}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+
+                    <Button x:Name="BtnLedger"
+                            Click="Ledger_Click"
+                            Style="{StaticResource SidebarNavButtonStyle}">
+                        <Grid FlowDirection="RightToLeft" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xE8A5;"
+                                      FontSize="18"
+                                      Foreground="{Binding Foreground, ElementName=BtnLedger}"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="دفتر الأستاذ"
+                                       Foreground="{Binding Foreground, ElementName=BtnLedger}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+
+                    <Button x:Name="BtnCurrencies"
+                            Click="Currencies_Click"
+                            Style="{StaticResource SidebarNavButtonStyle}">
+                        <Grid FlowDirection="RightToLeft" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xE8C7;"
+                                      FontSize="18"
+                                      Foreground="{Binding Foreground, ElementName=BtnCurrencies}"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="العملات"
+                                       Foreground="{Binding Foreground, ElementName=BtnCurrencies}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+
+                    <Button x:Name="BtnItems"
+                            Click="Items_Click"
+                            Style="{StaticResource SidebarNavButtonStyle}">
+                        <Grid FlowDirection="RightToLeft" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xE8EC;"
+                                      FontSize="18"
+                                      Foreground="{Binding Foreground, ElementName=BtnItems}"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="الأصناف"
+                                       Foreground="{Binding Foreground, ElementName=BtnItems}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+
+                    <Button x:Name="BtnSettings"
+                            Click="Settings_Click"
+                            Style="{StaticResource SidebarNavButtonStyle}">
+                        <Grid FlowDirection="RightToLeft" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xE713;"
+                                      FontSize="18"
+                                      Foreground="{Binding Foreground, ElementName=BtnSettings}"
+                                      VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="الإعدادات"
+                                       Foreground="{Binding Foreground, ElementName=BtnSettings}"
+                                       FontSize="13"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Button>
+                </StackPanel>
+
+                <Border Background="{StaticResource SidebarCardBackgroundBrush}"
+                        BorderBrush="#24FFFFFF"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        Padding="16">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="اختصارات مفيدة"
+                                   Foreground="{StaticResource SidebarMutedTextBrush}"
+                                   FontSize="10.5"
+                                   FontWeight="SemiBold"
+                                   CharacterSpacing="100"/>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Ctrl+K للبحث السريع"
+                                       Foreground="{StaticResource SidebarMutedTextBrush}"
+                                       FontSize="12.5"/>
+                            <TextBlock Text="Ctrl+S لحفظ السند كمسودة"
+                                       Foreground="{StaticResource SidebarMutedTextBrush}"
+                                       FontSize="12.5"/>
+                            <TextBlock Text="Ctrl+Enter للحفظ والترحيل"
+                                       Foreground="{StaticResource SidebarMutedTextBrush}"
+                                       FontSize="12.5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2"
+                    Padding="16,12,16,16"
+                    Spacing="10">
+            <Border Background="#14FFFFFF"
+                    CornerRadius="18"
+                    Padding="14">
                 <Grid ColumnSpacing="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="36"/>
+                        <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Width="36" Height="36" CornerRadius="18" Background="#3B82F6">
-                        <TextBlock Text="U" Foreground="White"
+                    <Border Width="40"
+                            Height="40"
+                            CornerRadius="20">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#3B82F6" Offset="0"/>
+                                <GradientStop Color="#8B5CF6" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <TextBlock x:Name="AvatarInitialsText"
+                                   Text="PM"
+                                   Foreground="White"
+                                   FontSize="13"
+                                   FontWeight="Bold"
                                    HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   FontWeight="Bold"/>
+                                   VerticalAlignment="Center"/>
                     </Border>
 
                     <StackPanel Grid.Column="1" Spacing="2">
-                        <TextBlock x:Name="UserNameText" Text="User" Foreground="White" FontWeight="SemiBold" FontSize="12"/>
-                        <TextBlock x:Name="CompanyText" Text="Company" Foreground="#C7D2FE" FontSize="11"/>
+                        <TextBlock x:Name="UserNameText"
+                                   Text="Promix User"
+                                   Foreground="White"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock x:Name="CompanyText"
+                                   Text=""
+                                   Foreground="{StaticResource SidebarMutedTextBrush}"
+                                   FontSize="11"/>
                     </StackPanel>
+
+                    <Border Grid.Column="2"
+                            Width="8"
+                            Height="8"
+                            Background="{StaticResource SuccessBrush}"
+                            CornerRadius="4"
+                            VerticalAlignment="Center"/>
                 </Grid>
             </Border>
 
-            <Button x:Uid="Sidebar_Logout" Click="Logout_Click" Style="{StaticResource SidebarLogoutButtonStyle}"/>
+            <Button x:Name="BtnLogout"
+                    Click="Logout_Click"
+                    Style="{StaticResource SidebarLogoutButtonStyle}"
+                    Background="#14FFFFFF"
+                    BorderBrush="#20FFFFFF"
+                    BorderThickness="1">
+                <Grid FlowDirection="RightToLeft" ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <FontIcon Glyph="&#xE8AC;"
+                              FontSize="18"
+                              Foreground="{Binding Foreground, ElementName=BtnLogout}"
+                              VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1"
+                               Text="تسجيل الخروج"
+                               Foreground="{Binding Foreground, ElementName=BtnLogout}"
+                               FontSize="13"
+                               VerticalAlignment="Center"/>
+                </Grid>
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

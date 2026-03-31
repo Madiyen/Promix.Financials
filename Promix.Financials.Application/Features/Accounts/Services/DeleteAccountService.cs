@@ -1,37 +1,29 @@
-﻿using Promix.Financials.Application.Abstractions;   // ✅ نفس namespace الـ Interface
+using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Domain.Exceptions;
 
 namespace Promix.Financials.Application.Features.Accounts.Services;
 
 public sealed class DeleteAccountService
 {
-    private readonly IAccountRepository _repo;
+    private readonly IAccountRepository _accounts;
+    private readonly AccountUsageRulesService _usageRules;
 
-    public DeleteAccountService(IAccountRepository repo)
-        => _repo = repo;
-
-    public async Task DeleteAsync(Guid accountId, Guid companyId)
+    public DeleteAccountService(IAccountRepository accounts, AccountUsageRulesService usageRules)
     {
-        var account = await _repo.GetByIdAsync(accountId, companyId);
+        _accounts = accounts;
+        _usageRules = usageRules;
+    }
+
+    public async Task DeleteAsync(Guid accountId, Guid companyId, CancellationToken ct = default)
+    {
+        var account = await _accounts.GetByIdAsync(accountId, companyId, ct);
 
         if (account is null)
             throw new BusinessRuleException("الحساب غير موجود.");
 
-        // ✅ القاعدة 1: حسابات النظام لا تُحذف
-        if (account.SystemRole is not null)
-            throw new BusinessRuleException("لا يمكن حذف حساب النظام.");
+        await _usageRules.EnsureCanDeleteAsync(account, ct);
 
-        // ✅ القاعدة 2: لا حذف إذا له أبناء
-        if (await _repo.HasChildrenAsync(accountId, companyId))
-            throw new BusinessRuleException(
-                "لا يمكن حذف الحساب لأنه يحتوي على حسابات فرعية.\nاحذف الحسابات الفرعية أولاً.");
-
-        // ✅ القاعدة 3: لا حذف إذا له حركات
-        if (await _repo.HasMovementsAsync(accountId, companyId))
-            throw new BusinessRuleException(
-                "لا يمكن حذف الحساب لأنه يحتوي على حركات محاسبية مسجّلة.");
-
-        _repo.Remove(account);
-        await _repo.SaveChangesAsync();
+        _accounts.Remove(account);
+        await _accounts.SaveChangesAsync(ct);
     }
 }

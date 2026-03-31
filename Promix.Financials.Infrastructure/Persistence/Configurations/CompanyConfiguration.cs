@@ -28,6 +28,9 @@ public sealed class CompanyConfiguration : IEntityTypeConfiguration<Company>
             .HasMaxLength(3)
             .IsRequired();
 
+        builder.Property(x => x.AccountingStartDate)
+            .IsRequired();
+
         builder.Property(x => x.IsActive)
             .IsRequired();
 

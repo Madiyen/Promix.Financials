@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Promix.Financials.Domain.Enums;
+using Promix.Financials.UI.ViewModels.Journals.Models;
 using Windows.Storage;
 
 namespace Promix.Financials.UI.Services.Journals;
@@ -17,7 +18,14 @@ public sealed record JournalQuickDefaults(
     Guid? CounterpartyAccountId,
     Guid? SourceAccountId,
     Guid? TargetAccountId,
-    string? CurrencyCode
+    string? CurrencyCode,
+    TransferEndpointMode? SourceEndpointMode = null,
+    TransferEndpointMode? TargetEndpointMode = null,
+    Guid? SourcePartyId = null,
+    Guid? TargetPartyId = null,
+    PartyLedgerSide? SourcePartySide = null,
+    PartyLedgerSide? TargetPartySide = null,
+    TransferSettlementMode? TransferSettlementMode = null
 );
 
 public sealed class LocalSettingsJournalQuickDefaultsStore : IJournalQuickDefaultsStore

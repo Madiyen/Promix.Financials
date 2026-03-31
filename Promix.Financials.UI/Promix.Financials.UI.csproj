@@ -31,13 +31,17 @@
     <None Remove="Dialogs\Journals\PaymentVoucherDialog.xaml" />
     <None Remove="Dialogs\Journals\ReceiptVoucherDialog.xaml" />
     <None Remove="Dialogs\Journals\TransferVoucherDialog.xaml" />
+    <None Remove="Dialogs\Parties\PartyDialog.xaml" />
     <None Remove="Styles\Buttons.xaml" />
+    <None Remove="Styles\InputStyles.xaml" />
     <None Remove="Views\Accounts\ChartOfAccountsView.xaml" />
     <None Remove="Views\CompanySelectionView.xaml" />
     <None Remove="Views\DashboardView.xaml" />
     <None Remove="Views\Journals\JournalEntriesPage.xaml" />
     <None Remove="Views\LoginView.xaml" />
+    <None Remove="Views\Parties\PartiesPage.xaml" />
     <None Remove="Views\SettingsView.xaml" />
+    <None Remove="Views\TrialBalancePage.xaml" />
 	  
   </ItemGroup>
 
@@ -78,6 +82,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260101001" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Promix.Financials.Domain\Promix.Financials.Domain.csproj" />
     <ProjectReference Include="..\Promix.Financials.Application\Promix.Financials.Application.csproj" />
     <ProjectReference Include="..\Promix.Financials.Infrastructure\Promix.Financials.Infrastructure.csproj" />
   </ItemGroup>
@@ -189,6 +194,11 @@
 	  </Page>
 	</ItemGroup>
 	<ItemGroup>
+	  <Page Update="Styles\InputStyles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
 	  <Folder Include="ViewModels\Companies\" />
 	</ItemGroup>
 	<ItemGroup>
@@ -242,7 +252,22 @@
 	  </Page>
 	</ItemGroup>
 	<ItemGroup>
+	  <Page Update="Dialogs\Parties\PartyDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
 	  <Page Update="Views\Journals\JournalEntriesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Views\Parties\PartiesPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="Views\TrialBalancePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
 	</ItemGroup>

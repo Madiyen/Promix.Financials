@@ -1,14 +1,134 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Page
+<UserControl
     x:Class="Promix.Financials.UI.Controls.KpiCards"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Promix.Financials.UI.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid>
+    <Grid ColumnSpacing="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
+        <Border Grid.Column="0"
+                Background="White"
+                BorderBrush="#F1F5F9"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="18">
+            <Grid>
+                <Border Height="3"
+                        VerticalAlignment="Top"
+                        Background="{StaticResource SidebarActiveBrush}"
+                        CornerRadius="18,18,0,0"
+                        Margin="-18,-18,-18,0"/>
+
+                <StackPanel Spacing="14">
+                    <Border Width="44" Height="44" Background="{StaticResource InfoSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
+                        <FontIcon Glyph="&#xE80F;" Foreground="{StaticResource SidebarActiveBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="إجمالي السندات" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
+                        <TextBlock Text="{Binding TotalEntriesText}" FontSize="24" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <TextBlock Text="كل القيود والسندات المسجلة حتى الآن"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="11"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="1"
+                Background="White"
+                BorderBrush="#F1F5F9"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="18">
+            <Grid>
+                <Border Height="3"
+                        VerticalAlignment="Top"
+                        Background="{StaticResource SuccessBrush}"
+                        CornerRadius="18,18,0,0"
+                        Margin="-18,-18,-18,0"/>
+
+                <StackPanel Spacing="14">
+                    <Border Width="44" Height="44" Background="{StaticResource SuccessSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
+                        <FontIcon Glyph="&#xE8FB;" Foreground="{StaticResource SuccessBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="المرحل" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
+                        <TextBlock Text="{Binding PostedEntriesText}" FontSize="24" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <TextBlock Text="سندات مؤثرة على الأرصدة والتقارير"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="11"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="2"
+                Background="White"
+                BorderBrush="#F1F5F9"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="18">
+            <Grid>
+                <Border Height="3"
+                        VerticalAlignment="Top"
+                        Background="{StaticResource WarningBrush}"
+                        CornerRadius="18,18,0,0"
+                        Margin="-18,-18,-18,0"/>
+
+                <StackPanel Spacing="14">
+                    <Border Width="44" Height="44" Background="{StaticResource WarningSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
+                        <FontIcon Glyph="&#xE70F;" Foreground="{StaticResource WarningBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="المسودات" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
+                        <TextBlock Text="{Binding DraftEntriesText}" FontSize="24" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <TextBlock Text="سندات بانتظار المراجعة أو الترحيل"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="11"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Column="3"
+                Background="White"
+                BorderBrush="#F1F5F9"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="18">
+            <Grid>
+                <Border Height="3"
+                        VerticalAlignment="Top"
+                        Background="{StaticResource DangerBrush}"
+                        CornerRadius="18,18,0,0"
+                        Margin="-18,-18,-18,0"/>
+
+                <StackPanel Spacing="14">
+                    <Border Width="44" Height="44" Background="{StaticResource DangerSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
+                        <FontIcon Glyph="&#xE81C;" Foreground="{StaticResource DangerBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="صافي اليوم" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
+                        <TextBlock Text="{Binding TodayNetMovementText}" FontSize="24" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding TodayMovementHintText}"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="11"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
-</Page>
+</UserControl>

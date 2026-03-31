@@ -29,25 +29,7 @@ public static class SeedData
             db.Currencies.Add(new DefaultCurrency("SYP", "ليرة سورية", "Syrian Pound", "£S", 2, true, true, 7));
             await db.SaveChangesAsync();
         }
-        // 1) Company MAIN
-        var company = await db.Companies.FirstOrDefaultAsync(x => x.Code == "MAIN");
-        if (company is null)
-        {
-            company = new Company("MAIN", "Main Company", "USD");
-            db.Companies.Add(company);
-            await db.SaveChangesAsync();
-        }
-
-        // ✅ 1b) Company BR2 (شركة ثانية للتجربة)
-        var company2 = await db.Companies.FirstOrDefaultAsync(x => x.Code == "BR2");
-        if (company2 is null)
-        {
-            company2 = new Company("BR2", "Branch 2", "USD");
-            db.Companies.Add(company2);
-            await db.SaveChangesAsync();
-        }
-
-        // 2) Role
+        // 1) Role
         var adminRole = await db.Roles.FirstOrDefaultAsync(x => x.Name == "Admin");
         if (adminRole is null)
         {
@@ -56,7 +38,7 @@ public static class SeedData
             await db.SaveChangesAsync();
         }
 
-        // 3) User
+        // 2) User
         var admin = await db.Users.FirstOrDefaultAsync(x => x.Username == "admin");
         if (admin is null)
         {
@@ -65,23 +47,7 @@ public static class SeedData
             await db.SaveChangesAsync();
         }
 
-        // 4) UserCompany link (MAIN)
-        var hasCompanyLink = await db.UserCompanies.AnyAsync(x => x.UserId == admin.Id && x.CompanyId == company.Id);
-        if (!hasCompanyLink)
-        {
-            db.UserCompanies.Add(new UserCompany(admin.Id, company.Id));
-            await db.SaveChangesAsync();
-        }
-
-        // ✅ 4b) UserCompany link (BR2)
-        var hasCompany2Link = await db.UserCompanies.AnyAsync(x => x.UserId == admin.Id && x.CompanyId == company2.Id);
-        if (!hasCompany2Link)
-        {
-            db.UserCompanies.Add(new UserCompany(admin.Id, company2.Id));
-            await db.SaveChangesAsync();
-        }
-
-        // 5) UserRole link
+        // 3) UserRole link
         var hasRoleLink = await db.UserRoles.AnyAsync(x => x.UserId == admin.Id && x.RoleId == adminRole.Id);
         if (!hasRoleLink)
         {

@@ -34,9 +34,10 @@ public sealed class EfUserCompanyRepository : IUserCompanyRepository
                 c => c.Id,
                 (uc, c) => new CompanySummaryDto(
                     c.Id,
-                    c.Name,      // ArabicName تمثل Name
-                    null,        // لا يوجد EnglishName حالياً
-                    c.BaseCurrency
+                    c.Name,
+                    null,
+                    c.BaseCurrency,
+                    c.AccountingStartDate
                 )
             )
             .AsNoTracking()

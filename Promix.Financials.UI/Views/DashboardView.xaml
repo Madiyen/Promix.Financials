@@ -2,13 +2,177 @@
     x:Class="Promix.Financials.UI.Views.DashboardView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Promix.Financials.UI.Controls">
+    xmlns:controls="using:Promix.Financials.UI.Controls"
+    xmlns:journals="using:Promix.Financials.UI.ViewModels.Journals.Models">
 
     <Grid Background="{StaticResource AppBackgroundBrush}">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="16" Padding="24,20,24,16">
+            <StackPanel Spacing="16" Padding="22,18,22,18">
+                <Border Visibility="{Binding LoadingVisibility}"
+                        Background="#E0F2FE"
+                        BorderBrush="#BFDBFE"
+                        BorderThickness="1"
+                        CornerRadius="14"
+                        Padding="12,8">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <ProgressRing Width="18" Height="18" IsActive="True"/>
+                        <TextBlock Text="جار تحميل بيانات الشاشة الرئيسية..." VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
                 <controls:KpiCards/>
-                <controls:QuickActions/>
+                <controls:QuickActions x:Name="QuickActionsPanel"/>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*"/>
+                        <ColumnDefinition Width="0.9*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0"
+                            Background="White"
+                            BorderBrush="#F1F5F9"
+                            BorderThickness="1"
+                            CornerRadius="18"
+                            Padding="18">
+                        <StackPanel Spacing="16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="اتجاه الحركة الأسبوعية" FontSize="15" FontWeight="Bold"/>
+                                    <TextBlock Text="صافي الحركة النقدية خلال آخر سبعة أيام بحسب القيود المرحلة."
+                                               Foreground="{StaticResource MutedTextBrush}"
+                                               FontSize="11.5"/>
+                                </StackPanel>
+                                <Border Grid.Column="1"
+                                        Background="#F8FAFC"
+                                        BorderBrush="#E2E8F0"
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="10,6"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="آخر 7 أيام" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
+                                </Border>
+                            </Grid>
+
+                            <Border Height="188">
+                                <ItemsControl ItemsSource="{Binding ActivityBars}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="journals:JournalActivityBarVm">
+                                            <StackPanel Width="64"
+                                                        VerticalAlignment="Bottom"
+                                                        HorizontalAlignment="Center"
+                                                        Spacing="6">
+                                                <TextBlock Text="{x:Bind ValueText}"
+                                                           Foreground="{x:Bind FillBrush}"
+                                                           FontSize="11"
+                                                           FontWeight="SemiBold"
+                                                           HorizontalAlignment="Center"/>
+                                                <Border Height="{x:Bind BarHeight}"
+                                                        Background="{x:Bind FillBrush}"
+                                                        CornerRadius="12"
+                                                        VerticalAlignment="Bottom"/>
+                                                <TextBlock Text="{x:Bind Label}"
+                                                           Foreground="{StaticResource MutedTextBrush}"
+                                                           FontSize="11"
+                                                           HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Stretch"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                            Background="White"
+                            BorderBrush="#F1F5F9"
+                            BorderThickness="1"
+                            CornerRadius="18"
+                            Padding="18">
+                        <StackPanel Spacing="16">
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="توزيع السندات" FontSize="15" FontWeight="Bold"/>
+                                <TextBlock Text="نسبة أنواع القيود والسندات داخل البيانات الحالية."
+                                           Foreground="{StaticResource MutedTextBrush}"
+                                           FontSize="11.5"/>
+                            </StackPanel>
+
+                            <StackPanel Spacing="12">
+                                <StackPanel Spacing="5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="سندات القبض" FontSize="12"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding ReceiptShareText}" FontSize="12" FontWeight="SemiBold"/>
+                                    </Grid>
+                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding ReceiptShare}" Height="8" Foreground="{StaticResource SuccessBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="سندات الصرف" FontSize="12"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding PaymentShareText}" FontSize="12" FontWeight="SemiBold"/>
+                                    </Grid>
+                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding PaymentShare}" Height="8" Foreground="{StaticResource DangerBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="قيود اليومية" FontSize="12"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding DailyShareText}" FontSize="12" FontWeight="SemiBold"/>
+                                    </Grid>
+                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding DailyShare}" Height="8" Foreground="#7C3AED"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="أنواع أخرى" FontSize="12"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding OtherShareText}" FontSize="12" FontWeight="SemiBold"/>
+                                    </Grid>
+                                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding OtherShare}" Height="8" Foreground="{StaticResource WarningBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Border Background="#F8FAFC"
+                                    BorderBrush="#E2E8F0"
+                                    BorderThickness="1"
+                                    CornerRadius="14"
+                                    Padding="14">
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="مؤشر اليوم" FontSize="12.5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding TodayMovementHintText}"
+                                               Foreground="{StaticResource SlateTextBrush}"
+                                               FontSize="11.5"
+                                               TextWrapping="WrapWholeWords"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
                 <controls:TransactionsTable/>
             </StackPanel>
         </ScrollViewer>

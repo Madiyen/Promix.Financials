@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
+using Promix.Financials.Application.Features.FinancialYears.Queries;
 using Promix.Financials.Application.Features.Journals.Queries;
 using Promix.Financials.Domain.Enums;
 using Promix.Financials.UI.ViewModels.Journals.Models;
@@ -15,6 +16,7 @@ namespace Promix.Financials.UI.ViewModels.Reports;
 public sealed class AccountStatementViewModel : INotifyPropertyChanged
 {
     private readonly IJournalEntriesQuery _query;
+    private readonly IFinancialYearQuery _financialYearQuery;
     private Guid _companyId;
     private Guid? _selectedAccountId;
     private bool _isBusy;
@@ -24,14 +26,15 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
     private string _movementsSectionHintText = "كل صف يمثل أثر السند المرحل على الحساب المختار خلال الفترة المحددة.";
     private DateTimeOffset _fromDate;
     private DateTimeOffset _toDate;
-    private int? _selectedFiscalYear;
+    private FinancialYearOptionVm? _selectedFiscalYear;
     private bool _includeZeroBalanceRows;
     private string _trialBalanceViewModeKey = "selected";
     private DateOnly? _lockedThroughDate;
 
-    public AccountStatementViewModel(IJournalEntriesQuery query)
+    public AccountStatementViewModel(IJournalEntriesQuery query, IFinancialYearQuery financialYearQuery)
     {
         _query = query;
+        _financialYearQuery = financialYearQuery;
 
         var today = DateTime.Today;
         _fromDate = new DateTimeOffset(new DateTime(today.Year, today.Month, 1));
@@ -43,7 +46,7 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
     public ObservableCollection<JournalAccountOptionVm> AccountOptions { get; } = new();
     public ObservableCollection<AccountStatementRowVm> Movements { get; } = new();
     public ObservableCollection<CashMovementDayVm> CashMovementDays { get; } = new();
-    public ObservableCollection<int> AvailableFiscalYears { get; } = new();
+    public ObservableCollection<FinancialYearOptionVm> AvailableFiscalYears { get; } = new();
     public ObservableCollection<TrialBalanceRowVm> TrialBalanceRows { get; } = new();
 
     public Guid? SelectedAccountId
@@ -84,7 +87,7 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
         }
     }
 
-    public int? SelectedFiscalYear
+    public FinancialYearOptionVm? SelectedFiscalYear
     {
         get => _selectedFiscalYear;
         set
@@ -93,10 +96,10 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
             _selectedFiscalYear = value;
             OnPropertyChanged();
 
-            if (value is int year)
+            if (value is not null)
             {
-                FromDate = new DateTimeOffset(new DateTime(year, 1, 1));
-                ToDate = new DateTimeOffset(new DateTime(year, 12, 31));
+                FromDate = new DateTimeOffset(value.StartDate.ToDateTime(TimeOnly.MinValue));
+                ToDate = new DateTimeOffset(value.EndDate.ToDateTime(TimeOnly.MinValue));
             }
         }
     }
@@ -248,9 +251,11 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
     {
         _companyId = companyId;
         await LoadAccountsAsync();
-        await LoadAllAsync();
+        await LoadReportMetadataAsync();
+        await LoadStatementPageAsync();
     }
 
+    public Task LoadStatementPageAsync() => LoadInternalAsync(loadStatement: true, loadTrialBalance: false);
     public Task LoadStatementAsync() => LoadInternalAsync(loadStatement: true, loadTrialBalance: false);
     public Task LoadTrialBalanceAsync() => LoadInternalAsync(loadStatement: false, loadTrialBalance: true);
     public Task LoadAllAsync() => LoadInternalAsync(loadStatement: true, loadTrialBalance: true);
@@ -274,7 +279,18 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
     public void SetThisYearRange()
     {
         var today = DateTime.Today;
-        SelectedFiscalYear = today.Year;
+        var preferredYear = AvailableFiscalYears.FirstOrDefault(x => x.IsActive)
+            ?? AvailableFiscalYears.FirstOrDefault(x => x.StartDate.Year == today.Year || x.EndDate.Year == today.Year);
+
+        if (preferredYear is not null)
+        {
+            SelectedFiscalYear = preferredYear;
+            return;
+        }
+
+        SelectedFiscalYear = null;
+        FromDate = new DateTimeOffset(new DateTime(today.Year, 1, 1));
+        ToDate = new DateTimeOffset(new DateTime(today.Year, 12, 31));
     }
 
     public async Task OpenAccountStatementFromTrialBalanceAsync(Guid accountId)
@@ -327,7 +343,7 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
 
         var accounts = await _query.GetPostingAccountsAsync(_companyId);
         foreach (var account in accounts)
-            AccountOptions.Add(new JournalAccountOptionVm(account.Id, account.Code, account.NameAr, account.Nature, account.SystemRole));
+            AccountOptions.Add(new JournalAccountOptionVm(account.Id, account.Code, account.NameAr, account.Nature, account.SystemRole, account.IsLegacyPartyLinkedAccount));
 
         SelectedAccountId = AccountOptions.FirstOrDefault(x => x.IsCashLike)?.Id
             ?? AccountOptions.FirstOrDefault()?.Id;
@@ -335,12 +351,24 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
 
     private async Task LoadReportMetadataAsync()
     {
-        var years = await _query.GetAvailableFiscalYearsAsync(_companyId);
+        var selectedId = SelectedFiscalYear?.Id;
+        var selectedLabel = SelectedFiscalYear?.DisplayText;
+        var years = await _financialYearQuery.GetSelectableYearsAsync(_companyId);
         var lockInfo = await _query.GetJournalPeriodLockAsync(_companyId);
 
         AvailableFiscalYears.Clear();
         foreach (var year in years)
-            AvailableFiscalYears.Add(year);
+            AvailableFiscalYears.Add(new FinancialYearOptionVm(
+                year.Id,
+                year.DisplayText,
+                year.StartDate,
+                year.EndDate,
+                year.IsActive,
+                year.IsDerivedFallback));
+
+        SelectedFiscalYear = AvailableFiscalYears.FirstOrDefault(x => x.Id == selectedId)
+            ?? AvailableFiscalYears.FirstOrDefault(x => selectedId is null && x.DisplayText == selectedLabel)
+            ?? SelectedFiscalYear;
 
         _lockedThroughDate = lockInfo.LockedThroughDate;
 

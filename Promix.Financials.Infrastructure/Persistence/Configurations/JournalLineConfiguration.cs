@@ -17,6 +17,8 @@ public sealed class JournalLineConfiguration : IEntityTypeConfiguration<JournalL
         builder.Property(x => x.JournalEntryId).IsRequired();
         builder.Property(x => x.LineNumber).IsRequired();
         builder.Property(x => x.AccountId).IsRequired();
+        builder.Property(x => x.PartyId).IsRequired(false);
+        builder.Property(x => x.PartyName).HasMaxLength(150);
         builder.Property(x => x.Description).HasMaxLength(250);
         builder.Property(x => x.Debit).HasPrecision(18, 2).IsRequired();
         builder.Property(x => x.Credit).HasPrecision(18, 2).IsRequired();
@@ -26,6 +28,11 @@ public sealed class JournalLineConfiguration : IEntityTypeConfiguration<JournalL
         builder.HasOne(x => x.Account)
             .WithMany()
             .HasForeignKey(x => x.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.Party)
+            .WithMany()
+            .HasForeignKey(x => x.PartyId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

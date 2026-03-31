@@ -14,4 +14,5 @@ public interface IUserRepository
 
     // ✅ لإعادة بناء IUserContext من Session (بدون تخزين Username داخل Session)
     Task<User?> FindByIdAsync(Guid userId, CancellationToken ct = default);
+    Task<IReadOnlyList<string>> GetRoleNamesAsync(Guid userId, CancellationToken ct = default);
 }

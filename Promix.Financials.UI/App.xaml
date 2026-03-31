@@ -11,30 +11,85 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
                 <ResourceDictionary Source="ms-appx:///Styles/Buttons.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/InputStyles.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/SurfaceStyles.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/VoucherDialogs.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Brushes -->
-            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F5F7FA"/>
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F3F6FB"/>
             <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
-            <SolidColorBrush x:Key="BorderBrushSoft" Color="#E5E9F0"/>
+            <SolidColorBrush x:Key="CardSubtleBackgroundBrush" Color="#F8FAFC"/>
+            <SolidColorBrush x:Key="BorderBrushSoft" Color="#DDE6F0"/>
+            <SolidColorBrush x:Key="BorderBrushStrong" Color="#C4D0DE"/>
 
-            <SolidColorBrush x:Key="PrimaryTextBrush" Color="#1E3A5F"/>
-            <SolidColorBrush x:Key="MutedTextBrush" Color="#94A3B8"/>
-            <SolidColorBrush x:Key="SlateTextBrush" Color="#64748B"/>
+            <SolidColorBrush x:Key="PrimaryTextBrush" Color="#16324F"/>
+            <SolidColorBrush x:Key="SecondaryTextBrush" Color="#41566E"/>
+            <SolidColorBrush x:Key="MutedTextBrush" Color="#6B7E95"/>
+            <SolidColorBrush x:Key="SlateTextBrush" Color="#5F728A"/>
+            <SolidColorBrush x:Key="FocusRingBrush" Color="#2563EB"/>
 
-            <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#1E3A5F"/>
+            <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#203C61"/>
             <SolidColorBrush x:Key="SidebarActiveBrush" Color="#3B82F6"/>
+            <SolidColorBrush x:Key="SidebarCardBackgroundBrush" Color="#2B537F"/>
+            <SolidColorBrush x:Key="SidebarMutedTextBrush" Color="#E3EDFF"/>
+            <SolidColorBrush x:Key="SidebarSoftTextBrush" Color="#C4D4EA"/>
+            <SolidColorBrush x:Key="SidebarHoverBrush" Color="#1EFFFFFF"/>
+
+            <SolidColorBrush x:Key="SuccessBrush" Color="#10B981"/>
+            <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
+            <SolidColorBrush x:Key="DangerBrush" Color="#EF4444"/>
+            <SolidColorBrush x:Key="SuccessSurfaceBrush" Color="#ECFDF5"/>
+            <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFF7ED"/>
+            <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FEF2F2"/>
+            <SolidColorBrush x:Key="InfoSurfaceBrush" Color="#EFF6FF"/>
+            <SolidColorBrush x:Key="SelectionHoverBrush" Color="#F1F6FD"/>
+            <SolidColorBrush x:Key="SelectionPressedBrush" Color="#E6EEF9"/>
+            <SolidColorBrush x:Key="SelectionSelectedBrush" Color="#EAF3FF"/>
+            <SolidColorBrush x:Key="SelectionHoverBorderBrush" Color="#C9DAF0"/>
+            <SolidColorBrush x:Key="SelectionSelectedBorderBrush" Color="#7CB3FF"/>
 
             <!-- Action Buttons -->
             <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#2563EB"/>
             <SolidColorBrush x:Key="PrimaryButtonHoverBrush" Color="#1D4ED8"/>
             <SolidColorBrush x:Key="PrimaryButtonPressedBrush" Color="#1E40AF"/>
+            <SolidColorBrush x:Key="PrimaryButtonDisabledBrush" Color="#BFDBFE"/>
 
-            <SolidColorBrush x:Key="SecondaryButtonBrush" Color="#E2E8F0"/>
-            <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="#CBD5E1"/>
-            <SolidColorBrush x:Key="SecondaryButtonPressedBrush" Color="#94A3B8"/>
-            <SolidColorBrush x:Key="SecondaryButtonTextBrush" Color="#1E3A5F"/>
+            <SolidColorBrush x:Key="SecondaryButtonBrush" Color="#F8FAFC"/>
+            <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="#EEF4FB"/>
+            <SolidColorBrush x:Key="SecondaryButtonPressedBrush" Color="#DEE8F5"/>
+            <SolidColorBrush x:Key="SecondaryButtonTextBrush" Color="#16324F"/>
+            <SolidColorBrush x:Key="SecondaryButtonDisabledBrush" Color="#F1F5F9"/>
+
+            <SolidColorBrush x:Key="DangerButtonBrush" Color="#DC2626"/>
+            <SolidColorBrush x:Key="DangerButtonHoverBrush" Color="#B91C1C"/>
+            <SolidColorBrush x:Key="DangerButtonPressedBrush" Color="#991B1B"/>
+            <SolidColorBrush x:Key="DangerButtonDisabledBrush" Color="#FECACA"/>
+
+            <SolidColorBrush x:Key="GhostButtonHoverBrush" Color="#EEF4FB"/>
+            <SolidColorBrush x:Key="GhostButtonPressedBrush" Color="#DEE8F5"/>
+            <SolidColorBrush x:Key="GhostButtonDisabledBrush" Color="#F8FAFC"/>
+
+            <SolidColorBrush x:Key="SidebarButtonPressedBrush" Color="#315988"/>
+            <SolidColorBrush x:Key="SidebarButtonDisabledBrush" Color="#294B72"/>
+
+            <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#94A3B8"/>
+            <SolidColorBrush x:Key="DisabledBorderBrush" Color="#D6E0EB"/>
+
+            <Style x:Key="InlineErrorBannerStyle" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource DangerSurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="#FECACA"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="Padding" Value="14,10"/>
+            </Style>
+
+            <Style x:Key="InlineSuccessBannerStyle" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource SuccessSurfaceBrush}"/>
+                <Setter Property="BorderBrush" Value="#BBF7D0"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="Padding" Value="14,10"/>
+            </Style>
 
             <Style x:Key="DataGridEnglishTextStyle" TargetType="TextBlock">
                 <Setter Property="Language" Value="en-US"/>
@@ -43,66 +98,6 @@
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
             </Style>
-
-            <Style TargetType="ComboBox">
-                <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
-                <Setter Property="PlaceholderForeground" Value="#64748B"/>
-            </Style>
-
-            <Style TargetType="TextBox">
-                <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
-                <Setter Property="PlaceholderForeground" Value="#64748B"/>
-            </Style>
-
-            <Style TargetType="ComboBoxItem">
-                <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
-                <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
-            </Style>
-
-            <Style x:Key="PrimaryActionButtonStyle" TargetType="Button">
-                <Setter Property="Background" Value="{StaticResource PrimaryButtonBrush}"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="BorderBrush" Value="{StaticResource PrimaryButtonBrush}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Padding" Value="14,8"/>
-                <Setter Property="MinHeight" Value="40"/>
-                <Setter Property="CornerRadius" Value="10"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-            </Style>
-
-            <Style x:Key="SecondaryActionButtonStyle" TargetType="Button">
-                <Setter Property="Background" Value="{StaticResource SecondaryButtonBrush}"/>
-                <Setter Property="Foreground" Value="{StaticResource SecondaryButtonTextBrush}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Padding" Value="14,8"/>
-                <Setter Property="MinHeight" Value="40"/>
-                <Setter Property="CornerRadius" Value="10"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-            </Style>
-
-            <!-- Sidebar Styles -->
-            <Style x:Key="SidebarNavButtonStyle" TargetType="Button">
-                <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                <Setter Property="Height" Value="44"/>
-                <Setter Property="Padding" Value="12,0"/>
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="FontSize" Value="13"/>
-                <Setter Property="FontWeight" Value="SemiBold"/>
-                <Setter Property="CornerRadius" Value="12"/>
-            </Style>
-
-            <Style x:Key="SidebarLogoutButtonStyle"
-                   TargetType="Button"
-                   BasedOn="{StaticResource SidebarNavButtonStyle}">
-                <Setter Property="Background" Value="#24466E"/>
-            </Style>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>

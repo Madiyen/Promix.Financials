@@ -1,5 +1,6 @@
 using Promix.Financials.Domain.Common;
 using Promix.Financials.Domain.Aggregates.Accounts;
+using Promix.Financials.Domain.Aggregates.Parties;
 using Promix.Financials.Domain.Exceptions;
 
 namespace Promix.Financials.Domain.Aggregates.Journals;
@@ -12,6 +13,8 @@ public sealed class JournalLine : Entity<Guid>
         Guid journalEntryId,
         int lineNumber,
         Guid accountId,
+        Guid? partyId,
+        string? partyName,
         string? description,
         decimal debit,
         decimal credit)
@@ -32,6 +35,8 @@ public sealed class JournalLine : Entity<Guid>
         JournalEntryId = journalEntryId;
         LineNumber = lineNumber;
         AccountId = accountId;
+        PartyId = partyId == Guid.Empty ? null : partyId;
+        PartyName = string.IsNullOrWhiteSpace(partyName) ? null : partyName.Trim();
         Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
         Debit = decimal.Round(debit, 2, MidpointRounding.AwayFromZero);
         Credit = decimal.Round(credit, 2, MidpointRounding.AwayFromZero);
@@ -40,9 +45,12 @@ public sealed class JournalLine : Entity<Guid>
     public Guid JournalEntryId { get; private set; }
     public int LineNumber { get; private set; }
     public Guid AccountId { get; private set; }
+    public Guid? PartyId { get; private set; }
+    public string? PartyName { get; private set; }
     public string? Description { get; private set; }
     public decimal Debit { get; private set; }
     public decimal Credit { get; private set; }
     public JournalEntry JournalEntry { get; private set; } = default!;
     public Account Account { get; private set; } = default!;
+    public Party? Party { get; private set; }
 }

@@ -19,7 +19,7 @@ public sealed class JournalEntriesQueryTests
             .UseInMemoryDatabase(databaseName)
             .Options;
 
-        var company = new Company("CMP2001", "Main", "USD");
+        var company = new Company("CMP2001", "Main", "USD", new DateOnly(2026, 1, 1));
         company.LockJournalThrough(new DateOnly(2026, 3, 31), Guid.NewGuid(), DateTimeOffset.UtcNow);
 
         var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
@@ -91,7 +91,7 @@ public sealed class JournalEntriesQueryTests
             .Options;
 
         var lockedByUserId = Guid.NewGuid();
-        var company = new Company("CMP2002", "Locked", "USD");
+        var company = new Company("CMP2002", "Locked", "USD", new DateOnly(2026, 1, 1));
         company.LockJournalThrough(new DateOnly(2026, 4, 1), lockedByUserId, new DateTimeOffset(2026, 4, 1, 18, 30, 0, TimeSpan.Zero));
 
         await using (var db = new PromixDbContext(options))
@@ -106,5 +106,98 @@ public sealed class JournalEntriesQueryTests
         Assert.Equal(new DateOnly(2026, 4, 1), lockInfo.LockedThroughDate);
         Assert.Equal(lockedByUserId, lockInfo.LockedByUserId);
         Assert.NotNull(lockInfo.LockedAtUtc);
+    }
+
+    [Fact]
+    public async Task GetEntryDetailAsync_ReturnsPartyNames()
+    {
+        var databaseName = Guid.NewGuid().ToString("N");
+        var options = new DbContextOptionsBuilder<PromixDbContext>()
+            .UseInMemoryDatabase(databaseName)
+            .Options;
+
+        var company = new Company("CMP2003", "Detail", "USD", new DateOnly(2026, 1, 1));
+        var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
+        var customerAccount = new Account(company.Id, "1220", "مدينون مختلفون", null, AccountNature.Debit, true, null, null, null, null, true);
+
+        JournalEntry receiptEntry;
+        await using (var db = new PromixDbContext(options))
+        {
+            db.Companies.Add(company);
+            db.Accounts.AddRange(cashAccount, customerAccount);
+
+            receiptEntry = new JournalEntry(
+                company.Id,
+                "RV-0002",
+                new DateOnly(2026, 3, 15),
+                JournalEntryType.ReceiptVoucher,
+                "USD",
+                1m,
+                180m,
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow,
+                "REF-1",
+                "قبض تفصيلي");
+            receiptEntry.AddLine(cashAccount.Id, null, "الحساب النقدي", 180m, 0m);
+            receiptEntry.AddLine(customerAccount.Id, "عميل مميز", "مقابل القبض", 0m, 180m);
+
+            db.JournalEntries.Add(receiptEntry);
+            await db.SaveChangesAsync();
+        }
+
+        var query = new JournalEntriesQuery(new TestDbContextFactory(options));
+        var detail = await query.GetEntryDetailAsync(company.Id, receiptEntry.Id);
+
+        Assert.NotNull(detail);
+        Assert.Equal("RV-0002", detail!.EntryNumber);
+        Assert.Contains(detail.Lines, x => x.AccountId == customerAccount.Id && x.PartyName == "عميل مميز");
+    }
+
+    [Fact]
+    public async Task GetEntriesAndTrialBalanceAsync_IgnoreSoftDeletedEntries()
+    {
+        var databaseName = Guid.NewGuid().ToString("N");
+        var options = new DbContextOptionsBuilder<PromixDbContext>()
+            .UseInMemoryDatabase(databaseName)
+            .Options;
+
+        var company = new Company("CMP2004", "Deleted", "USD", new DateOnly(2026, 1, 1));
+        var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
+        var revenueAccount = new Account(company.Id, "4101", "إيراد خدمات", null, AccountNature.Credit, true, null, null, null, null, true);
+
+        await using (var db = new PromixDbContext(options))
+        {
+            db.Companies.Add(company);
+            db.Accounts.AddRange(cashAccount, revenueAccount);
+
+            var deletedEntry = new JournalEntry(
+                company.Id,
+                "RV-0003",
+                new DateOnly(2026, 3, 20),
+                JournalEntryType.ReceiptVoucher,
+                "USD",
+                1m,
+                250m,
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow,
+                null,
+                "محذوف");
+            deletedEntry.AddLine(cashAccount.Id, null, 250m, 0m);
+            deletedEntry.AddLine(revenueAccount.Id, null, 0m, 250m);
+            deletedEntry.Post(Guid.NewGuid(), DateTimeOffset.UtcNow);
+            deletedEntry.Delete(Guid.NewGuid(), DateTimeOffset.UtcNow);
+
+            db.JournalEntries.Add(deletedEntry);
+            await db.SaveChangesAsync();
+        }
+
+        var query = new JournalEntriesQuery(new TestDbContextFactory(options));
+        var entries = await query.GetEntriesAsync(company.Id);
+        var trialBalance = await query.GetTrialBalanceAsync(company.Id, new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31), includeZeroBalance: false);
+        var cashMovements = await query.GetCashMovementSeriesAsync(company.Id, new DateOnly(2026, 3, 1), new DateOnly(2026, 3, 31));
+
+        Assert.Empty(entries);
+        Assert.Empty(trialBalance);
+        Assert.Empty(cashMovements);
     }
 }

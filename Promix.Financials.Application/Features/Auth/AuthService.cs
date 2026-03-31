@@ -37,6 +37,7 @@ public sealed class AuthService : IAuthService
             return LoginResult.Failed("InvalidCredentials");
 
         var now = _clock.UtcNow;
+        var roleNames = await _users.GetRoleNamesAsync(user.Id, ct);
 
         var expires = command.RememberMe
             ? now.AddDays(30)
@@ -46,6 +47,7 @@ public sealed class AuthService : IAuthService
         {
             UserId = user.Id,
             CompanyId = null,
+            RoleNames = roleNames.ToList(),
             CreatedAtUtc = now,
             ExpiresAtUtc = expires
         };

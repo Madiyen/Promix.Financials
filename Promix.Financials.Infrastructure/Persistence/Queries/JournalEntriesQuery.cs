@@ -23,7 +23,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
 
         return await db.Set<JournalEntry>()
             .AsNoTracking()
-            .Where(x => x.CompanyId == companyId)
+            .Where(x => x.CompanyId == companyId && !x.IsDeleted)
             .OrderByDescending(x => x.EntryDate)
             .ThenByDescending(x => x.CreatedAtUtc)
             .Select(x => new JournalEntrySummaryDto(
@@ -34,11 +34,52 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
                 (int)x.Status,
                 x.ReferenceNo,
                 x.Description,
+                x.CurrencyCode,
+                x.ExchangeRate,
+                x.CurrencyAmount,
                 x.Lines.Sum(l => l.Debit),
                 x.Lines.Sum(l => l.Credit),
                 x.Lines.Count,
-                x.CreatedAtUtc))
+                x.CreatedAtUtc,
+                x.PostedAtUtc,
+                x.ModifiedAtUtc))
             .ToListAsync(ct);
+    }
+
+    public async Task<JournalEntryDetailDto?> GetEntryDetailAsync(Guid companyId, Guid entryId, CancellationToken ct = default)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync(ct);
+
+        return await db.Set<JournalEntry>()
+            .AsNoTracking()
+            .Where(x => x.CompanyId == companyId && x.Id == entryId && !x.IsDeleted)
+            .Select(x => new JournalEntryDetailDto(
+                x.Id,
+                x.EntryNumber,
+                x.EntryDate,
+                (int)x.Type,
+                (int)x.Status,
+                x.ReferenceNo,
+                x.Description,
+                x.CurrencyCode,
+                x.ExchangeRate,
+                x.CurrencyAmount,
+                x.CreatedAtUtc,
+                x.PostedAtUtc,
+                x.ModifiedByUserId,
+                x.ModifiedAtUtc,
+                x.Lines
+                    .OrderBy(line => line.LineNumber)
+                    .Select(line => new JournalEntryDetailLineDto(
+                        line.AccountId,
+                        line.Debit,
+                        line.Credit,
+                        line.PartyName,
+                        line.Description,
+                        line.PartyId))
+                    .ToList(),
+                x.TransferSettlementMode))
+            .SingleOrDefaultAsync(ct);
     }
 
     public async Task<IReadOnlyList<JournalPostingAccountDto>> GetPostingAccountsAsync(Guid companyId, CancellationToken ct = default)
@@ -49,7 +90,15 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
             .AsNoTracking()
             .Where(x => x.CompanyId == companyId && x.IsPosting && x.IsActive)
             .OrderBy(x => x.Code)
-            .Select(x => new JournalPostingAccountDto(x.Id, x.Code, x.NameAr, x.Nature, x.SystemRole))
+            .Select(x => new JournalPostingAccountDto(
+                x.Id,
+                x.Code,
+                x.NameAr,
+                x.Nature,
+                x.SystemRole,
+                db.Parties.Any(p => p.CompanyId == companyId
+                    && p.LedgerMode == PartyLedgerMode.LegacyLinkedAccounts
+                    && (p.ReceivableAccountId == x.Id || p.PayableAccountId == x.Id))))
             .ToListAsync(ct);
     }
 
@@ -79,7 +128,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
 
         var years = await db.Set<JournalEntry>()
             .AsNoTracking()
-            .Where(x => x.CompanyId == companyId)
+            .Where(x => x.CompanyId == companyId && !x.IsDeleted)
             .Select(x => x.EntryDate.Year)
             .Distinct()
             .OrderByDescending(x => x)
@@ -135,6 +184,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
             .AsNoTracking()
             .Where(line => line.AccountId == accountId
                 && line.JournalEntry.CompanyId == companyId
+                && !line.JournalEntry.IsDeleted
                 && line.JournalEntry.Status == JournalEntryStatus.Posted
                 && line.JournalEntry.EntryDate < fromDate)
             .GroupBy(_ => 1)
@@ -149,6 +199,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
             .AsNoTracking()
             .Where(line => line.AccountId == accountId
                 && line.JournalEntry.CompanyId == companyId
+                && !line.JournalEntry.IsDeleted
                 && line.JournalEntry.Status == JournalEntryStatus.Posted
                 && line.JournalEntry.EntryDate >= fromDate
                 && line.JournalEntry.EntryDate <= toDate)
@@ -213,6 +264,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
         var openingSums = await db.Set<JournalLine>()
             .AsNoTracking()
             .Where(line => line.JournalEntry.CompanyId == companyId
+                && !line.JournalEntry.IsDeleted
                 && line.JournalEntry.Status == JournalEntryStatus.Posted
                 && line.JournalEntry.EntryDate < fromDate)
             .GroupBy(line => line.AccountId)
@@ -227,6 +279,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
         var periodSums = await db.Set<JournalLine>()
             .AsNoTracking()
             .Where(line => line.JournalEntry.CompanyId == companyId
+                && !line.JournalEntry.IsDeleted
                 && line.JournalEntry.Status == JournalEntryStatus.Posted
                 && line.JournalEntry.EntryDate >= fromDate
                 && line.JournalEntry.EntryDate <= toDate)
@@ -321,6 +374,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
             .AsNoTracking()
             .Where(line => ids.Contains(line.AccountId)
                 && line.JournalEntry.CompanyId == companyId
+                && !line.JournalEntry.IsDeleted
                 && line.JournalEntry.Status == JournalEntryStatus.Posted
                 && line.JournalEntry.EntryDate <= throughDate)
             .GroupBy(line => line.AccountId)
@@ -364,6 +418,7 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
         var cashLines = await db.Set<JournalLine>()
             .AsNoTracking()
             .Where(line => line.JournalEntry.CompanyId == companyId
+                && !line.JournalEntry.IsDeleted
                 && line.JournalEntry.Status == JournalEntryStatus.Posted
                 && line.JournalEntry.EntryDate >= fromDate
                 && line.JournalEntry.EntryDate <= toDate

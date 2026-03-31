@@ -40,6 +40,9 @@ public sealed class UserContextBootstrapper : IUserContextBootstrapper   // ✅ 
             return;
         }
 
+        if (session.RoleNames.Count == 0)
+            session.RoleNames = (await _users.GetRoleNamesAsync(session.UserId, ct)).ToList();
+
         _userContext.SetSession(session, user.Username);
     }
 }

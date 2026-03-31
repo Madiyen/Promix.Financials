@@ -1,31 +1,56 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+namespace Promix.Financials.UI.Controls;
 
-namespace Promix.Financials.UI.Controls
+public sealed partial class QuickActions : UserControl
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class QuickActions : Page
+    public event EventHandler<QuickActionRequestedEventArgs>? QuickActionRequested;
+
+    public QuickActions()
     {
-        public QuickActions()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
+
+    private void ReceiptVoucher_Click(object sender, RoutedEventArgs e)
+        => Raise(DashboardQuickAction.CreateReceiptVoucher);
+
+    private void PaymentVoucher_Click(object sender, RoutedEventArgs e)
+        => Raise(DashboardQuickAction.CreatePaymentVoucher);
+
+    private void TransferVoucher_Click(object sender, RoutedEventArgs e)
+        => Raise(DashboardQuickAction.CreateTransferVoucher);
+
+    private void DailyJournal_Click(object sender, RoutedEventArgs e)
+        => Raise(DashboardQuickAction.CreateDailyJournal);
+
+    private void Accounts_Click(object sender, RoutedEventArgs e)
+        => Raise(DashboardQuickAction.OpenAccounts);
+
+    private void Reports_Click(object sender, RoutedEventArgs e)
+        => Raise(DashboardQuickAction.OpenReports);
+
+    private void Raise(DashboardQuickAction action)
+        => QuickActionRequested?.Invoke(this, new QuickActionRequestedEventArgs(action));
+}
+
+public enum DashboardQuickAction
+{
+    CreateReceiptVoucher,
+    CreatePaymentVoucher,
+    CreateTransferVoucher,
+    CreateDailyJournal,
+    OpenAccounts,
+    OpenReports
+}
+
+public sealed class QuickActionRequestedEventArgs : EventArgs
+{
+    public QuickActionRequestedEventArgs(DashboardQuickAction action)
+    {
+        Action = action;
+    }
+
+    public DashboardQuickAction Action { get; }
 }

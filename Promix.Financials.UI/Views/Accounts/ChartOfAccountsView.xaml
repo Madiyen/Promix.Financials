@@ -2,332 +2,792 @@
     x:Class="Promix.Financials.UI.Views.Accounts.ChartOfAccountsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:converters="using:Promix.Financials.UI.Converters"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     FlowDirection="RightToLeft"
     Background="{StaticResource AppBackgroundBrush}">
 
     <Page.Resources>
-        <converters:AccountTypeToBrushConverter x:Key="AccountTypeToBrushConverter"/>
-        <converters:AccountIconConverter x:Key="AccountIconConverter"/>
-        <converters:AccountFontWeightConverter x:Key="AccountFontWeightConverter"/>
-        <converters:AccountNameBrushConverter x:Key="AccountNameBrushConverter"/>
-        <converters:EmptyToCollapsedConverter x:Key="EmptyToCollapsedConverter"/>
-
-        <Style x:Key="EnglishDigitsTextStyle" TargetType="TextBlock">
-            <Setter Property="Language" Value="en-US"/>
-        </Style>
-
         <Style x:Key="TreeItemStyle" TargetType="TreeViewItem">
-            <Setter Property="Padding" Value="6,4"/>
-            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
             <Setter Property="IsExpanded" Value="True"/>
-            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="FlowDirection" Value="RightToLeft"/>
         </Style>
     </Page.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Padding="20" RowSpacing="16">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Grid Padding="16" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <Border Grid.Row="0"
-                    Background="{StaticResource CardBackgroundBrush}"
-                    BorderBrush="{StaticResource BorderBrushSoft}"
-                    BorderThickness="1"
-                    CornerRadius="16"
-                    Padding="16">
-                <Grid ColumnSpacing="12">
+        <Border Grid.Row="0"
+                Style="{StaticResource AppSurfaceCardStyle}"
+                Padding="18,16">
+            <Grid ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            HorizontalAlignment="Left">
+                    <Button Click="NewAccount_Click" Style="{StaticResource PrimaryActionButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE710;" Foreground="White"/>
+                            <TextBlock Text="حساب جديد" Foreground="White"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding RefreshCommand}" Style="{StaticResource SecondaryActionButtonStyle}">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE72C;"/>
+                            <TextBlock Text="تحديث"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="4" HorizontalAlignment="Right">
+                    <TextBlock Text="شجرة الحسابات" Style="{StaticResource AppPageTitleTextStyle}"/>
+                    <TextBlock Text="اعرض الحسابات ضمن مساحة عمل واسعة وقابلة للتمرير، ثم افتح العرض الشجري عند الحاجة إلى البنية الكاملة."
+                               Style="{StaticResource AppPageSubtitleTextStyle}"
+                               MaxWidth="620"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <InfoBar Grid.Row="1"
+                 IsOpen="{Binding HasErrorMessage, Mode=OneWay}"
+                 Severity="Error"
+                 Title="تعذّر تحميل الحسابات"
+                 Message="{Binding ErrorMessage}"/>
+
+        <TabView Grid.Row="2"
+                 Style="{StaticResource AppTabViewStyle}"
+                 SelectedIndex="{Binding SelectedWorkspaceTabIndex, Mode=TwoWay}"
+                 TabWidthMode="Equal"
+                 Padding="0">
+            <TabView.Resources>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="#F8FAFC"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="#EEF4FB"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#EAF3FF"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPressed" Color="#DEE8F5"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderForeground" Color="#16324F"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderForegroundPointerOver" Color="#16324F"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderForegroundSelected" Color="#1D4ED8"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderForegroundDisabled" Color="#94A3B8"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrush" Color="#DDE6F0"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushPointerOver" Color="#C4D0DE"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushSelected" Color="#7CB3FF"/>
+                <Style TargetType="TabViewItem" BasedOn="{StaticResource AppTabViewItemStyle}"/>
+            </TabView.Resources>
+            <TabViewItem>
+                <TabViewItem.Header>
+                    <TextBlock Text="الحسابات" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                </TabViewItem.Header>
+                <Grid ColumnSpacing="16" Padding="0,10,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="0"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0"
-                                Orientation="Horizontal"
-                                Spacing="8"
-                                VerticalAlignment="Center">
+                    <Border Grid.Column="0"
+                            Style="{StaticResource AppSurfaceCardStyle}"
+                            Padding="16">
+                        <Grid RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                        <Button Click="NewAccount_Click"
-                                Style="{StaticResource PrimaryActionButtonStyle}">
-                            <Button.Resources>
-                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#1D4ED8"/>
-                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#1E40AF"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="White"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPressed" Color="White"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#1D4ED8"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#1E40AF"/>
-                            </Button.Resources>
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE710;" Foreground="White"/>
-                                <TextBlock Text="حساب جديد" Foreground="White"/>
-                            </StackPanel>
-                        </Button>
+                            <Grid Grid.Row="0" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="130"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
-                        <Button Command="{Binding RefreshCommand}"
-                                Style="{StaticResource SecondaryActionButtonStyle}">
-                            <Button.Resources>
-                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#CBD5E1"/>
-                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#94A3B8"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#1E3A5F"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#1E3A5F"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#CBD5E1"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#94A3B8"/>
-                            </Button.Resources>
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE72C;"/>
-                                <TextBlock Text="تحديث"/>
-                            </StackPanel>
-                        </Button>
+                                <TextBox Grid.Column="0"
+                                         Style="{StaticResource SearchBoxStyle}"
+                                         PlaceholderText="ابحث بالكود أو الاسم أو الحساب الأب..."
+                                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                        <Button Click="ExpandAll_Click"
-                                Style="{StaticResource SecondaryActionButtonStyle}">
-                            <Button.Resources>
-                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#CBD5E1"/>
-                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#94A3B8"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#1E3A5F"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#1E3A5F"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#CBD5E1"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#94A3B8"/>
-                            </Button.Resources>
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE70D;"/>
-                                <TextBlock Text="توسيع الكل"/>
-                            </StackPanel>
-                        </Button>
+                                <ComboBox Grid.Column="1"
+                                          Style="{StaticResource InputComboBoxStyle}"
+                                          ItemsSource="{Binding PostingFilters}"
+                                          SelectedItem="{Binding SelectedPostingFilter, Mode=TwoWay}"/>
 
-                        <Button Click="CollapseAll_Click"
-                                Style="{StaticResource SecondaryActionButtonStyle}">
-                            <Button.Resources>
-                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#CBD5E1"/>
-                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#94A3B8"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#1E3A5F"/>
-                                <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#1E3A5F"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#CBD5E1"/>
-                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#94A3B8"/>
-                            </Button.Resources>
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE70E;"/>
-                                <TextBlock Text="طي الكل"/>
-                            </StackPanel>
-                        </Button>
+                                <ComboBox Grid.Column="2"
+                                          Style="{StaticResource InputComboBoxStyle}"
+                                          ItemsSource="{Binding OriginFilters}"
+                                          SelectedItem="{Binding SelectedOriginFilter, Mode=TwoWay}"/>
 
-                        <ComboBox Width="160"
-                                  ItemsSource="{Binding FiscalYears}"
-                                  SelectedItem="{Binding SelectedFiscalYear}"
-                                  DisplayMemberPath="DisplayName"
-                                  Language="en-US"/>
-                    </StackPanel>
+                                <Button x:Name="SystemFilterChipButton"
+                                        Grid.Column="3"
+                                        Click="SystemFilterChipButton_Click"
+                                        Content="{Binding SystemFilterLabel}"/>
 
-                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                        <TextBlock Text="شجرة الحسابات"
-                                   FontSize="24"
-                                   FontWeight="SemiBold"/>
-                        <TextBlock Text="عرض هرمي للحسابات (الأب والابن)"
-                                   Foreground="{StaticResource SlateTextBrush}"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                                <Button x:Name="InactiveFilterChipButton"
+                                        Grid.Column="4"
+                                        Click="InactiveFilterChipButton_Click"
+                                        Content="{Binding InactiveFilterLabel}"/>
 
-            <!-- KPI -->
-            <Border Grid.Row="1"
-                    Background="{StaticResource CardBackgroundBrush}"
-                    BorderBrush="{StaticResource BorderBrushSoft}"
-                    BorderThickness="1"
-                    CornerRadius="16"
-                    Padding="16">
-                <StackPanel Orientation="Horizontal" Spacing="40">
-                    <StackPanel>
-                        <TextBlock Text="الحسابات الفعالة"
-                                   Foreground="{StaticResource SlateTextBrush}"/>
-                        <TextBlock Text="{Binding Kpis.ActiveAccountsText}"
-                                   FontSize="20"
-                                   FontWeight="SemiBold"
-                                   Language="en-US"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+                                <Button x:Name="PartyFilterChipButton"
+                                        Grid.Column="5"
+                                        Click="PartyFilterChipButton_Click"
+                                        Content="{Binding PartyFilterLabel}"/>
+                            </Grid>
 
-            <!-- Main -->
-            <Border Grid.Row="2"
-                    Background="{StaticResource CardBackgroundBrush}"
-                    BorderBrush="{StaticResource BorderBrushSoft}"
-                    BorderThickness="1"
-                    CornerRadius="16"
-                    Padding="16">
+                            <Border Grid.Row="1"
+                                    Background="#F8FAFC"
+                                    BorderBrush="#E2E8F0"
+                                    BorderThickness="1"
+                                    CornerRadius="16"
+                                    Padding="14,10">
+                                <Grid ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="92"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="156"/>
+                                        <ColumnDefinition Width="86"/>
+                                        <ColumnDefinition Width="96"/>
+                                        <ColumnDefinition Width="98"/>
+                                        <ColumnDefinition Width="132"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="الكود" Style="{StaticResource FieldLabelStyle}"/>
+                                    <TextBlock Grid.Column="1" Text="اسم الحساب" Style="{StaticResource FieldLabelStyle}"/>
+                                    <TextBlock Grid.Column="2" Text="الفئة" Style="{StaticResource FieldLabelStyle}"/>
+                                    <TextBlock Grid.Column="3" Text="الرصيد" Style="{StaticResource FieldLabelStyle}"/>
+                                    <TextBlock Grid.Column="4" Text="مدين/دائن" Style="{StaticResource FieldLabelStyle}"/>
+                                    <TextBlock Grid.Column="5" Text="الحالة" Style="{StaticResource FieldLabelStyle}"/>
+                                    <TextBlock Grid.Column="6" Text="الأصل" Style="{StaticResource FieldLabelStyle}"/>
+                                    <TextBlock Grid.Column="7" Text="الإجراءات" Style="{StaticResource FieldLabelStyle}"/>
+                                </Grid>
+                            </Border>
 
-                <Grid RowSpacing="12">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                            <Border Grid.Row="2"
+                                    Background="#FBFDFF"
+                                    BorderBrush="#E2E8F0"
+                                    BorderThickness="1"
+                                    CornerRadius="18"
+                                    Padding="8">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <ItemsControl ItemsSource="{Binding AccountGroups}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
+                                                          Margin="0,0,0,10">
+                                                    <Expander.Header>
+                                                        <Border Background="#F8FAFC"
+                                                                BorderBrush="#E2E8F0"
+                                                                BorderThickness="1"
+                                                                CornerRadius="14"
+                                                                Padding="14,10">
+                                                            <Grid ColumnSpacing="10">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                </Grid.ColumnDefinitions>
 
-                    <!-- ✅ شريط البحث واضح وبارز -->
-                    <Border Grid.Row="0"
-            Background="#EFF6FF"
-            BorderBrush="#BFDBFE"
-            BorderThickness="1"
-            CornerRadius="12"
-            Padding="12,10">
-                        <Grid ColumnSpacing="10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                                                                <StackPanel Grid.Column="0"
+                                                                            Orientation="Horizontal"
+                                                                            Spacing="10"
+                                                                            VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding ParentCode}"
+                                                                               Foreground="#1D4ED8"
+                                                                               FontWeight="Bold"
+                                                                               FontSize="12.5"
+                                                                               Language="en-US"/>
+                                                                    <TextBlock Text="{Binding ParentName}"
+                                                                               FontSize="14"
+                                                                               FontWeight="SemiBold"
+                                                                               Foreground="{StaticResource SlateTextBrush}"/>
+                                                                    <Border Background="#EEF6FF"
+                                                                            BorderBrush="#BFDBFE"
+                                                                            BorderThickness="1"
+                                                                            CornerRadius="999"
+                                                                            Padding="8,3">
+                                                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                            <TextBlock Text="الحسابات"
+                                                                                       Foreground="#1D4ED8"
+                                                                                       FontSize="10.5"
+                                                                                       FontWeight="SemiBold"/>
+                                                                            <TextBlock Text="{Binding AccountCountText}"
+                                                                                       Foreground="#1D4ED8"
+                                                                                       FontSize="10.5"
+                                                                                       FontWeight="SemiBold"
+                                                                                       Language="en-US"/>
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                </StackPanel>
 
-                            <FontIcon Grid.Column="0"
-                      Glyph="&#xE721;"
-                      FontSize="16"
-                      Foreground="#2563EB"
-                      VerticalAlignment="Center"/>
+                                                                <TextBlock Grid.Column="1"
+                                                                           Text="الرصيد المجمع"
+                                                                           Style="{StaticResource FieldLabelStyle}"
+                                                                           VerticalAlignment="Center"
+                                                                           Margin="0,0,8,0"/>
+                                                                <TextBlock Grid.Column="2"
+                                                                           Text="{Binding HeaderBalanceText}"
+                                                                           FontSize="14"
+                                                                           FontWeight="Bold"
+                                                                           Foreground="{StaticResource SlateTextBrush}"
+                                                                           VerticalAlignment="Center"
+                                                                           Language="en-US"/>
+                                                            </Grid>
+                                                        </Border>
+                                                    </Expander.Header>
 
-                            <TextBox Grid.Column="1"
-                     PlaceholderText="بحث بالكود أو الاسم..."
-                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     Background="Transparent"
-                     BorderThickness="0"
-                     VerticalAlignment="Center"
-                     FontSize="14"/>
+                                                    <ItemsControl ItemsSource="{Binding Accounts}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border Background="{Binding RowBackgroundBrush}"
+                                                                        BorderBrush="{Binding RowBorderBrush}"
+                                                                        BorderThickness="1"
+                                                                        CornerRadius="14"
+                                                                        Padding="10"
+                                                                        Margin="0,8,0,0">
+                                                                    <Grid ColumnSpacing="10">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="92"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="140"/>
+                                                                            <ColumnDefinition Width="156"/>
+                                                                            <ColumnDefinition Width="86"/>
+                                                                            <ColumnDefinition Width="96"/>
+                                                                            <ColumnDefinition Width="98"/>
+                                                                            <ColumnDefinition Width="132"/>
+                                                                        </Grid.ColumnDefinitions>
 
-                            <!-- ✅ زر مسح البحث -->
-                            <Button Grid.Column="2"
-                    Visibility="{Binding SearchText, Converter={StaticResource EmptyToCollapsedConverter}}"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Padding="4"
-                    VerticalAlignment="Center">
-                                <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="#64748B"/>
-                            </Button>
+                                                                        <Button Grid.ColumnSpan="7"
+                                                                                Tag="{Binding}"
+                                                                                Click="AccountListRowButton_Click"
+                                                                                Style="{StaticResource GhostActionButtonStyle}"
+                                                                                Padding="0"
+                                                                                Background="Transparent"
+                                                                                BorderBrush="Transparent"
+                                                                                HorizontalAlignment="Stretch"
+                                                                                HorizontalContentAlignment="Stretch">
+                                                                            <Button.ContextFlyout>
+                                                                                <MenuFlyout>
+                                                                                    <MenuFlyoutItem Text="تفاصيل" Click="AccountDetailsButton_Click" Tag="{Binding}"/>
+                                                                                    <MenuFlyoutItem Text="تعديل" Click="EditAccount_Click" Tag="{Binding}"/>
+                                                                                    <MenuFlyoutItem Text="إضافة حساب ابن" Click="AddChildAccount_Click" Tag="{Binding}"/>
+                                                                                    <MenuFlyoutSeparator/>
+                                                                                    <MenuFlyoutItem Text="حذف" Click="DeleteAccount_Click" Tag="{Binding}" Foreground="#DC2626"/>
+                                                                                </MenuFlyout>
+                                                                            </Button.ContextFlyout>
+                                                                            <Grid ColumnSpacing="10">
+                                                                                <Grid.ColumnDefinitions>
+                                                                                    <ColumnDefinition Width="92"/>
+                                                                                    <ColumnDefinition Width="*"/>
+                                                                                    <ColumnDefinition Width="140"/>
+                                                                                    <ColumnDefinition Width="156"/>
+                                                                                    <ColumnDefinition Width="86"/>
+                                                                                    <ColumnDefinition Width="96"/>
+                                                                                    <ColumnDefinition Width="98"/>
+                                                                                </Grid.ColumnDefinitions>
+
+                                                                                <TextBlock Text="{Binding Code}"
+                                                                                           FontSize="13"
+                                                                                           FontWeight="Bold"
+                                                                                           VerticalAlignment="Center"
+                                                                                           Foreground="#1D4ED8"
+                                                                                           Language="en-US"/>
+
+                                                                                <StackPanel Grid.Column="1" Spacing="3">
+                                                                                    <TextBlock Text="{Binding ArabicName}"
+                                                                                               FontWeight="SemiBold"
+                                                                                               Foreground="{Binding TitleForegroundBrush}"
+                                                                                               FontSize="13.5"
+                                                                                               TextTrimming="CharacterEllipsis"/>
+                                                                                    <TextBlock Text="{Binding LastMovementText}"
+                                                                                               Style="{StaticResource AppSectionCaptionTextStyle}"
+                                                                                               Language="en-US"/>
+                                                                                </StackPanel>
+
+                                                                                <StackPanel Grid.Column="2" Spacing="3" VerticalAlignment="Center">
+                                                                                    <TextBlock Text="{Binding ClassificationText}"
+                                                                                               Foreground="{StaticResource SlateTextBrush}"
+                                                                                               FontSize="12"/>
+                                                                                    <TextBlock Text="{Binding TypeText}"
+                                                                                               Style="{StaticResource AppSectionCaptionTextStyle}"/>
+                                                                                </StackPanel>
+
+                                                                                <TextBlock Grid.Column="3"
+                                                                                           Text="{Binding BalanceText}"
+                                                                                           Foreground="{Binding BalanceForegroundBrush}"
+                                                                                           FontSize="14"
+                                                                                           FontWeight="Bold"
+                                                                                           VerticalAlignment="Center"
+                                                                                           Language="en-US"/>
+
+                                                                                <Border Grid.Column="4"
+                                                                                        Background="{Binding NatureSurfaceBrush}"
+                                                                                        CornerRadius="999"
+                                                                                        Padding="8,4"
+                                                                                        HorizontalAlignment="Center"
+                                                                                        VerticalAlignment="Center">
+                                                                                    <TextBlock Text="{Binding BalanceSideText}"
+                                                                                               Foreground="{Binding NatureForegroundBrush}"
+                                                                                               FontSize="11.5"
+                                                                                               FontWeight="SemiBold"/>
+                                                                                </Border>
+
+                                                                                <Border Grid.Column="5"
+                                                                                        Background="{Binding StatusSurfaceBrush}"
+                                                                                        CornerRadius="999"
+                                                                                        Padding="8,4"
+                                                                                        HorizontalAlignment="Center"
+                                                                                        VerticalAlignment="Center">
+                                                                                    <TextBlock Text="{Binding StatusText}"
+                                                                                               Foreground="{Binding StatusForegroundBrush}"
+                                                                                               FontSize="11.5"
+                                                                                               FontWeight="SemiBold"/>
+                                                                                </Border>
+
+                                                                                <Border Grid.Column="6"
+                                                                                        Background="{Binding OriginSurfaceBrush}"
+                                                                                        CornerRadius="999"
+                                                                                        Padding="8,4"
+                                                                                        HorizontalAlignment="Center"
+                                                                                        VerticalAlignment="Center">
+                                                                                    <TextBlock Text="{Binding OriginText}"
+                                                                                               Foreground="{Binding OriginForegroundBrush}"
+                                                                                               FontSize="11.5"
+                                                                                               FontWeight="SemiBold"/>
+                                                                                </Border>
+                                                                            </Grid>
+                                                                        </Button>
+
+                                                                        <StackPanel Grid.Column="7"
+                                                                                    Orientation="Horizontal"
+                                                                                    Spacing="8"
+                                                                                    HorizontalAlignment="Left">
+                                                                            <Button Style="{StaticResource IconButtonStyle}"
+                                                                                    Click="AccountDetailsButton_Click"
+                                                                                    Tag="{Binding}"
+                                                                                    ToolTipService.ToolTip="عرض التفاصيل">
+                                                                                <FontIcon Glyph="&#xE890;"/>
+                                                                            </Button>
+                                                                            <Button Style="{StaticResource IconButtonStyle}"
+                                                                                    Click="EditAccount_Click"
+                                                                                    Tag="{Binding}"
+                                                                                    ToolTipService.ToolTip="تعديل الحساب">
+                                                                                <FontIcon Glyph="&#xE70F;"/>
+                                                                            </Button>
+                                                                            <Button Style="{StaticResource IconButtonStyle}"
+                                                                                    Tag="{Binding}"
+                                                                                    ToolTipService.ToolTip="إجراءات إضافية">
+                                                                                <Button.Flyout>
+                                                                                    <MenuFlyout>
+                                                                                        <MenuFlyoutItem Text="إضافة حساب ابن" Click="AddChildAccount_Click" Tag="{Binding}"/>
+                                                                                        <MenuFlyoutItem Text="تفاصيل" Click="AccountDetailsButton_Click" Tag="{Binding}"/>
+                                                                                        <MenuFlyoutSeparator/>
+                                                                                        <MenuFlyoutItem Text="حذف" Click="DeleteAccount_Click" Tag="{Binding}" Foreground="#DC2626"/>
+                                                                                    </MenuFlyout>
+                                                                                </Button.Flyout>
+                                                                                <FontIcon Glyph="&#xE712;"/>
+                                                                            </Button>
+                                                                        </StackPanel>
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </Expander>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Border>
+
+                            <Grid Grid.Row="3" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="يمكنك التنقل داخل المجموعات والتمرير داخل هذه المساحة دون ضغط التفاصيل أو التبويبات."
+                                           Style="{StaticResource AppSectionCaptionTextStyle}"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding Summary.TotalAccountsText}"
+                                           FontSize="12.5"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource SlateTextBrush}"
+                                           Language="en-US"/>
+                            </Grid>
                         </Grid>
                     </Border>
 
-                    <TreeView x:Name="AccountsTreeView"
-                              Grid.Row="1"
-                              ItemsSource="{Binding AccountTree}"
-                              ItemContainerStyle="{StaticResource TreeItemStyle}">
+                    <ScrollViewer Grid.Column="1"
+                                  Visibility="Collapsed"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Spacing="12">
+                            <Grid ColumnSpacing="10" RowSpacing="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                        <TreeView.ItemTemplate>
-                            <DataTemplate>
-                                <TreeViewItem ItemsSource="{Binding Children}">
+                                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource AppMetricCardStyle}">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="إجمالي الحسابات" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                        <TextBlock Text="{Binding Summary.TotalAccountsText}" Style="{StaticResource AppMetricValueTextStyle}" Language="en-US"/>
+                                    </StackPanel>
+                                </Border>
 
-                                    <!-- ✅ ContextFlyout واحد فقط -->
-                                    <TreeViewItem.ContextFlyout>
-                                        <MenuFlyout>
-                                            <MenuFlyoutItem Text="إضافة حساب ابن"
-                        Click="AddChildAccount_Click"
-                        Tag="{Binding}">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE710;"/>
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
+                                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource AppMetricCardStyle}">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="حسابات الأطراف" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                        <TextBlock Text="{Binding Summary.PartyAccountsText}" Style="{StaticResource AppMetricValueTextStyle}" Language="en-US"/>
+                                    </StackPanel>
+                                </Border>
 
-                                            <MenuFlyoutSeparator/>
+                                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource AppMetricCardStyle}">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="الافتراضية" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                        <TextBlock Text="{Binding Summary.TemplateAccountsText}" Style="{StaticResource AppMetricValueTextStyle}" Language="en-US"/>
+                                    </StackPanel>
+                                </Border>
 
-                                            <MenuFlyoutItem Text="تعديل"
-                        Click="EditAccount_Click"
-                        Tag="{Binding}">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE70F;"/>
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
+                                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource AppMetricCardStyle}">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="اليدوية" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                        <TextBlock Text="{Binding Summary.ManualAccountsText}" Style="{StaticResource AppMetricValueTextStyle}" Language="en-US"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
 
-                                            <MenuFlyoutItem Text="حذف"
-                        Click="DeleteAccount_Click"
-                        Tag="{Binding}"
-                        Foreground="#DC2626">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE74D;" Foreground="#DC2626"/>
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
+                            <Border Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="توزيع الحسابات" Style="{StaticResource AppSectionTitleTextStyle}"/>
+                                    <ItemsControl ItemsSource="{Binding Summary.ClassBreakdown}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,0,0,10">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="Auto"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Ellipse Width="10" Height="10" Fill="{Binding IndicatorBrush}" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding ClassificationText}" Foreground="{StaticResource SlateTextBrush}"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding PercentageText}" Foreground="{StaticResource SecondaryTextBrush}" Language="en-US"/>
+                                                    </Grid>
+                                                    <Grid Grid.Row="1" Margin="18,6,0,0">
+                                                        <Border Height="8" CornerRadius="999" Background="{Binding TrackBrush}"/>
+                                                        <Border Height="8" CornerRadius="999" Background="{Binding IndicatorBrush}" HorizontalAlignment="Left" MinWidth="12" Width="{Binding PercentageWidth}"/>
+                                                    </Grid>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
 
-                                            <MenuFlyoutSeparator/>
+                            <Border Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="ملخص الميزانية" Style="{StaticResource AppSectionTitleTextStyle}"/>
+                                    <Grid ColumnSpacing="10" RowSpacing="10">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="إجمالي الأصول" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Summary.AssetsBalanceText}" FontWeight="Bold" Language="en-US"/>
+                                        <TextBlock Grid.Row="1" Text="إجمالي الخصوم" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Summary.LiabilitiesBalanceText}" FontWeight="Bold" Language="en-US"/>
+                                        <TextBlock Grid.Row="2" Text="حقوق الملكية" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Summary.EquityBalanceText}" FontWeight="Bold" Language="en-US"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
 
-                                            <MenuFlyoutItem Text="تفاصيل"
-                        Click="AccountDetails_Click"
-                        Tag="{Binding}">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xE946;"/>
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
-                                        </MenuFlyout>
-                                    </TreeViewItem.ContextFlyout>
+                            <Border Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                                <Grid RowSpacing="12">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                                    <Border Background="#F8FAFC"
-                                            BorderBrush="#E2E8F0"
-                                            BorderThickness="1"
-                                            CornerRadius="12"
-                                            Padding="10,8"
-                                            Margin="0,2">
-                                        <Grid ColumnSpacing="12" MinHeight="44">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="110"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="130"/>
-                                            </Grid.ColumnDefinitions>
+                                    <Grid Grid.Row="0" ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="الحساب المحدد" Style="{StaticResource AppSectionTitleTextStyle}"/>
+                                            <TextBlock Text="{Binding SelectedAccountDetail.ArabicName}" FontSize="16" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding SelectedAccountDetail.Code}" Foreground="{StaticResource SecondaryTextBrush}" Language="en-US"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Left">
+                                            <Button Style="{StaticResource CompactActionButtonStyle}" Click="AddChildFromDetails_Click" Content="حساب ابن"/>
+                                            <Button Style="{StaticResource CompactActionButtonStyle}" Click="EditSelectedAccount_Click" Content="تعديل"/>
+                                            <Button Style="{StaticResource DangerActionButtonStyle}" Click="DeleteSelectedAccount_Click" Content="حذف"/>
+                                        </StackPanel>
+                                    </Grid>
 
-                                            <!-- Icon -->
-                                            <Border Grid.Column="0"
-                                                    Width="30" Height="30"
-                                                    Background="#EEF2FF"
-                                                    CornerRadius="8"
-                                                    VerticalAlignment="Center">
-                                                <FontIcon Glyph="{Binding TypeText, Converter={StaticResource AccountIconConverter}}"
-                                                          Foreground="#4F46E5"
-                                                          VerticalAlignment="Center"
-                                                          HorizontalAlignment="Center"
-                                                          FontSize="14"/>
-                                            </Border>
+                                    <TextBlock Grid.Row="1"
+                                               Text="{Binding SelectedAccountDetail.UsageHeadline}"
+                                               Style="{StaticResource VoucherDialogSubtleTextStyle}"
+                                               TextWrapping="WrapWholeWords"/>
 
-                                            <!-- Code -->
-                                            <TextBlock Grid.Column="1"
-                                                       Text="{Binding Code}"
-                                                       VerticalAlignment="Center"
-                                                       Language="en-US"
-                                                       FontSize="13"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="{StaticResource SlateTextBrush}"/>
+                                    <Grid Grid.Row="2" ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Spacing="6">
+                                            <TextBlock Text="الوالد" Style="{StaticResource FieldLabelStyle}"/>
+                                            <TextBlock Text="{Binding SelectedAccountDetail.ParentDisplay}" TextWrapping="WrapWholeWords"/>
+                                            <TextBlock Text="الرصيد" Style="{StaticResource FieldLabelStyle}" Margin="0,4,0,0"/>
+                                            <TextBlock Text="{Binding SelectedAccountDetail.BalanceText}" FontSize="18" FontWeight="Bold" Language="en-US"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="6">
+                                            <TextBlock Text="الترحيل اليدوي" Style="{StaticResource FieldLabelStyle}"/>
+                                            <TextBlock Text="{Binding SelectedAccountDetail.PostingModeText}" TextWrapping="WrapWholeWords"/>
+                                            <TextBlock Text="الأطراف المرتبطة" Style="{StaticResource FieldLabelStyle}" Margin="0,4,0,0"/>
+                                            <TextBlock Text="{Binding SelectedAccountDetail.LinkedPartiesText}" TextWrapping="WrapWholeWords"/>
+                                        </StackPanel>
+                                    </Grid>
 
-                                            <!-- Name -->
-                                            <StackPanel Grid.Column="2"
-                                                        VerticalAlignment="Center"
-                                                        Spacing="2">
-                                                <TextBlock Text="{Binding ArabicName}"
-                                                           VerticalAlignment="Center"
-                                                           FontSize="14"
-                                                           FontWeight="{Binding TypeText, Converter={StaticResource AccountFontWeightConverter}}"
-                                                           Foreground="{Binding TypeText, Converter={StaticResource AccountNameBrushConverter}}"/>
-                                                <TextBlock Text="{Binding Id}"
-                                                           Visibility="Collapsed"/>
-                                            </StackPanel>
-
-                                            <!-- Type Badge -->
-                                            <Border Grid.Column="3"
-                                                    Background="{Binding TypeText, Converter={StaticResource AccountTypeToBrushConverter}}"
-                                                    CornerRadius="20"
-                                                    Padding="10,4"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding TypeText}"
-                                                           Foreground="White"
-                                                           FontSize="11"
-                                                           FontWeight="SemiBold"/>
-                                            </Border>
-                                        </Grid>
-                                    </Border>
-                                </TreeViewItem>
-                            </DataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
+                                    <ItemsControl Grid.Row="3" ItemsSource="{Binding SelectedAccountDetail.UsageBadges}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapGrid Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F1F5F9"
+                                                        BorderBrush="#D6E0EB"
+                                                        BorderThickness="1"
+                                                        CornerRadius="999"
+                                                        Padding="10,5"
+                                                        Margin="0,0,8,8">
+                                                    <TextBlock Text="{Binding}" FontSize="11.5" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
-            </Border>
-        </Grid>
-    </ScrollViewer>
+            </TabViewItem>
+            <TabViewItem>
+                <TabViewItem.Header>
+                    <TextBlock Text="العرض الشجري" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                </TabViewItem.Header>
+                <Grid ColumnSpacing="16" Padding="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="360"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                        <Grid RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Spacing="3">
+                                    <TextBlock Text="العرض الشجري" Style="{StaticResource AppSectionTitleTextStyle}"/>
+                                    <TextBlock Text="شجرة فعلية بأسهم واضحة مع صفوف مضغوطة، لتصفح الهيكل الكامل عند الحاجة."
+                                               Style="{StaticResource AppSectionCaptionTextStyle}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+                                    <Button Click="ExpandAll_Click" Style="{StaticResource GhostActionButtonStyle}" Content="توسيع"/>
+                                    <Button Click="CollapseAll_Click" Style="{StaticResource GhostActionButtonStyle}" Content="طي"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Grid.Row="1"
+                                    Background="#FBFDFF"
+                                    BorderBrush="#E2E8F0"
+                                    BorderThickness="1"
+                                    CornerRadius="18"
+                                    Padding="8">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <TreeView x:Name="AccountsTreeView"
+                                              FlowDirection="RightToLeft"
+                                              ItemContainerStyle="{StaticResource TreeItemStyle}">
+                                        <TreeView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button x:Name="TreeRowButton"
+                                                        DataContext="{Binding Content}"
+                                                        Tag="{Binding}"
+                                                        Click="TreeAccountRowButton_Click"
+                                                        Style="{StaticResource GhostActionButtonStyle}"
+                                                        Padding="0"
+                                                        Background="Transparent"
+                                                        BorderBrush="Transparent"
+                                                        HorizontalAlignment="Stretch"
+                                                        HorizontalContentAlignment="Stretch">
+                                                    <Button.ContextFlyout>
+                                                        <MenuFlyout>
+                                                            <MenuFlyoutItem Text="إضافة حساب ابن" Click="AddChildAccount_Click" Tag="{Binding}"/>
+                                                            <MenuFlyoutItem Text="تعديل" Click="EditAccount_Click" Tag="{Binding}"/>
+                                                            <MenuFlyoutItem Text="عرض التفاصيل" Click="AccountDetailsButton_Click" Tag="{Binding}"/>
+                                                            <MenuFlyoutSeparator/>
+                                                            <MenuFlyoutItem Text="حذف" Click="DeleteAccount_Click" Tag="{Binding}" Foreground="#DC2626"/>
+                                                        </MenuFlyout>
+                                                    </Button.ContextFlyout>
+
+                                                    <Border Background="{Binding RowBackgroundBrush}"
+                                                            BorderBrush="{Binding RowBorderBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="12"
+                                                            Padding="10,8">
+                                                        <Grid ColumnSpacing="10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="80"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding Code}" Foreground="{Binding CodeForegroundBrush}" FontWeight="Bold" FontSize="12.5" Language="en-US"/>
+                                                                <TextBlock Text="{Binding TypeText}" Style="{StaticResource HintLabelStyle}"/>
+                                                            </StackPanel>
+
+                                                            <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                                <TextBlock Text="{Binding ArabicName}" Foreground="{Binding RowForegroundBrush}" FontWeight="{Binding NameFontWeight}" FontSize="13.5" TextTrimming="CharacterEllipsis"/>
+                                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                                    <Border Background="{Binding OriginSurfaceBrush}" CornerRadius="999" Padding="8,3">
+                                                                        <TextBlock Text="{Binding OriginText}" Foreground="{Binding OriginForegroundBrush}" FontSize="10.5" FontWeight="SemiBold"/>
+                                                                    </Border>
+                                                                    <Border Background="{Binding StatusSurfaceBrush}" CornerRadius="999" Padding="8,3">
+                                                                        <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusForegroundBrush}" FontSize="10.5" FontWeight="SemiBold"/>
+                                                                    </Border>
+                                                                </StackPanel>
+                                                            </StackPanel>
+
+                                                            <TextBlock Grid.Column="2" Text="{Binding ClassificationText}" FontSize="11.5" VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </TreeView.ItemTemplate>
+                                    </TreeView>
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer Grid.Column="1"
+                                  VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <StackPanel Spacing="12">
+                            <Border Style="{StaticResource VoucherDialogCardStyle}">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="البيانات الأساسية" Style="{StaticResource VoucherDialogSectionTitleStyle}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Background="#EFF6FF" CornerRadius="999" Padding="10,5"><TextBlock Text="{Binding SelectedAccountDetail.ClassificationText}" Foreground="#1D4ED8" Style="{StaticResource VoucherDialogBadgeTextStyle}"/></Border>
+                                        <Border Background="#ECFDF5" CornerRadius="999" Padding="10,5"><TextBlock Text="{Binding SelectedAccountDetail.NatureText}" Foreground="#166534" Style="{StaticResource VoucherDialogBadgeTextStyle}"/></Border>
+                                        <Border Background="#F5F3FF" CornerRadius="999" Padding="10,5"><TextBlock Text="{Binding SelectedAccountDetail.OriginText}" Foreground="#6D28D9" Style="{StaticResource VoucherDialogBadgeTextStyle}"/></Border>
+                                        <Border Background="#FFF7ED" CornerRadius="999" Padding="10,5"><TextBlock Text="{Binding SelectedAccountDetail.CloseBehaviorText}" Foreground="#C2410C" Style="{StaticResource VoucherDialogBadgeTextStyle}"/></Border>
+                                    </StackPanel>
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0" Spacing="8">
+                                            <StackPanel Spacing="3"><TextBlock Text="الحساب الأب" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.ParentDisplay}"/></StackPanel>
+                                            <StackPanel Spacing="3"><TextBlock Text="نوع الحساب" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.TypeText}"/></StackPanel>
+                                            <StackPanel Spacing="3"><TextBlock Text="المستوى" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.LevelText}"/></StackPanel>
+                                            <StackPanel Spacing="3"><TextBlock Text="الحالة" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.StatusText}"/></StackPanel>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="8">
+                                            <StackPanel Spacing="3"><TextBlock Text="العملة" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.CurrencyText}" Language="en-US"/></StackPanel>
+                                            <StackPanel Spacing="3"><TextBlock Text="الدور النظامي" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.SystemRoleText}"/></StackPanel>
+                                            <StackPanel Spacing="3"><TextBlock Text="الترحيل اليدوي" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.PostingModeText}" TextWrapping="WrapWholeWords"/></StackPanel>
+                                            <StackPanel Spacing="3"><TextBlock Text="ملاحظات" Style="{StaticResource FieldLabelStyle}"/><TextBlock Text="{Binding SelectedAccountDetail.NotesText}" TextWrapping="WrapWholeWords"/></StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource VoucherDialogCardStyle}">
+                                <StackPanel Spacing="12">
+                                    <TextBlock Text="الارتباطات والاستخدامات" Style="{StaticResource VoucherDialogSectionTitleStyle}"/>
+                                    <TextBlock Text="{Binding SelectedAccountDetail.UsageHeadline}" Style="{StaticResource VoucherDialogSubtleTextStyle}" TextWrapping="WrapWholeWords"/>
+                                    <ItemsControl ItemsSource="{Binding SelectedAccountDetail.BlockingReasons}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="12" Padding="10,8" Margin="0,0,0,6">
+                                                    <TextBlock Text="{Binding}" Foreground="#B91C1C" FontSize="12" TextWrapping="WrapWholeWords"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ItemsControl ItemsSource="{Binding SelectedAccountDetail.UsageBadges}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapGrid Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#F1F5F9" BorderBrush="#D6E0EB" BorderThickness="1" CornerRadius="999" Padding="10,5" Margin="0,0,8,8">
+                                                    <TextBlock Text="{Binding}" FontSize="11.5" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource VoucherDialogCardStyle}">
+                                <StackPanel Spacing="10">
+                                    <TextBlock Text="إجراءات سريعة" Style="{StaticResource VoucherDialogSectionTitleStyle}"/>
+                                    <Button Style="{StaticResource CompactActionButtonStyle}" Click="AddChildFromDetails_Click" Content="إضافة حساب ابن"/>
+                                    <Button Style="{StaticResource CompactActionButtonStyle}" Click="EditSelectedAccount_Click" Content="تعديل الحساب المحدد"/>
+                                    <Button Style="{StaticResource DangerActionButtonStyle}" Click="DeleteSelectedAccount_Click" Content="حذف الحساب المحدد"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabViewItem>
+        </TabView>
+    </Grid>
 </Page>

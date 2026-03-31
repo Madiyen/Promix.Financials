@@ -48,13 +48,12 @@
                           MaxHeight="220"
                           SelectionMode="Single">
                     <ListView.Resources>
-                        <Style TargetType="ListViewItem">
+                        <Style TargetType="ListViewItem"
+                               BasedOn="{StaticResource AppSelectableListViewItemStyle}">
                             <Setter Property="Padding" Value="0"/>
                             <Setter Property="Margin" Value="0"/>
                             <Setter Property="MinHeight" Value="44"/>
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                            <Setter Property="Foreground" Value="#0F172A"/>
-                            <Setter Property="Background" Value="Transparent"/>
                         </Style>
                     </ListView.Resources>
 

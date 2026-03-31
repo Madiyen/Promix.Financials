@@ -1,0 +1,684 @@
+<Page
+    x:Class="Promix.Financials.UI.Views.Parties.PartiesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    RequestedTheme="Light"
+    Background="{StaticResource AppBackgroundBrush}">
+
+    <Page.Resources>
+        <Style x:Key="PartyListItemStyle"
+               TargetType="ListViewItem"
+               BasedOn="{StaticResource AppSelectableListViewItemStyle}">
+            <Setter Property="MinHeight" Value="132"/>
+            <Setter Property="Padding" Value="16,16"/>
+        </Style>
+
+        <Style x:Key="DetailsPlainItemStyle"
+               TargetType="ListViewItem"
+               BasedOn="{StaticResource AppPlainListViewItemStyle}">
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <Style x:Key="PartyMetaBadgeStyle"
+               TargetType="Border"
+               BasedOn="{StaticResource AppBadgeBorderStyle}">
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Page.Resources>
+
+    <Grid Padding="24,18,24,20" RowSpacing="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" ColumnSpacing="14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid ColumnSpacing="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="58"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Width="54"
+                        Height="54"
+                        CornerRadius="18"
+                        VerticalAlignment="Center">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#0F766E" Offset="0"/>
+                            <GradientStop Color="#2563EB" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <FontIcon Glyph="&#xE716;"
+                              Foreground="White"
+                              FontSize="24"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                    <TextBlock Text="العملاء والموردون" Style="{StaticResource AppPageTitleTextStyle}"/>
+                    <TextBlock Text="إدارة الأطراف وكشف الحساب والبنود المفتوحة والتسويات من مساحة عمل واحدة وواضحة."
+                               Style="{StaticResource AppPageSubtitleTextStyle}"
+                               MaxWidth="640"/>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="10"
+                        VerticalAlignment="Center">
+                <Button Content="تحديث"
+                        Click="Refresh_Click"
+                        Style="{StaticResource SecondaryActionButtonStyle}"/>
+                <Button Content="+ إضافة طرف"
+                        Click="AddParty_Click"
+                        Style="{StaticResource PrimaryActionButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Spacing="10">
+            <Border x:Name="ErrorBanner"
+                    Style="{StaticResource InlineErrorBannerStyle}"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="ErrorBannerText"
+                           Style="{StaticResource ErrorLabelStyle}"
+                           TextWrapping="WrapWholeWords"/>
+            </Border>
+            <Border x:Name="SuccessBanner"
+                    Style="{StaticResource InlineSuccessBannerStyle}"
+                    Visibility="Collapsed">
+                <TextBlock x:Name="SuccessBannerText"
+                           Foreground="#065F46"
+                           FontSize="12.5"
+                           FontWeight="SemiBold"
+                           TextWrapping="WrapWholeWords"/>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Row="2" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource AppMetricCardStyle}">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="إجمالي الأطراف" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                    <TextBlock Text="{Binding TotalPartiesText}" Style="{StaticResource AppMetricValueTextStyle}"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource AppMetricCardStyle}">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="الأطراف النشطة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                    <TextBlock Text="{Binding ActivePartiesText}"
+                               Style="{StaticResource AppMetricValueTextStyle}"
+                               Foreground="{StaticResource SuccessBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource AppMetricCardStyle}">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="ذمم مدينة مفتوحة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                    <TextBlock Text="{Binding ReceivableOpenText}"
+                               Style="{StaticResource AppMetricValueTextStyle}"
+                               Foreground="#1D4ED8"
+                               Language="en-US"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Style="{StaticResource AppMetricCardStyle}">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="ذمم دائنة مفتوحة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                    <TextBlock Text="{Binding PayableOpenText}"
+                               Style="{StaticResource AppMetricValueTextStyle}"
+                               Foreground="{StaticResource DangerBrush}"
+                               Language="en-US"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="3" ColumnSpacing="14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="398"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardStyle}">
+                <Grid RowSpacing="14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="دليل الأطراف" Style="{StaticResource AppSectionTitleTextStyle}"/>
+                        <TextBlock Text="ابحث عن الطرف المناسب، ثم راجع كشفه أو عدّل بياناته من نفس الشاشة."
+                                   Style="{StaticResource AppSectionCaptionTextStyle}"/>
+                    </StackPanel>
+
+                    <Border Grid.Row="1" Style="{StaticResource AppSubtleSurfaceCardStyle}" Padding="14,10">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <FontIcon Glyph="&#xE721;"
+                                      FontSize="16"
+                                      Foreground="{StaticResource SlateTextBrush}"
+                                      VerticalAlignment="Center"/>
+
+                            <TextBox x:Name="SearchBox"
+                                     Grid.Column="1"
+                                     Style="{StaticResource SearchBoxStyle}"
+                                     TextChanged="SearchBox_TextChanged"
+                                     PlaceholderText="ابحث بالاسم أو الكود أو الهاتف أو الرقم الضريبي"/>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="2" ColumnSpacing="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox x:Name="TypeFilterComboBox"
+                                  Grid.Column="0"
+                                  SelectedIndex="0"
+                                  SelectionChanged="TypeFilterComboBox_SelectionChanged">
+                            <ComboBoxItem Content="الكل"/>
+                            <ComboBoxItem Content="العملاء"/>
+                            <ComboBoxItem Content="الموردون"/>
+                            <ComboBoxItem Content="عميل ومورد"/>
+                        </ComboBox>
+
+                        <ComboBox x:Name="StatusFilterComboBox"
+                                  Grid.Column="1"
+                                  SelectedIndex="1"
+                                  SelectionChanged="StatusFilterComboBox_SelectionChanged">
+                            <ComboBoxItem Content="الكل"/>
+                            <ComboBoxItem Content="نشط"/>
+                            <ComboBoxItem Content="موقوف التعامل"/>
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid Grid.Row="3">
+                        <Border x:Name="NoPartiesState"
+                                Style="{StaticResource AppEmptyStateCardStyle}"
+                                Visibility="Collapsed">
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Spacing="10">
+                                <TextBlock Text="لا توجد أطراف مطابقة"
+                                           Style="{StaticResource AppSectionTitleTextStyle}"
+                                           TextAlignment="Center"/>
+                                <TextBlock Text="جرّب تغيير الفلاتر أو أضف طرفًا جديدًا للبدء."
+                                           Style="{StaticResource AppSectionCaptionTextStyle}"
+                                           TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+
+                        <ListView x:Name="PartiesListView"
+                                  Style="{StaticResource AppListViewStyle}"
+                                  ItemContainerStyle="{StaticResource PartyListItemStyle}"
+                                  ItemsSource="{Binding Parties}"
+                                  SelectionChanged="PartiesListView_SelectionChanged">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Spacing="12">
+                                        <Grid ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Spacing="4">
+                                                <TextBlock Text="{Binding NameAr}"
+                                                           FontSize="16"
+                                                           FontWeight="SemiBold"
+                                                           TextWrapping="WrapWholeWords"/>
+                                                <TextBlock Text="{Binding Code}"
+                                                           Foreground="{StaticResource SlateTextBrush}"
+                                                           FontSize="11.5"
+                                                           Language="en-US"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1"
+                                                        Orientation="Horizontal"
+                                                        Spacing="6"
+                                                        VerticalAlignment="Top">
+                                                <Border Style="{StaticResource PartyMetaBadgeStyle}"
+                                                        Background="{Binding TypeSurfaceBrush}">
+                                                    <TextBlock Text="{Binding TypeText}"
+                                                               Style="{StaticResource AppBadgeTextStyle}"
+                                                               Foreground="{Binding TypeForegroundBrush}"/>
+                                                </Border>
+                                                <Border Style="{StaticResource PartyMetaBadgeStyle}"
+                                                        Background="{Binding StatusSurfaceBrush}">
+                                                    <TextBlock Text="{Binding StatusText}"
+                                                               Style="{StaticResource AppBadgeTextStyle}"
+                                                               Foreground="{Binding StatusForegroundBrush}"/>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TextBlock Text="{Binding ContactSummaryText}"
+                                                   Style="{StaticResource AppSectionCaptionTextStyle}"/>
+
+                                        <Grid ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Border Grid.Column="0"
+                                                    Style="{StaticResource AppSubtleSurfaceCardStyle}"
+                                                    Background="#F0F7FF"
+                                                    BorderBrush="#C5DBFF">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="مدين مفتوح"
+                                                               Foreground="#1D4ED8"
+                                                               FontSize="11.5"
+                                                               FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding ReceivableOpenText}"
+                                                               Foreground="#1D4ED8"
+                                                               FontSize="18"
+                                                               FontWeight="Bold"
+                                                               Language="en-US"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <Border Grid.Column="1"
+                                                    Style="{StaticResource AppSubtleSurfaceCardStyle}"
+                                                    Background="#FEF4F4"
+                                                    BorderBrush="#F8C8C8">
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock Text="دائن مفتوح"
+                                                               Foreground="{StaticResource DangerBrush}"
+                                                               FontSize="11.5"
+                                                               FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding PayableOpenText}"
+                                                               Foreground="{StaticResource DangerBrush}"
+                                                               FontSize="18"
+                                                               FontWeight="Bold"
+                                                               Language="en-US"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1">
+                <Border x:Name="NoDetailsState"
+                        Style="{StaticResource AppEmptyStateCardStyle}">
+                    <StackPanel HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Spacing="12">
+                        <TextBlock Text="اختر طرفًا من القائمة"
+                                   Style="{StaticResource AppSectionTitleTextStyle}"
+                                   TextAlignment="Center"/>
+                        <TextBlock Text="ستظهر هنا بطاقة الطرف والحركات والبنود المفتوحة وأعمار الذمم والتسويات بشكل منظم وواضح."
+                                   Style="{StaticResource AppSectionCaptionTextStyle}"
+                                   TextAlignment="Center"
+                                   MaxWidth="440"/>
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer x:Name="DetailsScrollViewer"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              Visibility="Collapsed">
+                    <StackPanel Spacing="14">
+                        <Border CornerRadius="22" Padding="18">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#1E3A5F" Offset="0"/>
+                                    <GradientStop Color="#0F766E" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+
+                            <Grid ColumnSpacing="18">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="250"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Spacing="10">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Style="{StaticResource AppBadgeBorderStyle}"
+                                                Background="#1D4ED8"
+                                                Padding="10,4">
+                                            <TextBlock Text="{Binding SelectedParty.TypeText}"
+                                                       Style="{StaticResource AppBadgeTextStyle}"
+                                                       Foreground="White"/>
+                                        </Border>
+                                        <Border Style="{StaticResource AppBadgeBorderStyle}"
+                                                Background="#164E63"
+                                                Padding="10,4">
+                                            <TextBlock Text="{Binding SelectedParty.StatusText}"
+                                                       Style="{StaticResource AppBadgeTextStyle}"
+                                                       Foreground="#E0F2FE"/>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding SelectedPartyTitle}"
+                                               Foreground="White"
+                                               FontSize="24"
+                                               FontWeight="Bold"
+                                               TextWrapping="WrapWholeWords"/>
+
+                                    <TextBlock Text="{Binding SelectedPartySubtitle}"
+                                               Foreground="#D8ECFF"
+                                               FontSize="12.5"/>
+
+                                    <TextBlock Text="{Binding SelectedParty.ContactSummaryText}"
+                                               Foreground="#E0F2FE"
+                                               FontSize="11.5"
+                                               TextWrapping="WrapWholeWords"/>
+                                </StackPanel>
+
+                                <Border Grid.Column="1"
+                                        Background="#15081420"
+                                        BorderBrush="#2FD8ECFF"
+                                        BorderThickness="1"
+                                        CornerRadius="18"
+                                        Padding="14">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock Text="ملخص الذمة"
+                                                   Foreground="#BFDBFE"
+                                                   FontSize="10.5"
+                                                   FontWeight="SemiBold"/>
+
+                                        <Grid ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0" Spacing="4">
+                                                <TextBlock Text="مدين مفتوح"
+                                                           Foreground="#BFDBFE"
+                                                           FontSize="11"/>
+                                                <TextBlock Text="{Binding SelectedParty.ReceivableOpenText}"
+                                                           Foreground="White"
+                                                           FontSize="18"
+                                                           FontWeight="Bold"
+                                                           Language="en-US"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" Spacing="4">
+                                                <TextBlock Text="دائن مفتوح"
+                                                           Foreground="#BFDBFE"
+                                                           FontSize="11"/>
+                                                <TextBlock Text="{Binding SelectedParty.PayableOpenText}"
+                                                           Foreground="White"
+                                                           FontSize="18"
+                                                           FontWeight="Bold"
+                                                           Language="en-US"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Border Background="#104455"
+                                                CornerRadius="14"
+                                                Padding="10,8">
+                                            <StackPanel Spacing="2">
+                                                <TextBlock Text="الرصيد الختامي"
+                                                           Foreground="#A5F3FC"
+                                                           FontSize="10.5"/>
+                                                <TextBlock Text="{Binding ClosingBalanceText}"
+                                                           Foreground="White"
+                                                           FontSize="18"
+                                                           FontWeight="Bold"
+                                                           Language="en-US"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0"
+                                    Content="تحديث البيان"
+                                    Click="RefreshStatement_Click"
+                                    Style="{StaticResource SecondaryActionButtonStyle}"/>
+
+                            <Button Grid.Column="1"
+                                    Content="تعديل"
+                                    Click="EditParty_Click"
+                                    Style="{StaticResource SecondaryActionButtonStyle}"
+                                    IsEnabled="{Binding CanEditSelectedParty}"/>
+
+                            <Button x:Name="DeactivatePartyButton"
+                                    Grid.Column="2"
+                                    Content="إيقاف التعامل"
+                                    Click="DeactivateParty_Click"
+                                    Style="{StaticResource DangerActionButtonStyle}"
+                                    IsEnabled="{Binding CanDeactivateSelectedParty}"/>
+
+                            <Button x:Name="ActivatePartyButton"
+                                    Grid.Column="2"
+                                    Content="إعادة التنشيط"
+                                    Click="ActivateParty_Click"
+                                    Style="{StaticResource SecondaryActionButtonStyle}"
+                                    IsEnabled="{Binding CanActivateSelectedParty}"
+                                    Visibility="Collapsed"/>
+                        </Grid>
+
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="الرصيد أول المدة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                    <TextBlock Text="{Binding OpeningBalanceText}" FontSize="20" FontWeight="Bold" Language="en-US"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="1" Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="الرصيد الختامي" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                    <TextBlock Text="{Binding ClosingBalanceText}" FontSize="20" FontWeight="Bold" Language="en-US"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="2" Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="مدين مفتوح" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                    <TextBlock Text="{Binding SelectedParty.ReceivableOpenText}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="#1D4ED8"
+                                               Language="en-US"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Column="3" Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="دائن مفتوح" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                    <TextBlock Text="{Binding SelectedParty.PayableOpenText}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource DangerBrush}"
+                                               Language="en-US"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <Border Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <DatePicker Grid.Column="0"
+                                            Date="{Binding FromDate, Mode=TwoWay}"/>
+                                <DatePicker Grid.Column="1"
+                                            Date="{Binding ToDate, Mode=TwoWay}"/>
+                                <Button Grid.Column="2"
+                                        Content="تحميل البيان"
+                                        Click="RefreshStatement_Click"
+                                        Style="{StaticResource PrimaryActionButtonStyle}"
+                                        VerticalAlignment="Bottom"/>
+                            </Grid>
+                        </Border>
+
+                        <Border Style="{StaticResource AppSurfaceCardStyle}" Padding="12">
+                            <controls:TabView Style="{StaticResource AppTabViewStyle}">
+                                <controls:TabViewItem Header="الحركات">
+                                    <Grid Padding="10,14,10,4">
+                                        <ListView Style="{StaticResource AppPlainListViewStyle}"
+                                                  ItemContainerStyle="{StaticResource DetailsPlainItemStyle}"
+                                                  ItemsSource="{Binding Movements}">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                                        <Grid ColumnSpacing="10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="120"/>
+                                                                <ColumnDefinition Width="110"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="95"/>
+                                                                <ColumnDefinition Width="95"/>
+                                                                <ColumnDefinition Width="95"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock Text="{Binding EntryNumber}" FontWeight="SemiBold"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding EntryDateText}" Language="en-US"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding Description}" TextWrapping="WrapWholeWords"/>
+                                                            <TextBlock Grid.Column="3" Text="{Binding DebitText}" Foreground="#1D4ED8" FontWeight="SemiBold" Language="en-US"/>
+                                                            <TextBlock Grid.Column="4" Text="{Binding CreditText}" Foreground="{StaticResource DangerBrush}" FontWeight="SemiBold" Language="en-US"/>
+                                                            <TextBlock Grid.Column="5" Text="{Binding RunningBalanceText}" FontWeight="Bold" Language="en-US"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+                                </controls:TabViewItem>
+
+                                <controls:TabViewItem Header="البنود المفتوحة">
+                                    <Grid Padding="10,14,10,4">
+                                        <ListView Style="{StaticResource AppPlainListViewStyle}"
+                                                  ItemContainerStyle="{StaticResource DetailsPlainItemStyle}"
+                                                  ItemsSource="{Binding OpenItems}">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                                        <Grid ColumnSpacing="10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="120"/>
+                                                                <ColumnDefinition Width="100"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="110"/>
+                                                                <ColumnDefinition Width="72"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock Text="{Binding EntryNumber}" FontWeight="SemiBold"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding EntryDateText}" Language="en-US"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding AccountName}" TextWrapping="WrapWholeWords"/>
+                                                            <TextBlock Grid.Column="3" Text="{Binding OpenAmountText}" FontWeight="Bold" Language="en-US"/>
+                                                            <TextBlock Grid.Column="4" Text="{Binding AgeDays}" Language="en-US"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+                                </controls:TabViewItem>
+
+                                <controls:TabViewItem Header="أعمار الذمم">
+                                    <Grid Padding="10,14,10,4">
+                                        <ListView Style="{StaticResource AppPlainListViewStyle}"
+                                                  ItemContainerStyle="{StaticResource DetailsPlainItemStyle}"
+                                                  ItemsSource="{Binding AgingBuckets}">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                                        <Grid ColumnSpacing="10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="130"/>
+                                                                <ColumnDefinition Width="130"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding ReceivableAmountText}" Foreground="#1D4ED8" FontWeight="Bold" Language="en-US"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding PayableAmountText}" Foreground="{StaticResource DangerBrush}" FontWeight="Bold" Language="en-US"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+                                </controls:TabViewItem>
+
+                                <controls:TabViewItem Header="التسويات">
+                                    <Grid Padding="10,14,10,4">
+                                        <ListView Style="{StaticResource AppPlainListViewStyle}"
+                                                  ItemContainerStyle="{StaticResource DetailsPlainItemStyle}"
+                                                  ItemsSource="{Binding Settlements}">
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Style="{StaticResource AppSubtleSurfaceCardStyle}">
+                                                        <Grid ColumnSpacing="10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="125"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="110"/>
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock Text="{Binding SettledOnText}" FontWeight="SemiBold" Language="en-US"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding DebitEntryNumber}"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding CreditEntryNumber}"/>
+                                                            <TextBlock Grid.Column="3" Text="{Binding AmountText}" FontWeight="Bold" Language="en-US"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+                                    </Grid>
+                                </controls:TabViewItem>
+                            </controls:TabView>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

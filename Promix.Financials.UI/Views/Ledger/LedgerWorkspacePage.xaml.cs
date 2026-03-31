@@ -1,0 +1,145 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Navigation;
+using Promix.Financials.UI.Navigation;
+using Promix.Financials.UI.Views;
+using Promix.Financials.UI.Views.Accounts;
+using Promix.Financials.UI.Views.Journals;
+using Promix.Financials.UI.Views.Parties;
+using System;
+using System.Collections.Generic;
+
+namespace Promix.Financials.UI.Views.Ledger;
+
+public sealed partial class LedgerWorkspacePage : Page
+{
+    private readonly Dictionary<LedgerWorkspaceTab, Frame> _tabFrames;
+    private readonly HashSet<LedgerWorkspaceTab> _initializedTabs = new();
+    private bool _isTabSelectionSyncing;
+
+    public LedgerWorkspacePage()
+    {
+        InitializeComponent();
+        NavigationCacheMode = NavigationCacheMode.Required;
+
+        _tabFrames = new()
+        {
+            [LedgerWorkspaceTab.Accounts] = AccountsFrame,
+            [LedgerWorkspaceTab.Journals] = JournalsFrame,
+            [LedgerWorkspaceTab.AccountStatement] = StatementFrame,
+            [LedgerWorkspaceTab.TrialBalance] = TrialBalanceFrame,
+            [LedgerWorkspaceTab.ReceivablesPayables] = ReceivablesFrame,
+            [LedgerWorkspaceTab.FinancialYears] = FinancialYearsFrame
+        };
+
+        Loaded += (_, _) =>
+        {
+            if (LedgerTabView.SelectedItem is not TabViewItem)
+            {
+                SelectTab(LedgerWorkspaceTab.Accounts);
+            }
+            else
+            {
+                EnsureTabInitialized(GetSelectedTab());
+                UpdateHeaderSummary(GetSelectedTab());
+            }
+        };
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        var request = e.Parameter as LedgerWorkspaceNavigationRequest
+            ?? new LedgerWorkspaceNavigationRequest(GetSelectedOrDefaultTab());
+
+        ApplyNavigationRequest(request);
+    }
+
+    public void ApplyNavigationRequest(LedgerWorkspaceNavigationRequest request)
+    {
+        if (request is null)
+            return;
+
+        SelectTab(request.InitialTab);
+
+        if (request.InitialTab == LedgerWorkspaceTab.AccountStatement && request.AccountId is Guid accountId && accountId != Guid.Empty)
+        {
+            StatementFrame.Navigate(typeof(ReportsPage), accountId);
+            _initializedTabs.Add(LedgerWorkspaceTab.AccountStatement);
+        }
+        else
+        {
+            EnsureTabInitialized(request.InitialTab);
+        }
+
+        UpdateHeaderSummary(request.InitialTab);
+    }
+
+    private void LedgerTabView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isTabSelectionSyncing)
+            return;
+
+        var selectedTab = GetSelectedTab();
+        EnsureTabInitialized(selectedTab);
+        UpdateHeaderSummary(selectedTab);
+    }
+
+    private void SelectTab(LedgerWorkspaceTab tab)
+    {
+        _isTabSelectionSyncing = true;
+        LedgerTabView.SelectedIndex = (int)tab;
+        _isTabSelectionSyncing = false;
+    }
+
+    private void EnsureTabInitialized(LedgerWorkspaceTab tab)
+    {
+        if (_initializedTabs.Contains(tab))
+            return;
+
+        var frame = _tabFrames[tab];
+        frame.Navigate(ResolvePageType(tab));
+        _initializedTabs.Add(tab);
+    }
+
+    private static Type ResolvePageType(LedgerWorkspaceTab tab)
+        => tab switch
+        {
+            LedgerWorkspaceTab.Accounts => typeof(ChartOfAccountsView),
+            LedgerWorkspaceTab.Journals => typeof(JournalEntriesPage),
+            LedgerWorkspaceTab.AccountStatement => typeof(ReportsPage),
+            LedgerWorkspaceTab.TrialBalance => typeof(TrialBalancePage),
+            LedgerWorkspaceTab.ReceivablesPayables => typeof(PartiesPage),
+            LedgerWorkspaceTab.FinancialYears => typeof(FinancialYearsPage),
+            _ => typeof(ChartOfAccountsView)
+        };
+
+    private LedgerWorkspaceTab GetSelectedTab()
+        => LedgerTabView.SelectedIndex switch
+        {
+            1 => LedgerWorkspaceTab.Journals,
+            2 => LedgerWorkspaceTab.AccountStatement,
+            3 => LedgerWorkspaceTab.TrialBalance,
+            4 => LedgerWorkspaceTab.ReceivablesPayables,
+            5 => LedgerWorkspaceTab.FinancialYears,
+            _ => LedgerWorkspaceTab.Accounts
+        };
+
+    private LedgerWorkspaceTab GetSelectedOrDefaultTab()
+        => LedgerTabView.SelectedItem is TabViewItem ? GetSelectedTab() : LedgerWorkspaceTab.Accounts;
+
+    private void UpdateHeaderSummary(LedgerWorkspaceTab tab)
+    {
+        ActiveTabSummaryText.Text = tab switch
+        {
+            LedgerWorkspaceTab.Accounts => "الحسابات هي نقطة البداية الافتراضية داخل دفتر الأستاذ.",
+            LedgerWorkspaceTab.Journals => "أنشئ السندات والقيود وراجع المسودات والترحيل من نفس المساحة.",
+            LedgerWorkspaceTab.AccountStatement => "راجع حركة أي حساب واختر الفترة المناسبة دون مغادرة دفتر الأستاذ.",
+            LedgerWorkspaceTab.TrialBalance => "تابع أرصدة الافتتاح والحركة والختام من تبويب ميزان المراجعة.",
+            LedgerWorkspaceTab.ReceivablesPayables => "أدر الأطراف والذمم والتسويات ضمن نفس سياق الأستاذ العام.",
+            LedgerWorkspaceTab.FinancialYears => "عرّف السنوات المالية وفعّل السنة المعتمدة للتقارير والتشغيل.",
+            _ => "الحسابات هي نقطة البداية الافتراضية داخل دفتر الأستاذ."
+        };
+    }
+}

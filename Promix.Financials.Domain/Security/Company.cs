@@ -8,6 +8,7 @@ public sealed class Company : Entity<Guid>
     public string Code { get; private set; } = default!;
     public string Name { get; private set; } = default!;
     public string BaseCurrency { get; private set; } = "USD";
+    public DateOnly AccountingStartDate { get; private set; }
     public bool IsActive { get; private set; } = true;
     public DateOnly? JournalLockedThroughDate { get; private set; }
     public Guid? JournalLockedByUserId { get; private set; }
@@ -15,7 +16,7 @@ public sealed class Company : Entity<Guid>
 
     private Company() { }
 
-    public Company(string code, string name, string baseCurrency)
+    public Company(string code, string name, string baseCurrency, DateOnly accountingStartDate)
     {
         if (string.IsNullOrWhiteSpace(code))
             throw new BusinessRuleException("Company code is required.");
@@ -26,11 +27,15 @@ public sealed class Company : Entity<Guid>
         if (string.IsNullOrWhiteSpace(baseCurrency))
             throw new BusinessRuleException("Base currency is required.");
 
-        Id = Guid.NewGuid(); // <-- هذا هو الإصلاح الأهم
+        if (accountingStartDate == default)
+            throw new BusinessRuleException("Accounting start date is required.");
+
+        Id = Guid.NewGuid();
 
         Code = code.Trim();
         Name = name.Trim();
         BaseCurrency = baseCurrency.Trim().ToUpperInvariant();
+        AccountingStartDate = accountingStartDate;
     }
 
     public void Deactivate() => IsActive = false;

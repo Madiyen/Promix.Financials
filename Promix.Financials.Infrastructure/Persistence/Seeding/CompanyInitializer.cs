@@ -46,9 +46,10 @@ public sealed class CompanyInitializer : ICompanyInitializer
     isPosting: node.IsPosting,
     parentId: parentId,
     currencyCode: null,
-    systemRole: null,
+    systemRole: ResolveSystemRole(node.Code),
     notes: null,
-    isActive: true
+    isActive: true,
+    origin: AccountOrigin.Template
 );
 
             _db.Set<Account>().Add(acc);
@@ -65,6 +66,9 @@ public sealed class CompanyInitializer : ICompanyInitializer
             .ToListAsync(ct);
 
         var customersParent = accounts.FirstOrDefault(x => x.Code == "121");
+        if (customersParent is not null && customersParent.SystemRole != "ARControl")
+            customersParent.AssignSystemRole("ARControl");
+
         if (customersParent is not null
             && accounts.All(x => x.ParentId != customersParent.Id)
             && accounts.All(x => x.Code != "1211"))
@@ -80,10 +84,14 @@ public sealed class CompanyInitializer : ICompanyInitializer
                 currencyCode: null,
                 systemRole: null,
                 notes: "أضيف تلقائياً لدعم سندات القبض.",
-                isActive: true));
+                isActive: true,
+                origin: AccountOrigin.Template));
         }
 
         var suppliersParent = accounts.FirstOrDefault(x => x.Code == "221");
+        if (suppliersParent is not null && suppliersParent.SystemRole != "APControl")
+            suppliersParent.AssignSystemRole("APControl");
+
         if (suppliersParent is not null
             && accounts.All(x => x.ParentId != suppliersParent.Id)
             && accounts.All(x => x.Code != "2211"))
@@ -99,7 +107,8 @@ public sealed class CompanyInitializer : ICompanyInitializer
                 currencyCode: null,
                 systemRole: null,
                 notes: "أضيف تلقائياً لدعم سندات الصرف.",
-                isActive: true));
+                isActive: true,
+                origin: AccountOrigin.Template));
         }
 
         await _db.SaveChangesAsync(ct);
@@ -182,6 +191,14 @@ public sealed class CompanyInitializer : ICompanyInitializer
 
         return best;
     }
+
+    private static string? ResolveSystemRole(string code)
+        => code switch
+        {
+            "121" => "ARControl",
+            "221" => "APControl",
+            _ => null
+        };
 
     private sealed record TemplateNode(string Code, string NameAr, AccountNature Nature, bool IsPosting);
 

@@ -23,7 +23,7 @@ public sealed class EfJournalEntryRepository : IJournalEntryRepository
     public Task<JournalEntry?> GetByIdAsync(Guid companyId, Guid entryId, CancellationToken ct = default)
         => _db.JournalEntries
             .Include(x => x.Lines)
-            .FirstOrDefaultAsync(x => x.CompanyId == companyId && x.Id == entryId, ct);
+            .FirstOrDefaultAsync(x => x.CompanyId == companyId && x.Id == entryId && !x.IsDeleted, ct);
 
     public async Task<string> GenerateNextNumberAsync(Guid companyId, JournalEntryType type, CancellationToken ct = default)
     {
@@ -60,6 +60,7 @@ public sealed class EfJournalEntryRepository : IJournalEntryRepository
         var summary = await _db.JournalEntries
             .AsNoTracking()
             .Where(x => x.CompanyId == companyId
+                && !x.IsDeleted
                 && x.EntryDate == entryDate
                 && x.Status == JournalEntryStatus.Posted
                 && x.Type != JournalEntryType.DailyCashClosing)
@@ -77,6 +78,7 @@ public sealed class EfJournalEntryRepository : IJournalEntryRepository
         => _db.JournalEntries
             .AsNoTracking()
             .Where(x => x.CompanyId == companyId
+                && !x.IsDeleted
                 && x.EntryDate == entryDate
                 && x.Type == JournalEntryType.DailyCashClosing)
             .AnyAsync(x => x.Lines.Any(line => line.AccountId == accountId), ct);

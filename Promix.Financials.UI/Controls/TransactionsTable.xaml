@@ -1,14 +1,159 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Page
+<UserControl
     x:Class="Promix.Financials.UI.Controls.TransactionsTable"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Promix.Financials.UI.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    xmlns:journals="using:Promix.Financials.UI.ViewModels.Journals.Models">
 
-    <Grid>
+    <Border Background="White"
+            BorderBrush="#F1F5F9"
+            BorderThickness="1"
+            CornerRadius="18">
+        <StackPanel>
+            <Grid Padding="18,16" BorderBrush="#F1F5F9" BorderThickness="0,0,0,1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-    </Grid>
-</Page>
+                <StackPanel Spacing="3">
+                    <TextBlock Text="آخر الحركات" FontSize="15" FontWeight="Bold"/>
+                    <TextBlock Text="أحدث السندات والقيود المسجلة داخل الشركة الحالية."
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="11.5"/>
+                </StackPanel>
+
+                <TextBlock Grid.Column="1"
+                           Text="آخر 6 عناصر"
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource MutedTextBrush}"
+                           FontSize="12"/>
+            </Grid>
+
+            <Border Visibility="{Binding EmptyEntriesVisibility}"
+                    Padding="18">
+                <Border Background="#F8FAFC"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1"
+                        CornerRadius="16"
+                        Padding="18">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="لا توجد حركات بعد" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock Text="ابدأ بسند قبض أو صرف أو قيد يومية، وستظهر آخر الحركات هنا تلقائيًا."
+                                   Foreground="{StaticResource SlateTextBrush}"
+                                   FontSize="11.5"
+                                   TextWrapping="WrapWholeWords"/>
+                    </StackPanel>
+                </Border>
+            </Border>
+
+            <StackPanel Visibility="{Binding RecentEntriesVisibility}">
+                <Grid Background="#F8FAFC" Padding="16,10" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="105"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="110"/>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="80"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="الرقم" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="1" Text="التاريخ" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="2" Text="الوصف" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="3" Text="النوع" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="4" Text="المرجع" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="5" Text="الإجمالي" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="6" Text="الحالة" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="7" Text="السطور" Foreground="{StaticResource SlateTextBrush}" FontSize="11" FontWeight="SemiBold"/>
+                </Grid>
+
+                <ItemsControl ItemsSource="{Binding RecentEntries}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="journals:JournalEntryRowVm">
+                            <Border BorderBrush="#F1F5F9"
+                                    BorderThickness="0,0,0,1"
+                                    Background="White">
+                                <Grid Padding="16,12" ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="105"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{x:Bind EntryNumber}"
+                                               Foreground="#2563EB"
+                                               FontSize="12.5"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{x:Bind EntryDateText}"
+                                               Foreground="{StaticResource SlateTextBrush}"
+                                               FontSize="12"
+                                               VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Column="2"
+                                               Text="{x:Bind Description}"
+                                               FontSize="12"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center"/>
+
+                                    <Border Grid.Column="3"
+                                            Background="{x:Bind TypeBackgroundBrush}"
+                                            CornerRadius="8"
+                                            Padding="8,4"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind TypeText}"
+                                                   Foreground="{x:Bind TypeForegroundBrush}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"/>
+                                    </Border>
+
+                                    <TextBlock Grid.Column="4"
+                                               Text="{x:Bind ReferenceDisplay}"
+                                               Foreground="{StaticResource MutedTextBrush}"
+                                               FontFamily="Consolas"
+                                               FontSize="11"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Column="5"
+                                               Text="{x:Bind TotalDebitText}"
+                                               FontSize="12.5"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+
+                                    <Border Grid.Column="6"
+                                            Background="{x:Bind StatusBackgroundBrush}"
+                                            CornerRadius="999"
+                                            Padding="8,4"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{x:Bind StatusText}"
+                                                   Foreground="{x:Bind StatusForegroundBrush}"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"/>
+                                    </Border>
+
+                                    <TextBlock Grid.Column="7"
+                                               Text="{x:Bind LineCountText}"
+                                               Foreground="{StaticResource SlateTextBrush}"
+                                               FontSize="11.5"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

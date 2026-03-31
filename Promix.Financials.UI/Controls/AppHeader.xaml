@@ -13,29 +13,38 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
         <StackPanel VerticalAlignment="Center">
-            <TextBlock x:Uid="Dashboard_Title"
+            <TextBlock x:Name="TitleText"
+                       Text="لوحة القيادة"
                        Foreground="{StaticResource PrimaryTextBrush}"
                        FontWeight="Bold"
-                       FontSize="17"/>
-            <TextBlock x:Uid="Dashboard_Subtitle"
+                       FontSize="18"/>
+            <TextBlock x:Name="SubtitleText"
+                       Text="ملخص سريع لأهم المؤشرات والحركات اليومية."
                        Foreground="{StaticResource MutedTextBrush}"
-                       FontSize="12"
-                       Margin="0,2,0,0"/>
+                       FontSize="11.5"
+                       Margin="0,3,0,0"/>
         </StackPanel>
 
         <Border Grid.Column="1"
                 VerticalAlignment="Center"
                 Background="#F1F5F9"
-                CornerRadius="8"
-                Padding="12,6"
-                Margin="12,0,0,0">
-            <TextBlock x:Name="DateText"
-                       Foreground="{StaticResource SlateTextBrush}"
-                       FontSize="12"
-                       FontWeight="SemiBold"/>
+                CornerRadius="10"
+                Padding="12,7"
+                Margin="14,0,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <FontIcon Glyph="&#xE787;"
+                          Foreground="{StaticResource SlateTextBrush}"
+                          FontSize="13"
+                          VerticalAlignment="Center"/>
+                <TextBlock x:Name="DateText"
+                           Foreground="{StaticResource SlateTextBrush}"
+                           FontSize="12"
+                           FontWeight="SemiBold"/>
+            </StackPanel>
         </Border>
 
         <Border Grid.Column="2"
@@ -43,23 +52,113 @@
                 Background="{StaticResource AppBackgroundBrush}"
                 BorderBrush="#E2E8F0"
                 BorderThickness="1"
-                CornerRadius="12"
-                Padding="12,6"
-                Width="380"
+                CornerRadius="14"
+                Padding="14,0"
+                Height="42"
+                Width="390"
                 HorizontalAlignment="Center">
-            <TextBox x:Name="SearchBox"
-                     BorderThickness="0"
-                     Background="Transparent"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <FontIcon Glyph="&#xE721;"
+                          Foreground="{StaticResource MutedTextBrush}"
+                          FontSize="14"
+                          VerticalAlignment="Center"/>
+
+                <TextBox x:Name="SearchBox"
+                         Grid.Column="1"
+                         Margin="10,0,0,0"
+                         Style="{StaticResource SearchBoxStyle}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         VerticalAlignment="Center"
+                         TextAlignment="Right"/>
+
+                <Border Grid.Column="2"
+                        Background="#E2E8F0"
+                        CornerRadius="6"
+                        Padding="6,2"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="Ctrl+K"
+                               Foreground="{StaticResource MutedTextBrush}"
+                               FontSize="10"
+                               FontFamily="Consolas"/>
+                </Border>
+            </Grid>
         </Border>
 
-        <Button Grid.Column="3"
+        <Border Grid.Column="3"
+                x:Name="FiscalYearBadge"
                 VerticalAlignment="Center"
-                Margin="15,0,0,0"
-                Content="⚙"
-                Width="50"
-                Height="50"
-                        Click="Settings_Click"
+                Margin="12,0,0,0"
+                Background="{StaticResource InfoSurfaceBrush}"
+                BorderBrush="#BFDBFE"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="12,8">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock x:Name="FiscalYearText"
+                           Text="الفترة الحالية"
+                           Foreground="#1D4ED8"
+                           FontSize="12.5"
+                           FontWeight="SemiBold"/>
+                <FontIcon Glyph="&#xE70D;"
+                          Foreground="#3B82F6"
+                          FontSize="12"
+                          VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
 
-                ToolTipService.ToolTip="{x:Bind SettingsTooltip, Mode=OneTime}"/>
+        <StackPanel Grid.Column="4"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center"
+                    Margin="14,0,0,0"
+                    Spacing="10">
+            <Button Width="40"
+                    Height="40"
+                    Style="{StaticResource IconButtonStyle}"
+                    Click="Settings_Click"
+                    ToolTipService.ToolTip="{x:Bind SettingsTooltip, Mode=OneTime}">
+                <FontIcon Glyph="&#xE713;"
+                          Foreground="{StaticResource SlateTextBrush}"
+                          FontSize="16"/>
+            </Button>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Width="38"
+                        Height="38"
+                        CornerRadius="19">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#3B82F6" Offset="0"/>
+                            <GradientStop Color="#8B5CF6" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <TextBlock x:Name="AvatarText"
+                               Text="PM"
+                               Foreground="White"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <FontIcon Grid.Column="1"
+                          Glyph="&#xE70D;"
+                          Foreground="{StaticResource MutedTextBrush}"
+                          FontSize="12"
+                          VerticalAlignment="Center"
+                          Margin="8,0,0,0"/>
+            </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>

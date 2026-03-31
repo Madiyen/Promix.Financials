@@ -10,6 +10,8 @@ public interface ICompanyAdminRepository
         string code,
         string name,
         string baseCurrency,
+        DateOnly accountingStartDate,
         Guid ownerUserId,
         CancellationToken ct = default);
+    Task ResetApplicationDataAsync(CancellationToken ct = default);
 }

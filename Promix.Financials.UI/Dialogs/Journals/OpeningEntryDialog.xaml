@@ -169,6 +169,16 @@
                                                                SelectedAccountId="{Binding SelectedAccountId, Mode=TwoWay}"/>
 
                                     <StackPanel Spacing="6">
+                                        <TextBlock Text="الطرف" Style="{StaticResource FieldLabelStyle}"/>
+                                        <ComboBox Style="{StaticResource InputComboBoxStyle}"
+                                                  ItemsSource="{Binding DataContext.PartyOptions, ElementName=RootDialog}"
+                                                  DisplayMemberPath="DisplayText"
+                                                  SelectedValuePath="Id"
+                                                  SelectedValue="{Binding SelectedPartyId, Mode=TwoWay}"
+                                                  PlaceholderText="اختياري عند افتتاح ذمم عميل أو مورد"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="6">
                                         <TextBlock Text="وصف السطر" Style="{StaticResource FieldLabelStyle}"/>
                                         <TextBox Style="{StaticResource InputTextBoxStyle}"
                                                  Text="{Binding Description, Mode=TwoWay}"

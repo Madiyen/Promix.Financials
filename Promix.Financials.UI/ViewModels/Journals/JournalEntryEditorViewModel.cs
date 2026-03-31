@@ -8,12 +8,14 @@ using Microsoft.UI.Xaml.Media;
 using Promix.Financials.Application.Features.Journals.Commands;
 using Promix.Financials.Domain.Enums;
 using Promix.Financials.UI.ViewModels.Journals.Models;
+using Promix.Financials.UI.ViewModels.Parties.Models;
 
 namespace Promix.Financials.UI.ViewModels.Journals;
 
 public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
 {
     public ObservableCollection<JournalAccountOptionVm> AccountOptions { get; }
+    public ObservableCollection<PartyOptionVm> PartyOptions { get; }
     public ObservableCollection<JournalEntryLineEditorVm> Lines { get; } = new();
 
     private readonly JournalEntryType _entryType;
@@ -23,12 +25,14 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
 
     public JournalEntryEditorViewModel(
         IEnumerable<JournalAccountOptionVm> accountOptions,
+        IEnumerable<PartyOptionVm> partyOptions,
         JournalEntryType entryType,
         string title,
         string subtitle,
         string noteText)
     {
         AccountOptions = new ObservableCollection<JournalAccountOptionVm>(accountOptions);
+        PartyOptions = new ObservableCollection<PartyOptionVm>(partyOptions.Where(x => x.IsActive).OrderBy(x => x.Code));
         _entryType = entryType;
         Title = title;
         Subtitle = subtitle;
@@ -41,6 +45,8 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
     public string Title { get; }
     public string Subtitle { get; }
     public string NoteText { get; }
+    private Guid? ReceivableControlAccountId => AccountOptions.FirstOrDefault(x => x.IsReceivableControl)?.Id;
+    private Guid? PayableControlAccountId => AccountOptions.FirstOrDefault(x => x.IsPayableControl)?.Id;
     public string EntryTypeText => _entryType switch
     {
         JournalEntryType.OpeningEntry => "قيد افتتاحي",
@@ -124,6 +130,37 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
                 return false;
             }
 
+            if (line.SelectedPartyId is Guid partyId)
+            {
+                var party = PartyOptions.FirstOrDefault(x => x.Id == partyId);
+                if (party is null)
+                {
+                    error = "أحد الأطراف المختارة لم يعد متاحًا.";
+                    return false;
+                }
+
+                if (!party.MatchesAccount(line.SelectedAccountId, ReceivableControlAccountId, PayableControlAccountId))
+                {
+                    error = "عند اختيار طرف يجب استخدام الحساب المرتبط به أو حساب الضبط المناسب لو كان هذا الطرف من سجل قديم على دفتر فرعي.";
+                    return false;
+                }
+            }
+            else if (line.SelectedAccountId is Guid selectedAccountId)
+            {
+                var account = AccountOptions.FirstOrDefault(x => x.Id == selectedAccountId);
+                if (account?.IsPartyControlAccount == true)
+                {
+                    error = "لا يمكن التقييد على حسابات ضبط العملاء أو الموردين بدون اختيار طرف.";
+                    return false;
+                }
+
+                if (account?.IsLegacyPartyLinkedAccount == true)
+                {
+                    error = "هذا الحساب مرتبط بطرف. اختر الطرف نفسه أو استخدم حساباً عاماً آخر.";
+                    return false;
+                }
+            }
+
             var hasDebit = line.Debit > 0;
             var hasCredit = line.Credit > 0;
             if (hasDebit == hasCredit)
@@ -160,7 +197,9 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
                     x.SelectedAccountId!.Value,
                     Convert.ToDecimal(x.Debit),
                     Convert.ToDecimal(x.Credit),
-                    x.Description))
+                    x.Description,
+                    NormalizeSmallText(x.PartyName),
+                    x.SelectedPartyId))
                 .ToList());
 
         return true;
@@ -171,11 +210,52 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
         if (e.PropertyName is nameof(JournalEntryLineEditorVm.Debit)
             or nameof(JournalEntryLineEditorVm.Credit)
             or nameof(JournalEntryLineEditorVm.SelectedAccountId)
+            or nameof(JournalEntryLineEditorVm.SelectedPartyId)
             or nameof(JournalEntryLineEditorVm.IsEmpty))
         {
+            if (sender is JournalEntryLineEditorVm line)
+            {
+                ApplyPartyDefaults(line);
+                EnsurePartyStillMatches(line);
+            }
+
             NotifyTotals();
         }
     }
+
+    private void ApplyPartyDefaults(JournalEntryLineEditorVm line)
+    {
+        if (line.SelectedPartyId is not Guid partyId)
+            return;
+
+        var party = PartyOptions.FirstOrDefault(x => x.Id == partyId);
+        if (party is null)
+            return;
+
+        line.PartyName = party.NameAr;
+        if (party.MatchesAccount(line.SelectedAccountId, ReceivableControlAccountId, PayableControlAccountId))
+            return;
+
+        var preferredAccountId = party.ResolveJournalAccountId(line.Debit >= line.Credit, ReceivableControlAccountId, PayableControlAccountId);
+        if (preferredAccountId is Guid accountId)
+            line.SelectedAccountId = accountId;
+    }
+
+    private void EnsurePartyStillMatches(JournalEntryLineEditorVm line)
+    {
+        if (line.SelectedPartyId is not Guid partyId)
+            return;
+
+        var party = PartyOptions.FirstOrDefault(x => x.Id == partyId);
+        if (party is null)
+            return;
+
+        if (!party.MatchesAccount(line.SelectedAccountId, ReceivableControlAccountId, PayableControlAccountId))
+            line.SelectedPartyId = null;
+    }
+
+    private static string? NormalizeSmallText(string? value)
+        => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 
     private void NotifyTotals()
     {

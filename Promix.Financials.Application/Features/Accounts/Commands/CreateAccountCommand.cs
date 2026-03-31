@@ -13,5 +13,6 @@ public sealed record CreateAccountCommand(
     string? CurrencyCode,
     string? SystemRole,
     bool IsActive,
-    string? Notes
+    string? Notes,
+    AccountOrigin Origin = AccountOrigin.Manual
 );

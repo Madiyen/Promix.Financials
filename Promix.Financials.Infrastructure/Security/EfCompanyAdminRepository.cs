@@ -44,15 +44,33 @@ public sealed class EfCompanyAdminRepository : ICompanyAdminRepository
         string code,
         string name,
         string baseCurrency,
+        DateOnly accountingStartDate,
         Guid ownerUserId,
         CancellationToken ct = default)
     {
-        var company = new Company(code, name, baseCurrency);
+        var company = new Company(code, name, baseCurrency, accountingStartDate);
 
         _db.Companies.Add(company);
         _db.UserCompanies.Add(new UserCompany(ownerUserId, company.Id));
 
         await _db.SaveChangesAsync(ct);
         return company;
+    }
+
+    public async Task ResetApplicationDataAsync(CancellationToken ct = default)
+    {
+        await using var transaction = await _db.Database.BeginTransactionAsync(ct);
+
+        await _db.PartySettlements.ExecuteDeleteAsync(ct);
+        await _db.JournalLines.ExecuteDeleteAsync(ct);
+        await _db.JournalEntries.ExecuteDeleteAsync(ct);
+        await _db.Parties.ExecuteDeleteAsync(ct);
+        await _db.Accounts.ExecuteDeleteAsync(ct);
+        await _db.CompanyCurrencies.ExecuteDeleteAsync(ct);
+        await _db.CurrencyRates.ExecuteDeleteAsync(ct);
+        await _db.UserCompanies.ExecuteDeleteAsync(ct);
+        await _db.Companies.ExecuteDeleteAsync(ct);
+
+        await transaction.CommitAsync(ct);
     }
 }

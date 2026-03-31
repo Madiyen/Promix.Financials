@@ -7,6 +7,7 @@ using Promix.Financials.Application.Features.Journals.Commands;
 using Promix.Financials.Domain.Enums;
 using Promix.Financials.UI.ViewModels.Journals;
 using Promix.Financials.UI.ViewModels.Journals.Models;
+using Promix.Financials.UI.ViewModels.Parties.Models;
 using Windows.Foundation;
 using Windows.System;
 
@@ -16,12 +17,13 @@ public sealed partial class OpeningEntryDialog : ContentDialog
 {
     private readonly Guid _companyId;
 
-    public OpeningEntryDialog(Guid companyId, IReadOnlyList<JournalAccountOptionVm> accounts)
+    public OpeningEntryDialog(Guid companyId, IReadOnlyList<JournalAccountOptionVm> accounts, IReadOnlyList<PartyOptionVm> parties)
     {
         InitializeComponent();
         _companyId = companyId;
         ViewModel = new JournalEntryEditorViewModel(
             accounts,
+            parties,
             JournalEntryType.OpeningEntry,
             "قيد افتتاحي",
             "قيد مخصص لفتح السنة المالية أو معالجة حالات استثنائية معتمدة من الإدارة.",

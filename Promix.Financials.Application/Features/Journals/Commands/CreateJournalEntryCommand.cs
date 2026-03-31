@@ -6,7 +6,9 @@ public sealed record CreateJournalEntryLineCommand(
     Guid AccountId,
     decimal Debit,
     decimal Credit,
-    string? Description
+    string? Description,
+    string? PartyName = null,
+    Guid? PartyId = null
 );
 
 public sealed record CreateJournalEntryCommand(
@@ -19,5 +21,6 @@ public sealed record CreateJournalEntryCommand(
     decimal? ExchangeRate,
     decimal? CurrencyAmount,
     bool PostNow,
-    IReadOnlyList<CreateJournalEntryLineCommand> Lines
+    IReadOnlyList<CreateJournalEntryLineCommand> Lines,
+    TransferSettlementMode? TransferSettlementMode = null
 );

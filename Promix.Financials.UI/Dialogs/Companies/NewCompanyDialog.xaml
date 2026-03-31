@@ -3,12 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="إنشاء شركة جديدة"
-    PrimaryButtonText="إنشاء"
+    PrimaryButtonText="إنشاء الشركة"
     CloseButtonText="إلغاء"
     DefaultButton="Primary"
-    MinWidth="520">
+    MinWidth="720">
 
-    <Grid RowSpacing="10">
+    <Grid RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -17,26 +17,102 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Text="أدخل بيانات الشركة. سيتم إنشاء دليل الحسابات تلقائيًا."
-                   Opacity="0.7"/>
+        <Border Grid.Row="0"
+                Background="#F8FAFC"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="18">
+            <StackPanel Spacing="10">
+                <TextBlock Text="إعداد البداية المحاسبية"
+                           FontSize="20"
+                           FontWeight="SemiBold"/>
+                <TextBlock Text="أدخل بيانات الشركة الأساسية وحدد تاريخ بداية العمل المحاسبي قبل إنشاء الدليل الافتراضي."
+                           Opacity="0.72"
+                           TextWrapping="WrapWholeWords"/>
 
-        <TextBox Grid.Row="1"
-                 Header="كود الشركة"
-                 IsReadOnly="True"
-                 Text="{Binding GeneratedCode, Mode=OneWay}"/>
+                <Border Background="#EFF6FF"
+                        BorderBrush="#BFDBFE"
+                        BorderThickness="1"
+                        CornerRadius="14"
+                        Padding="14,12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding TemplateName}"
+                                   FontWeight="SemiBold"
+                                   Foreground="#1D4ED8"/>
+                        <TextBlock Text="{Binding TemplateHintText}"
+                                   Foreground="#334155"
+                                   FontSize="12"
+                                   TextWrapping="WrapWholeWords"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
 
-        <TextBox Grid.Row="2"
-                 Header="اسم الشركة"
-                 PlaceholderText="مثال: الشركة الرئيسية"
-                 Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Grid Grid.Row="1" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <ComboBox Grid.Row="3"
-                  Header="عملة الأساس"
-                  ItemsSource="{Binding AvailableCurrencies}"
-                  SelectedValuePath="Code"
-                  DisplayMemberPath="DisplayName"
-                  SelectedValue="{Binding SelectedCurrencyCode, Mode=TwoWay}"/>
+            <TextBox Grid.Column="0"
+                     Header="كود الشركة"
+                     IsReadOnly="True"
+                     Text="{Binding GeneratedCode, Mode=OneWay}"/>
+
+            <ComboBox Grid.Column="1"
+                      Header="عملة الأساس"
+                      ItemsSource="{Binding AvailableCurrencies}"
+                      SelectedValuePath="Code"
+                      DisplayMemberPath="DisplayName"
+                      SelectedValue="{Binding SelectedCurrencyCode, Mode=TwoWay}"/>
+        </Grid>
+
+        <Grid Grid.Row="2" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0"
+                     Header="اسم الشركة"
+                     PlaceholderText="مثال: الشركة الرئيسية"
+                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <DatePicker Grid.Column="1"
+                        Header="بداية العمل المحاسبي"
+                        Date="{Binding AccountingStartDate, Mode=TwoWay}"/>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Background="White"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                CornerRadius="18"
+                Padding="18">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="القالب" Foreground="#64748B" FontSize="12"/>
+                    <TextBlock Text="{Binding TemplateName}" FontWeight="SemiBold"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="4">
+                    <TextBlock Text="عملة الأساس" Foreground="#64748B" FontSize="12"/>
+                    <TextBlock Text="{Binding SelectedCurrencyCode}" FontWeight="SemiBold"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Spacing="4">
+                    <TextBlock Text="تاريخ البداية" Foreground="#64748B" FontSize="12"/>
+                    <TextBlock Text="{Binding AccountingStartDateText}" FontWeight="SemiBold" Language="en-US"/>
+                </StackPanel>
+            </Grid>
+        </Border>
 
         <TextBlock Grid.Row="4"
                    Text="{Binding Error}"

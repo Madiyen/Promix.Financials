@@ -3,5 +3,6 @@
 public sealed record CreateCompanyCommand(
     string Code,
     string Name,
-    string BaseCurrency
+    string BaseCurrency,
+    DateOnly AccountingStartDate
 );

@@ -10,10 +10,43 @@ public sealed record JournalEntrySummaryDto(
     int Status,
     string? ReferenceNo,
     string? Description,
+    string CurrencyCode,
+    decimal ExchangeRate,
+    decimal CurrencyAmount,
     decimal TotalDebit,
     decimal TotalCredit,
     int LineCount,
-    DateTimeOffset CreatedAtUtc
+    DateTimeOffset CreatedAtUtc,
+    DateTimeOffset? PostedAtUtc,
+    DateTimeOffset? ModifiedAtUtc
+);
+
+public sealed record JournalEntryDetailLineDto(
+    Guid AccountId,
+    decimal Debit,
+    decimal Credit,
+    string? PartyName,
+    string? Description,
+    Guid? PartyId = null
+);
+
+public sealed record JournalEntryDetailDto(
+    Guid Id,
+    string EntryNumber,
+    DateOnly EntryDate,
+    int Type,
+    int Status,
+    string? ReferenceNo,
+    string? Description,
+    string CurrencyCode,
+    decimal ExchangeRate,
+    decimal CurrencyAmount,
+    DateTimeOffset CreatedAtUtc,
+    DateTimeOffset? PostedAtUtc,
+    Guid? ModifiedByUserId,
+    DateTimeOffset? ModifiedAtUtc,
+    IReadOnlyList<JournalEntryDetailLineDto> Lines,
+    TransferSettlementMode? TransferSettlementMode = null
 );
 
 public sealed record JournalPostingAccountDto(
@@ -21,7 +54,8 @@ public sealed record JournalPostingAccountDto(
     string Code,
     string NameAr,
     AccountNature Nature,
-    string? SystemRole
+    string? SystemRole,
+    bool IsLegacyPartyLinkedAccount
 );
 
 public sealed record JournalAccountBalanceDto(
@@ -51,6 +85,7 @@ public sealed record JournalCurrencyOptionDto(
 public interface IJournalEntriesQuery
 {
     Task<IReadOnlyList<JournalEntrySummaryDto>> GetEntriesAsync(Guid companyId, CancellationToken ct = default);
+    Task<JournalEntryDetailDto?> GetEntryDetailAsync(Guid companyId, Guid entryId, CancellationToken ct = default);
     Task<IReadOnlyList<JournalPostingAccountDto>> GetPostingAccountsAsync(Guid companyId, CancellationToken ct = default);
     Task<IReadOnlyList<JournalCurrencyOptionDto>> GetActiveCurrenciesAsync(Guid companyId, CancellationToken ct = default);
     Task<IReadOnlyList<int>> GetAvailableFiscalYearsAsync(Guid companyId, CancellationToken ct = default);

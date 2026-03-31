@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Application.Features.Accounts.Queries;
 using Promix.Financials.Application.Features.Companies;
+using Promix.Financials.Domain.Enums;
 
 namespace Promix.Financials.UI.ViewModels.Accounts;
 
@@ -24,7 +25,6 @@ public sealed class NewAccountDialogViewModel : INotifyPropertyChanged
 
     public ObservableCollection<string> SystemRoles { get; } = new()
     {
-        "", // None
         "CashMain","CashDaily","BankMain","ARControl","APControl","InventoryControl","COGS",
         "SalesRevenue","SalesReturns","SalesDiscountAllowed","InventoryAdjustments","RetainedEarnings"
     };
@@ -42,7 +42,7 @@ public sealed class NewAccountDialogViewModel : INotifyPropertyChanged
         // defaults
         _selectedAccountType = "Postable";
         _selectedCurrency = null;
-        _selectedSystemRole = "";
+        _selectedSystemRole = null;
         _isActive = true;
 
         ParentAccounts.Clear();
@@ -140,7 +140,13 @@ public sealed class NewAccountDialogViewModel : INotifyPropertyChanged
     public string SelectedAccountType
     {
         get => _selectedAccountType;
-        set { if (_selectedAccountType == value) return; _selectedAccountType = value; OnPropertyChanged(); }
+        set
+        {
+            if (_selectedAccountType == value) return;
+            _selectedAccountType = value;
+            OnPropertyChanged();
+            RecomputeDerivedDetails();
+        }
     }
 
     // ✅ نوع CurrencyOptionDto بدل string
@@ -151,8 +157,8 @@ public sealed class NewAccountDialogViewModel : INotifyPropertyChanged
         set { if (_selectedCurrency == value) return; _selectedCurrency = value; OnPropertyChanged(); }
     }
 
-    private string _selectedSystemRole;
-    public string SelectedSystemRole
+    private string? _selectedSystemRole;
+    public string? SelectedSystemRole
     {
         get => _selectedSystemRole;
         set { if (_selectedSystemRole == value) return; _selectedSystemRole = value; OnPropertyChanged(); }
@@ -247,6 +253,9 @@ public sealed class NewAccountDialogViewModel : INotifyPropertyChanged
             var next = ComputeNextSegment(children, parentCode);
             SuggestedCode = $"{parentCode}.{next}";
         }
+
+        RecomputeDerivedCategory();
+        RecomputeDerivedDetails();
     }
 
     private static int ComputeNextSegment(List<string> siblingCodes, string parentCode)
@@ -271,15 +280,13 @@ public sealed class NewAccountDialogViewModel : INotifyPropertyChanged
 
     private void RecomputeDerivedCategory()
     {
-        var parentCode = SelectedParentAccount?.Code ?? "";
+        var root = SuggestedCode.Split('.', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
 
-        if (string.IsNullOrWhiteSpace(parentCode))
+        if (string.IsNullOrWhiteSpace(root))
         {
             DerivedCategoryText = "—";
             return;
         }
-
-        var root = parentCode.Split('.')[0];
 
         DerivedCategoryText = root switch
         {
@@ -297,6 +304,69 @@ public sealed class NewAccountDialogViewModel : INotifyPropertyChanged
     {
         get => _derivedCategoryText;
         private set { if (_derivedCategoryText == value) return; _derivedCategoryText = value; OnPropertyChanged(); }
+    }
+
+    private string _derivedNatureText = "مدين";
+    public string DerivedNatureText
+    {
+        get => _derivedNatureText;
+        private set { if (_derivedNatureText == value) return; _derivedNatureText = value; OnPropertyChanged(); }
+    }
+
+    private string _derivedCloseBehaviorText = "دائم";
+    public string DerivedCloseBehaviorText
+    {
+        get => _derivedCloseBehaviorText;
+        private set { if (_derivedCloseBehaviorText == value) return; _derivedCloseBehaviorText = value; OnPropertyChanged(); }
+    }
+
+    private string _derivedLevelText = "المستوى 1";
+    public string DerivedLevelText
+    {
+        get => _derivedLevelText;
+        private set { if (_derivedLevelText == value) return; _derivedLevelText = value; OnPropertyChanged(); }
+    }
+
+    private string _postingModeHintText = "الحساب الحركي يقبل القيود المباشرة ولا يسمح له بأبناء.";
+    public string PostingModeHintText
+    {
+        get => _postingModeHintText;
+        private set { if (_postingModeHintText == value) return; _postingModeHintText = value; OnPropertyChanged(); }
+    }
+
+    private string _parentGuideText = "اختر الحساب الأب الذي سيولد النظام الكود الجديد تحته.";
+    public string ParentGuideText
+    {
+        get => _parentGuideText;
+        private set { if (_parentGuideText == value) return; _parentGuideText = value; OnPropertyChanged(); }
+    }
+
+    private void RecomputeDerivedDetails()
+    {
+        var normalizedCode = SuggestedCode;
+        var root = normalizedCode.Split('.', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
+        var nature = root is "2" or "3" or "4" ? AccountNature.Credit : AccountNature.Debit;
+        var accountClass = root switch
+        {
+            "1" => AccountClass.Assets,
+            "2" => AccountClass.Liabilities,
+            "3" => AccountClass.Equity,
+            "4" => AccountClass.Revenue,
+            "5" => AccountClass.Expenses,
+            _ => AccountClass.Assets
+        };
+
+        DerivedNatureText = nature == AccountNature.Debit ? "مدين" : "دائن";
+        DerivedCloseBehaviorText = accountClass is AccountClass.Revenue or AccountClass.Expenses
+            ? "يقفل آخر السنة"
+            : "دائم";
+        DerivedLevelText = $"المستوى {normalizedCode.Count(c => c == '.') + 1}";
+        PostingModeHintText = SelectedAccountType == "Postable"
+            ? "الحساب الحركي يقبل القيود المباشرة ولا يسمح له بحسابات فرعية."
+            : "الحساب التجميعي لا يقبل القيود المباشرة ويستخدم لتنظيم الحسابات الفرعية.";
+        ParentGuideText = string.IsNullOrWhiteSpace(SelectedParentAccount?.Code)
+            ? "سيُنشئ النظام هذا الحساب كجذر جديد داخل الشجرة اعتمادًا على الفئة المختارة من الكود."
+            : $"سيُنشئ النظام الحساب تحت الأب {SelectedParentAccount.DisplayName}.";
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

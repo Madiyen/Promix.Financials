@@ -25,4 +25,16 @@ public sealed class EfUserRepository : IUserRepository
 
     public Task<User?> FindByIdAsync(Guid userId, CancellationToken ct = default)
         => _db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct);
+
+    public async Task<IReadOnlyList<string>> GetRoleNamesAsync(Guid userId, CancellationToken ct = default)
+        => await _db.UserRoles
+            .AsNoTracking()
+            .Where(link => link.UserId == userId)
+            .Join(
+                _db.Roles.AsNoTracking(),
+                link => link.RoleId,
+                role => role.Id,
+                (_, role) => role.Name)
+            .OrderBy(name => name)
+            .ToListAsync(ct);
 }

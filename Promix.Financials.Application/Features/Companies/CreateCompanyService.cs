@@ -32,6 +32,9 @@ public sealed class CreateCompanyService
         if (string.IsNullOrWhiteSpace(baseCurrency))
             throw new InvalidOperationException("Base currency is required.");
 
+        if (cmd.AccountingStartDate == default)
+            throw new InvalidOperationException("Accounting start date is required.");
+
         if (!await _currencies.ExistsActiveAsync(baseCurrency, ct))
             throw new InvalidOperationException("Base currency is invalid or inactive.");
 
@@ -42,6 +45,7 @@ public sealed class CreateCompanyService
             code: code,
             name: name,
             baseCurrency: baseCurrency,
+            accountingStartDate: cmd.AccountingStartDate,
             ownerUserId: _userContext.UserId,
             ct: ct);
 

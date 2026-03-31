@@ -12,9 +12,13 @@ using Promix.Financials.UI.Security;
 using Promix.Financials.UI.Services.Journals;
 using Promix.Financials.UI.ViewModels.Accounts;
 using Promix.Financials.UI.ViewModels.Currencies;
+using Promix.Financials.UI.ViewModels.Dashboard;
 using Promix.Financials.UI.ViewModels.Journals;
+using Promix.Financials.UI.ViewModels.Ledger;
+using Promix.Financials.UI.ViewModels.Parties;
 using Promix.Financials.UI.ViewModels.Reports;
 using System;
+using System.Runtime.InteropServices;
 using Windows.Globalization;
 using Windows.Storage;
 
@@ -68,10 +72,15 @@ public partial class App : Microsoft.UI.Xaml.Application
                     ?? throw new InvalidOperationException("Missing ConnectionStrings:Promix in appsettings.json");
                 services.AddInfrastructure(cs);
                 services.AddTransient<CompanyCurrenciesViewModel>();
+                services.AddTransient<DashboardViewModel>();
                 services.AddTransient<JournalEntriesViewModel>();
+                services.AddTransient<PartiesPageViewModel>();
+                services.AddTransient<FinancialYearsViewModel>();
                 services.AddTransient<AccountStatementViewModel>();
+                services.AddTransient<TrialBalanceViewModel>();
                 services.AddSingleton<IJournalQuickDefaultsStore, LocalSettingsJournalQuickDefaultsStore>();
                 services.AddSingleton<ISessionStore, LocalSettingsSessionStore>();
+                services.AddTransient<JournalDialogLauncher>();
                 services.AddTransient<ChartOfAccountsViewModel>();
                 services.AddTransient<NewAccountDialogViewModel>();
                 
@@ -111,29 +120,42 @@ public partial class App : Microsoft.UI.Xaml.Application
         }
         catch (Exception ex)
         {
-            // ✅ عرض خطأ واضح عند فشل التشغيل
-            _window = new Window();
-            _window.Activate();
-
-            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
-            {
-                Title = "خطأ في التشغيل",
-                Content = $"فشل تشغيل التطبيق:\n\n{ex.Message}\n\nتحقق من اتصال قاعدة البيانات.",
-                CloseButtonText = "إغلاق",
-            };
-
-            _window.DispatcherQueue.TryEnqueue(async () =>
-            {
-                try
-                {
-                    dialog.XamlRoot = _window.Content?.XamlRoot;
-                    await dialog.ShowAsync();
-                }
-                finally
-                {
-                    _window.Close();
-                }
-            });
+            ShowStartupFailure(ex);
         }
+    }
+
+    private void ShowStartupFailure(Exception ex)
+    {
+        const string title = "خطأ في التشغيل";
+        var message = $"فشل تشغيل التطبيق:{Environment.NewLine}{Environment.NewLine}{ex.Message}{Environment.NewLine}{Environment.NewLine}تحقق من اتصال قاعدة البيانات أو راجع سجل الأعطال.";
+
+        try
+        {
+            if (_window?.Content is FrameworkElement root && root.XamlRoot is not null)
+            {
+                var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+                {
+                    XamlRoot = root.XamlRoot,
+                    Title = title,
+                    Content = message,
+                    CloseButtonText = "إغلاق"
+                };
+
+                _window.DispatcherQueue.TryEnqueue(async () => await dialog.ShowAsync());
+                return;
+            }
+        }
+        catch
+        {
+            // ننتقل إلى الرسالة الأصلية على مستوى النظام إذا فشل مسار WinUI.
+        }
+
+        NativeMethods.MessageBoxW(nint.Zero, message, title, 0x00000010);
+    }
+
+    private static partial class NativeMethods
+    {
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "MessageBoxW")]
+        public static extern int MessageBoxW(nint hWnd, string text, string caption, uint type);
     }
 }

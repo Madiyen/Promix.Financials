@@ -51,11 +51,27 @@ public sealed class TrialBalanceRowVm
     public string ClosingDebitText => FormatAmount(ClosingDebit);
     public string ClosingCreditText => FormatAmount(ClosingCredit);
     public string ClosingSideText => ClosingDebit > 0m ? "مدين" : ClosingCredit > 0m ? "دائن" : "صفري";
+    public decimal NetClosingBalanceSigned => ClosingDebit > 0m
+        ? ClosingDebit
+        : ClosingCredit > 0m
+            ? -ClosingCredit
+            : 0m;
+    public string NetClosingBalanceSignedText => $"{(NetClosingBalanceSigned > 0m ? "+" : NetClosingBalanceSigned < 0m ? "-" : string.Empty)}{Math.Abs(NetClosingBalanceSigned):N2}";
+    public string NetClosingBalanceMeaningText => NetClosingBalanceSigned > 0m
+        ? "مدين"
+        : NetClosingBalanceSigned < 0m
+            ? "دائن"
+            : "صفري";
     public Brush ClosingAccentBrush => ClosingDebit > 0m
         ? JournalActivityBarVm.FromHex("#1D4ED8")
         : ClosingCredit > 0m
-            ? JournalActivityBarVm.FromHex("#0369A1")
-            : JournalActivityBarVm.FromHex("#64748B");
+            ? JournalActivityBarVm.FromHex("#047857")
+            : JournalActivityBarVm.FromHex("#475569");
+    public Brush NetClosingBalanceAccentBrush => NetClosingBalanceSigned > 0m
+        ? JournalActivityBarVm.FromHex("#1D4ED8")
+        : NetClosingBalanceSigned < 0m
+            ? JournalActivityBarVm.FromHex("#B91C1C")
+            : JournalActivityBarVm.FromHex("#475569");
 
-    private static string FormatAmount(decimal amount) => amount == 0m ? "—" : amount.ToString("N2");
+    private static string FormatAmount(decimal amount) => amount.ToString("N2");
 }

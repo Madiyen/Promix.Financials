@@ -7,6 +7,8 @@ namespace Promix.Financials.UI.ViewModels.Journals.Models;
 public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
 {
     private Guid? _selectedAccountId;
+    private Guid? _selectedPartyId;
+    private string _partyName = string.Empty;
     private string _description = string.Empty;
     private double _debit;
     private double _credit;
@@ -18,6 +20,30 @@ public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
         {
             if (_selectedAccountId == value) return;
             _selectedAccountId = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsEmpty));
+        }
+    }
+
+    public Guid? SelectedPartyId
+    {
+        get => _selectedPartyId;
+        set
+        {
+            if (_selectedPartyId == value) return;
+            _selectedPartyId = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsEmpty));
+        }
+    }
+
+    public string PartyName
+    {
+        get => _partyName;
+        set
+        {
+            if (_partyName == value) return;
+            _partyName = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsEmpty));
         }
@@ -73,6 +99,8 @@ public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
 
     public bool IsEmpty =>
         SelectedAccountId is null &&
+        SelectedPartyId is null &&
+        string.IsNullOrWhiteSpace(PartyName) &&
         string.IsNullOrWhiteSpace(Description) &&
         Debit <= 0 &&
         Credit <= 0;

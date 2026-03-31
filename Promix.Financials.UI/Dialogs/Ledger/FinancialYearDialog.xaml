@@ -1,0 +1,66 @@
+<ContentDialog
+    x:Class="Promix.Financials.UI.Dialogs.Ledger.FinancialYearDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    FlowDirection="RightToLeft"
+    PrimaryButtonText="حفظ"
+    CloseButtonText="إلغاء"
+    DefaultButton="Primary"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
+
+    <StackPanel Spacing="16">
+        <TextBlock x:Name="SubtitleText"
+                   Text="أدخل بيانات السنة المالية المطلوبة."
+                   Foreground="{StaticResource SlateTextBrush}"
+                   TextWrapping="WrapWholeWords"/>
+
+        <Grid ColumnSpacing="12" RowSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                <TextBlock Text="الرمز" Style="{StaticResource FieldLabelStyle}"/>
+                <TextBox x:Name="CodeTextBox" Style="{StaticResource InputTextBoxStyle}" PlaceholderText="FY-2026"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                <TextBlock Text="الاسم" Style="{StaticResource FieldLabelStyle}"/>
+                <TextBox x:Name="NameTextBox" Style="{StaticResource InputTextBoxStyle}" PlaceholderText="السنة المالية 2026"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                <TextBlock Text="من تاريخ" Style="{StaticResource FieldLabelStyle}"/>
+                <DatePicker x:Name="StartDatePicker" Style="{StaticResource InputDatePickerStyle}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                <TextBlock Text="إلى تاريخ" Style="{StaticResource FieldLabelStyle}"/>
+                <DatePicker x:Name="EndDatePicker" Style="{StaticResource InputDatePickerStyle}"/>
+            </StackPanel>
+
+            <CheckBox x:Name="SetActiveCheckBox"
+                      Grid.Row="2"
+                      Grid.ColumnSpan="2"
+                      Content="تفعيل هذه السنة مباشرة بعد الحفظ"/>
+        </Grid>
+
+        <Border Background="#F8FAFC"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="12">
+            <TextBlock x:Name="ValidationHintText"
+                       Text="يجب أن تكون التواريخ غير متداخلة مع أي سنة مالية أخرى داخل نفس الشركة."
+                       Foreground="{StaticResource SlateTextBrush}"
+                       FontSize="12"
+                       TextWrapping="WrapWholeWords"/>
+        </Border>
+    </StackPanel>
+</ContentDialog>

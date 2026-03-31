@@ -16,13 +16,14 @@ public sealed class JournalAccountOptionVm
         "بنك"
     ];
 
-    public JournalAccountOptionVm(Guid id, string code, string nameAr, AccountNature nature, string? systemRole)
+    public JournalAccountOptionVm(Guid id, string code, string nameAr, AccountNature nature, string? systemRole, bool isLegacyPartyLinkedAccount = false)
     {
         Id = id;
         Code = code;
         NameAr = nameAr;
         Nature = nature;
         SystemRole = systemRole;
+        IsLegacyPartyLinkedAccount = isLegacyPartyLinkedAccount;
     }
 
     public Guid Id { get; set; }
@@ -30,10 +31,14 @@ public sealed class JournalAccountOptionVm
     public string NameAr { get; set; }
     public AccountNature Nature { get; set; }
     public string? SystemRole { get; set; }
+    public bool IsLegacyPartyLinkedAccount { get; set; }
 
     public string DisplayText => $"{Code} - {NameAr}";
     public string SearchText => $"{Code} {NameAr} {SystemRole}";
     public bool IsCashLike => IsCashAccount(Code, NameAr, SystemRole);
+    public bool IsReceivableControl => string.Equals(SystemRole, "ARControl", StringComparison.OrdinalIgnoreCase);
+    public bool IsPayableControl => string.Equals(SystemRole, "APControl", StringComparison.OrdinalIgnoreCase);
+    public bool IsPartyControlAccount => IsReceivableControl || IsPayableControl;
     public string CategoryText => IsCashLike ? "نقدي" : "تشغيلي";
     public string NatureText => Nature == AccountNature.Debit ? "طبيعته مدينة" : "طبيعته دائنة";
 

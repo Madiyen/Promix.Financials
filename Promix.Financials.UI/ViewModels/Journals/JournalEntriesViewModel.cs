@@ -20,6 +20,8 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
     private readonly CreateJournalEntryService _createService;
     private readonly CreateDailyCashClosingService _cashClosingService;
     private readonly PostJournalEntryService _postService;
+    private readonly UpdateJournalEntryService _updateService;
+    private readonly DeleteJournalEntryService _deleteService;
     private readonly List<JournalEntryRowVm> _allEntries = new();
     private Guid _companyId;
     private JournalEntryRowVm? _selectedEntry;
@@ -37,12 +39,16 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         IJournalEntriesQuery query,
         CreateJournalEntryService createService,
         CreateDailyCashClosingService cashClosingService,
-        PostJournalEntryService postService)
+        PostJournalEntryService postService,
+        UpdateJournalEntryService updateService,
+        DeleteJournalEntryService deleteService)
     {
         _query = query;
         _createService = createService;
         _cashClosingService = cashClosingService;
         _postService = postService;
+        _updateService = updateService;
+        _deleteService = deleteService;
     }
 
     public ObservableCollection<JournalEntryRowVm> Entries { get; } = new();
@@ -64,6 +70,11 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(PreviewPlaceholderVisibility));
             OnPropertyChanged(nameof(SelectedEntryTitle));
             OnPropertyChanged(nameof(SelectedEntryCreatedAtText));
+            OnPropertyChanged(nameof(SelectedEntryCurrencyText));
+            OnPropertyChanged(nameof(SelectedEntryExchangeRateText));
+            OnPropertyChanged(nameof(SelectedEntryPostedAtText));
+            OnPropertyChanged(nameof(SelectedEntryModifiedAtText));
+            OnPropertyChanged(nameof(SelectedEntryAuditText));
             OnPropertyChanged(nameof(SelectedEntryReferenceText));
             OnPropertyChanged(nameof(SelectedEntryDescriptionText));
             OnPropertyChanged(nameof(SelectedEntryStatusHintText));
@@ -172,6 +183,11 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
     public Visibility PreviewPlaceholderVisibility => SelectedEntry is null ? Visibility.Visible : Visibility.Collapsed;
     public string SelectedEntryTitle => SelectedEntry is null ? "حدد سنداً للمراجعة" : $"{SelectedEntry.TypeText} · {SelectedEntry.EntryNumber}";
     public string SelectedEntryCreatedAtText => SelectedEntry?.CreatedAtText ?? "—";
+    public string SelectedEntryCurrencyText => SelectedEntry?.CurrencySummaryText ?? "—";
+    public string SelectedEntryExchangeRateText => SelectedEntry?.ExchangeRateText ?? "—";
+    public string SelectedEntryPostedAtText => SelectedEntry?.PostedAtText ?? "لم يرحل بعد";
+    public string SelectedEntryModifiedAtText => SelectedEntry?.ModifiedAtText ?? "بدون تعديل";
+    public string SelectedEntryAuditText => SelectedEntry?.AuditSummaryText ?? "لا توجد بيانات تتبع بعد.";
     public string SelectedEntryReferenceText => SelectedEntry?.ReferenceDisplay ?? "بدون رقم مرجعي";
     public string SelectedEntryDescriptionText => SelectedEntry?.Description ?? "اختر أي سند من القائمة وسيظهر وصفه وأثره المحاسبي هنا.";
     public string SelectedEntryStatusHintText => SelectedEntry?.StatusNoteText ?? "اختر سنداً من القائمة لعرض حالته وما إذا كان يمكن ترحيله.";
@@ -207,10 +223,48 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         {
             ErrorMessage = null;
             SuccessMessage = null;
-            await _createService.CreateAsync(command);
+            var entryId = await _createService.CreateAsync(command);
             SuccessMessage = command.PostNow
                 ? "تم حفظ السند وترحيله بنجاح."
                 : "تم حفظ السند كمسودة بنجاح.";
+            await LoadAsync(entryId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateAsync(UpdateJournalEntryCommand command)
+    {
+        try
+        {
+            ErrorMessage = null;
+            SuccessMessage = null;
+            await _updateService.UpdateAsync(command);
+            SuccessMessage = command.PostNow
+                ? "تم حفظ التعديلات وترحيل السند."
+                : "تم حفظ التعديلات على السند.";
+            await LoadAsync(command.EntryId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            return false;
+        }
+    }
+
+    public async Task<bool> DeleteAsync(DeleteJournalEntryCommand command)
+    {
+        try
+        {
+            ErrorMessage = null;
+            SuccessMessage = null;
+            await _deleteService.DeleteAsync(command);
+            SuccessMessage = "تم حذف السند منطقيًا من القوائم التشغيلية.";
             await LoadAsync();
             return true;
         }
@@ -232,7 +286,7 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             SuccessMessage = null;
             await _postService.PostAsync(new PostJournalEntryCommand(_companyId, SelectedEntry.Id));
             SuccessMessage = $"تم ترحيل السند {SelectedEntry.EntryNumber}.";
-            await LoadAsync();
+            await LoadAsync(SelectedEntry.Id);
             return true;
         }
         catch (Exception ex)
@@ -296,7 +350,7 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         ApplyFilters();
     }
 
-    private async Task LoadAsync()
+    private async Task LoadAsync(Guid? preferredSelectionId = null)
     {
         IsBusy = true;
         ErrorMessage = null;
@@ -322,15 +376,20 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
                     (JournalEntryStatus)entry.Status,
                     entry.ReferenceNo,
                     entry.Description,
+                    entry.CurrencyCode,
+                    entry.ExchangeRate,
+                    entry.CurrencyAmount,
                     entry.TotalDebit,
                     entry.TotalCredit,
                     entry.LineCount,
-                    entry.CreatedAtUtc));
+                    entry.CreatedAtUtc,
+                    entry.PostedAtUtc,
+                    entry.ModifiedAtUtc));
             }
 
             AccountOptions.Clear();
             foreach (var account in accounts)
-                AccountOptions.Add(new JournalAccountOptionVm(account.Id, account.Code, account.NameAr, account.Nature, account.SystemRole));
+                AccountOptions.Add(new JournalAccountOptionVm(account.Id, account.Code, account.NameAr, account.Nature, account.SystemRole, account.IsLegacyPartyLinkedAccount));
 
             CurrencyOptions.Clear();
             foreach (var currency in currencies)
@@ -348,7 +407,7 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             RebuildActivityBars(cashMovements, trendStart);
             _lockedThroughDate = periodLock.LockedThroughDate;
             _lastRefreshedAt = DateTimeOffset.Now;
-            ApplyFilters(SelectedEntry?.Id);
+            ApplyFilters(preferredSelectionId ?? SelectedEntry?.Id);
 
             OnPropertyChanged(nameof(LastRefreshedText));
             OnPropertyChanged(nameof(PeriodLockSummaryText));

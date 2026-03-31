@@ -4,6 +4,7 @@ public sealed class AppSession
 {
     public Guid UserId { get; set; }
     public Guid? CompanyId { get; set; }
+    public List<string> RoleNames { get; set; } = new();
 
     public DateTimeOffset CreatedAtUtc { get; set; }
     public DateTimeOffset ExpiresAtUtc { get; set; }

@@ -15,10 +15,15 @@ public sealed class JournalEntryRowVm
         JournalEntryStatus status,
         string? referenceNo,
         string? description,
+        string currencyCode,
+        decimal exchangeRate,
+        decimal currencyAmount,
         decimal totalDebit,
         decimal totalCredit,
         int lineCount,
-        DateTimeOffset createdAtUtc)
+        DateTimeOffset createdAtUtc,
+        DateTimeOffset? postedAtUtc,
+        DateTimeOffset? modifiedAtUtc)
     {
         Id = id;
         EntryNumber = entryNumber;
@@ -28,11 +33,16 @@ public sealed class JournalEntryRowVm
         Status = status;
         ReferenceNo = string.IsNullOrWhiteSpace(referenceNo) ? "—" : referenceNo;
         Description = string.IsNullOrWhiteSpace(description) ? "بدون وصف إضافي" : description;
+        CurrencyCode = string.IsNullOrWhiteSpace(currencyCode) ? "—" : currencyCode.Trim().ToUpperInvariant();
+        ExchangeRate = exchangeRate <= 0 ? 1m : exchangeRate;
+        CurrencyAmount = currencyAmount;
         TotalDebit = totalDebit;
         TotalCredit = totalCredit;
         LineCount = lineCount;
         LineCountText = $"{lineCount} سطر";
         CreatedAtUtc = createdAtUtc;
+        PostedAtUtc = postedAtUtc;
+        ModifiedAtUtc = modifiedAtUtc;
     }
 
     public Guid Id { get; }
@@ -43,11 +53,16 @@ public sealed class JournalEntryRowVm
     public JournalEntryStatus Status { get; }
     public string ReferenceNo { get; }
     public string Description { get; }
+    public string CurrencyCode { get; }
+    public decimal ExchangeRate { get; }
+    public decimal CurrencyAmount { get; }
     public decimal TotalDebit { get; }
     public decimal TotalCredit { get; }
     public int LineCount { get; }
     public string LineCountText { get; }
     public DateTimeOffset CreatedAtUtc { get; }
+    public DateTimeOffset? PostedAtUtc { get; }
+    public DateTimeOffset? ModifiedAtUtc { get; }
 
     public bool IsDraft => Status == JournalEntryStatus.Draft;
     public bool IsBalanced => TotalDebit == TotalCredit && TotalDebit > 0;
@@ -56,6 +71,20 @@ public sealed class JournalEntryRowVm
     public string DifferenceText => Math.Abs(TotalDebit - TotalCredit).ToString("N2");
     public string ReferenceDisplay => ReferenceNo == "—" ? "بدون رقم مرجعي" : ReferenceNo;
     public string CreatedAtText => CreatedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm");
+    public string CurrencySummaryText => $"{CurrencyCode} · {CurrencyAmount:N2}";
+    public string ExchangeRateText => $"سعر الصرف {ExchangeRate:N4}";
+    public string PostedAtText => PostedAtUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "لم يرحل بعد";
+    public string ModifiedAtText => ModifiedAtUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "بدون تعديل";
+    public string LifecycleText => ModifiedAtUtc is not null
+        ? $"آخر تعديل {ModifiedAtText}"
+        : PostedAtUtc is not null
+            ? $"تم الترحيل {PostedAtText}"
+            : "بانتظار الترحيل";
+    public string AuditSummaryText => Status == JournalEntryStatus.Posted
+        ? ModifiedAtUtc is not null
+            ? $"مرحل • آخر تعديل {ModifiedAtText}"
+            : $"مرحل في {PostedAtText}"
+        : "مسودة قابلة للمراجعة والتعديل";
 
     public decimal SignedMovementAmount => Status != JournalEntryStatus.Posted
         ? 0m
@@ -171,6 +200,7 @@ public sealed class JournalEntryRowVm
         return EntryNumber.Contains(normalized, StringComparison.CurrentCultureIgnoreCase)
             || ReferenceNo.Contains(normalized, StringComparison.CurrentCultureIgnoreCase)
             || Description.Contains(normalized, StringComparison.CurrentCultureIgnoreCase)
+            || CurrencyCode.Contains(normalized, StringComparison.CurrentCultureIgnoreCase)
             || TypeText.Contains(normalized, StringComparison.CurrentCultureIgnoreCase)
             || EntryDateText.Contains(normalized, StringComparison.CurrentCultureIgnoreCase);
     }

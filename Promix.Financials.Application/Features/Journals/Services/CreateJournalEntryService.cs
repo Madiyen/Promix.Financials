@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Application.Features.Journals.Commands;
+using Promix.Financials.Application.Features.Parties.Services;
 using Promix.Financials.Domain.Aggregates.Journals;
 using Promix.Financials.Domain.Exceptions;
 
@@ -11,25 +12,34 @@ public sealed class CreateJournalEntryService
 {
     private readonly IJournalEntryRepository _entries;
     private readonly IAccountRepository _accounts;
+    private readonly IPartyRepository _parties;
     private readonly ICompanyCurrencyRepository _currencies;
     private readonly IUserContext _userContext;
     private readonly IDateTimeProvider _clock;
     private readonly JournalPeriodLockService _periodLockService;
+    private readonly RebuildPartySettlementsService _settlements;
+    private readonly PartyPostingRulesService _partyPostingRules;
 
     public CreateJournalEntryService(
         IJournalEntryRepository entries,
         IAccountRepository accounts,
+        IPartyRepository parties,
         ICompanyCurrencyRepository currencies,
         IUserContext userContext,
         IDateTimeProvider clock,
-        JournalPeriodLockService periodLockService)
+        JournalPeriodLockService periodLockService,
+        RebuildPartySettlementsService settlements,
+        PartyPostingRulesService? partyPostingRules = null)
     {
         _entries = entries;
         _accounts = accounts;
+        _parties = parties;
         _currencies = currencies;
         _userContext = userContext;
         _clock = clock;
         _periodLockService = periodLockService;
+        _settlements = settlements;
+        _partyPostingRules = partyPostingRules ?? new PartyPostingRulesService(accounts, parties);
     }
 
     public async Task<Guid> CreateAsync(CreateJournalEntryCommand command, CancellationToken ct = default)
@@ -89,7 +99,8 @@ public sealed class CreateJournalEntryService
             createdByUserId: _userContext.UserId,
             createdAtUtc: _clock.UtcNow,
             referenceNo: command.ReferenceNo,
-            description: command.Description);
+            description: command.Description,
+            transferSettlementMode: command.TransferSettlementMode);
 
         foreach (var line in command.Lines)
         {
@@ -103,7 +114,13 @@ public sealed class CreateJournalEntryService
             if (!account.IsActive)
                 throw new BusinessRuleException($"Account {account.Code} is inactive.");
 
-            entry.AddLine(line.AccountId, line.Description, line.Debit, line.Credit);
+            var partyName = await _partyPostingRules.ResolvePartyNameAsync(
+                command.CompanyId,
+                line.AccountId,
+                line.PartyId,
+                line.PartyName,
+                ct);
+            entry.AddLine(line.AccountId, line.PartyId, partyName, line.Description, line.Debit, line.Credit);
         }
 
         if (command.PostNow)
@@ -112,6 +129,19 @@ public sealed class CreateJournalEntryService
         await _entries.AddAsync(entry, ct);
         await _entries.SaveChangesAsync(ct);
 
+        if (entry.Status == Domain.Enums.JournalEntryStatus.Posted && ShouldRebuildPartySettlements(entry))
+        {
+            await _settlements.RebuildAsync(
+                command.CompanyId,
+                RebuildPartySettlementsService.CollectScopes(entry.Lines),
+                ct);
+            await _entries.SaveChangesAsync(ct);
+        }
+
         return entry.Id;
     }
+
+    private static bool ShouldRebuildPartySettlements(JournalEntry entry)
+        => entry.Type != Domain.Enums.JournalEntryType.TransferVoucher
+            || entry.TransferSettlementMode == Domain.Enums.TransferSettlementMode.Automatic;
 }
