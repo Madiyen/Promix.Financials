@@ -25,7 +25,10 @@ public sealed class CompanyInitializer : ICompanyInitializer
         // لا نعيد زرع دليل الحسابات إذا كان موجوداً بالفعل.
         var hasAccounts = await _db.Set<Account>().AnyAsync(a => a.CompanyId == companyId, ct);
         if (hasAccounts)
+        {
+            await EnsureFinancialCalendarAsync(companyId, ct);
             return;
+        }
 
         var template = DefaultChartOfAccountsTemplate.FromPdfV1();
 
@@ -57,6 +60,7 @@ public sealed class CompanyInitializer : ICompanyInitializer
         }
 
         await _db.SaveChangesAsync(ct);
+        await EnsureFinancialCalendarAsync(companyId, ct);
     }
 
     private async Task EnsureVoucherPostingAccountsAsync(Guid companyId, CancellationToken ct)
@@ -199,6 +203,122 @@ public sealed class CompanyInitializer : ICompanyInitializer
             "221" => "APControl",
             _ => null
         };
+
+    private async Task EnsureFinancialCalendarAsync(Guid companyId, CancellationToken ct)
+    {
+        var company = await _db.Companies.FirstOrDefaultAsync(x => x.Id == companyId, ct);
+        if (company is null)
+            return;
+
+        var entryYears = await _db.JournalEntries
+            .Where(x => x.CompanyId == companyId && !x.IsDeleted)
+            .Select(x => x.EntryDate.Year)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToListAsync(ct);
+
+        var years = await _db.FinancialYears
+            .Where(x => x.CompanyId == companyId)
+            .OrderBy(x => x.StartDate)
+            .ToListAsync(ct);
+
+        if (years.Count == 0)
+        {
+            var startYear = company.AccountingStartDate.Year;
+            var maxYear = Math.Max(Math.Max(startYear, DateTime.Today.Year), entryYears.DefaultIfEmpty(startYear).Max());
+
+            for (var year = startYear; year <= maxYear; year++)
+            {
+                years.Add(new FinancialYear(
+                    companyId,
+                    $"FY-{year}",
+                    $"السنة المالية {year}",
+                    new DateOnly(year, 1, 1),
+                    new DateOnly(year, 12, 31),
+                    false));
+            }
+        }
+
+        foreach (var uncoveredYear in entryYears.Where(year => years.All(x => !x.Contains(new DateOnly(year, 1, 1)))))
+        {
+            var code = years.Any(x => x.Code == $"FY-{uncoveredYear}") ? $"LEGACY-{uncoveredYear}" : $"FY-{uncoveredYear}";
+            years.Add(new FinancialYear(
+                companyId,
+                code,
+                $"سنة مرحّلة {uncoveredYear}",
+                new DateOnly(uncoveredYear, 1, 1),
+                new DateOnly(uncoveredYear, 12, 31),
+                false));
+        }
+
+        if (years.Count > 0)
+        {
+            var yearToActivate = years.FirstOrDefault(x => x.Contains(DateOnly.FromDateTime(DateTime.Today)))
+                ?? years.OrderByDescending(x => x.EndDate).First();
+
+            foreach (var year in years)
+            {
+                if (year.Id == yearToActivate.Id)
+                    year.Activate();
+                else if (year.IsActive)
+                    year.Deactivate();
+            }
+        }
+
+        foreach (var year in years.Where(x => _db.Entry(x).State == EntityState.Detached))
+            _db.FinancialYears.Add(year);
+
+        await _db.SaveChangesAsync(ct);
+
+        var trackedYears = await _db.FinancialYears
+            .Where(x => x.CompanyId == companyId)
+            .OrderBy(x => x.StartDate)
+            .ToListAsync(ct);
+
+        foreach (var year in trackedYears)
+        {
+            var existingPeriods = await _db.FinancialPeriods
+                .Where(x => x.CompanyId == companyId && x.FinancialYearId == year.Id)
+                .ToListAsync(ct);
+
+            if (existingPeriods.Count == 0)
+                _db.FinancialPeriods.AddRange(year.BuildMonthlyPeriods());
+        }
+
+        await _db.SaveChangesAsync(ct);
+
+        var resolvedYears = await _db.FinancialYears
+            .Where(x => x.CompanyId == companyId)
+            .ToListAsync(ct);
+        var resolvedPeriods = await _db.FinancialPeriods
+            .Where(x => x.CompanyId == companyId)
+            .ToListAsync(ct);
+
+        var entriesToBackfill = await _db.JournalEntries
+            .Where(x => x.CompanyId == companyId
+                && !x.IsDeleted
+                && (x.FinancialYearId == Guid.Empty || x.FinancialPeriodId == Guid.Empty))
+            .ToListAsync(ct);
+
+        foreach (var entry in entriesToBackfill)
+        {
+            var year = resolvedYears.FirstOrDefault(x => x.Contains(entry.EntryDate));
+            if (year is null)
+                continue;
+
+            var period = resolvedPeriods.FirstOrDefault(x =>
+                x.FinancialYearId == year.Id
+                && x.StartDate <= entry.EntryDate
+                && x.EndDate >= entry.EntryDate);
+
+            if (period is null)
+                continue;
+
+            entry.AssignFinancialContext(year.Id, period.Id);
+        }
+
+        await _db.SaveChangesAsync(ct);
+    }
 
     private sealed record TemplateNode(string Code, string NameAr, AccountNature Nature, bool IsPosting);
 

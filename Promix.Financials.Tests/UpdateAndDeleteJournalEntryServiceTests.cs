@@ -23,20 +23,20 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
         var repository = new FakeJournalEntryRepository();
-        var lockService = new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock);
         var rebuildService = new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock);
 
         var entry = CreatePostedReceipt(company.Id, cashAccount.Id, revenueAccount.Id);
         await repository.AddAsync(entry);
 
-        var service = new UpdateJournalEntryService(
+        var service = CreateUpdateService(
+            company,
+            new DateOnly(2026, 3, 29),
             repository,
             new FakeAccountRepository([cashAccount, revenueAccount]),
             new FakePartyRepository(),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
             clock,
-            lockService,
             rebuildService);
 
         var command = new UpdateJournalEntryCommand(
@@ -60,7 +60,7 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
     }
 
     [Fact]
-    public async Task UpdateAsync_AdminCanUpdatePostedEntry_AndKeepsItPosted()
+    public async Task UpdateAsync_AdminCannotUpdatePostedEntry()
     {
         var company = new Company("CMP3002", "Main", "USD", new DateOnly(2026, 1, 1));
         var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
@@ -86,20 +86,20 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
         userContext.SetRoles("Admin");
         var clock = new FixedDateTimeProvider(new DateTimeOffset(2026, 3, 29, 9, 0, 0, TimeSpan.Zero));
         var repository = new FakeJournalEntryRepository();
-        var lockService = new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock);
         var rebuildService = new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock);
 
         var entry = CreatePostedReceipt(company.Id, cashAccount.Id, revenueAccount.Id);
         await repository.AddAsync(entry);
 
-        var service = new UpdateJournalEntryService(
+        var service = CreateUpdateService(
+            company,
+            new DateOnly(2026, 3, 29),
             repository,
             new FakeAccountRepository([cashAccount, revenueAccount, receivableControlAccount]),
             new FakePartyRepository([customerParty]),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
             clock,
-            lockService,
             rebuildService);
 
         var command = new UpdateJournalEntryCommand(
@@ -117,17 +117,14 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
                 new CreateJournalEntryLineCommand(receivableControlAccount.Id, 0m, 300m, "مقابل القبض", customerParty.NameAr, customerParty.Id)
             ]);
 
-        await service.UpdateAsync(command);
+        var ex = await Assert.ThrowsAsync<BusinessRuleException>(() => service.UpdateAsync(command));
 
+        Assert.Contains("immutable", ex.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Equal(JournalEntryStatus.Posted, entry.Status);
-        Assert.Equal(new DateOnly(2026, 3, 29), entry.EntryDate);
-        Assert.Equal("RV-0001-REV", entry.ReferenceNo);
-        Assert.Equal("قبض معدل", entry.Description);
-        Assert.Equal(300m, entry.CurrencyAmount);
-        Assert.Equal(userContext.UserId, entry.ModifiedByUserId);
-        Assert.Equal(clock.UtcNow, entry.ModifiedAtUtc);
-        Assert.Equal(2, entry.Lines.Count);
-        Assert.Contains(entry.Lines, x => x.AccountId == receivableControlAccount.Id && x.PartyId == customerParty.Id && x.PartyName == "عميل نقدي" && x.Credit == 300m);
+        Assert.Equal("RV-0001", entry.ReferenceNo);
+        Assert.Equal(200m, entry.CurrencyAmount);
+        Assert.Null(entry.ModifiedByUserId);
+        Assert.Null(entry.ModifiedAtUtc);
     }
 
     [Fact]
@@ -148,7 +145,7 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
     }
 
     [Fact]
-    public async Task DeleteAsync_AdminSoftDeletesEntry()
+    public async Task DeleteAsync_AdminCannotDeletePostedEntry()
     {
         var company = new Company("CMP3004", "Main", "USD", new DateOnly(2026, 1, 1));
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
@@ -160,15 +157,16 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
         await repository.AddAsync(entry);
 
         var service = new DeleteJournalEntryService(repository, userContext, clock, new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock));
-        await service.DeleteAsync(new DeleteJournalEntryCommand(company.Id, entry.Id));
+        var ex = await Assert.ThrowsAsync<BusinessRuleException>(() => service.DeleteAsync(new DeleteJournalEntryCommand(company.Id, entry.Id)));
 
-        Assert.True(entry.IsDeleted);
-        Assert.Equal(userContext.UserId, entry.DeletedByUserId);
-        Assert.Equal(clock.UtcNow, entry.DeletedAtUtc);
+        Assert.Contains("cannot be deleted", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.False(entry.IsDeleted);
+        Assert.Null(entry.DeletedByUserId);
+        Assert.Null(entry.DeletedAtUtc);
     }
 
     [Fact]
-    public async Task UpdateAsync_TransferVoucherSwitchingFromAutomaticToNone_RebuildsPriorSettlementScopes()
+    public async Task UpdateAsync_TransferVoucherPostedEntryCannotSwitchSettlementMode()
     {
         var company = new Company("CMP3005", "Main", "USD", new DateOnly(2026, 1, 1));
         var sourceAccount = new Account(company.Id, "1211", "ذمم عميل أول", null, AccountNature.Debit, true, null, null, null, null, true);
@@ -181,22 +179,22 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
         var repository = new FakeJournalEntryRepository();
         var settlementsRepository = new FakePartySettlementRepository();
         var rebuildService = new RebuildPartySettlementsService(settlementsRepository, userContext, clock);
-        var lockService = new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock);
 
         var entry = CreatePostedTransfer(company.Id, sourceAccount.Id, sourceParty, targetAccount.Id, targetParty, TransferSettlementMode.Automatic);
         await repository.AddAsync(entry);
 
-        var service = new UpdateJournalEntryService(
+        var service = CreateUpdateService(
+            company,
+            new DateOnly(2026, 3, 30),
             repository,
             new FakeAccountRepository([sourceAccount, targetAccount]),
             new FakePartyRepository([sourceParty, targetParty]),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
             clock,
-            lockService,
             rebuildService);
 
-        await service.UpdateAsync(new UpdateJournalEntryCommand(
+        var ex = await Assert.ThrowsAsync<BusinessRuleException>(() => service.UpdateAsync(new UpdateJournalEntryCommand(
             company.Id,
             entry.Id,
             new DateOnly(2026, 3, 30),
@@ -210,10 +208,80 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
                 new CreateJournalEntryLineCommand(targetAccount.Id, 80m, 0m, "الجهة المستلمة", targetParty.NameAr, targetParty.Id),
                 new CreateJournalEntryLineCommand(sourceAccount.Id, 0m, 80m, "جهة المصدر", sourceParty.NameAr, sourceParty.Id)
             ],
-            TransferSettlementMode.None));
+            TransferSettlementMode.None)));
 
-        Assert.True(settlementsRepository.GetPostedLedgerLinesCallCount > 0);
-        Assert.Equal(TransferSettlementMode.None, entry.TransferSettlementMode);
+        Assert.Contains("immutable", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(TransferSettlementMode.Automatic, entry.TransferSettlementMode);
+        Assert.Equal(0, settlementsRepository.GetPostedLedgerLinesCallCount);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_AdminCanUpdateDraftEntry()
+    {
+        var company = new Company("CMP3006", "Main", "USD", new DateOnly(2026, 1, 1));
+        var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
+        var revenueAccount = new Account(company.Id, "4101", "إيراد خدمات", null, AccountNature.Credit, true, null, null, null, null, true);
+        var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
+        userContext.SetRoles("Admin");
+        var clock = new FixedDateTimeProvider(new DateTimeOffset(2026, 3, 29, 9, 0, 0, TimeSpan.Zero));
+        var repository = new FakeJournalEntryRepository();
+        var rebuildService = new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock);
+
+        var entry = CreateDraftReceipt(company.Id, cashAccount.Id, revenueAccount.Id);
+        await repository.AddAsync(entry);
+
+        var service = CreateUpdateService(
+            company,
+            new DateOnly(2026, 3, 29),
+            repository,
+            new FakeAccountRepository([cashAccount, revenueAccount]),
+            new FakePartyRepository(),
+            new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
+            userContext,
+            clock,
+            rebuildService);
+
+        await service.UpdateAsync(new UpdateJournalEntryCommand(
+            company.Id,
+            entry.Id,
+            new DateOnly(2026, 3, 29),
+            "RV-DR-UPDATED",
+            "قبض معدل على مسودة",
+            "USD",
+            1m,
+            250m,
+            PostNow: false,
+            [
+                new CreateJournalEntryLineCommand(cashAccount.Id, 250m, 0m, "الحساب النقدي"),
+                new CreateJournalEntryLineCommand(revenueAccount.Id, 0m, 250m, "مقابل القبض")
+            ]));
+
+        Assert.Equal(JournalEntryStatus.Draft, entry.Status);
+        Assert.Equal("RV-DR-UPDATED", entry.ReferenceNo);
+        Assert.Equal("قبض معدل على مسودة", entry.Description);
+        Assert.Equal(250m, entry.CurrencyAmount);
+        Assert.Equal(userContext.UserId, entry.ModifiedByUserId);
+        Assert.Equal(clock.UtcNow, entry.ModifiedAtUtc);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_AdminSoftDeletesDraftEntry()
+    {
+        var company = new Company("CMP3007", "Main", "USD", new DateOnly(2026, 1, 1));
+        var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
+        userContext.SetRoles("Admin");
+        var clock = new FixedDateTimeProvider(new DateTimeOffset(2026, 3, 29, 10, 0, 0, TimeSpan.Zero));
+        var repository = new FakeJournalEntryRepository();
+
+        var entry = CreateDraftReceipt(company.Id, Guid.NewGuid(), Guid.NewGuid());
+        await repository.AddAsync(entry);
+
+        var service = new DeleteJournalEntryService(repository, userContext, clock, new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock));
+        await service.DeleteAsync(new DeleteJournalEntryCommand(company.Id, entry.Id));
+
+        Assert.True(entry.IsDeleted);
+        Assert.Equal(userContext.UserId, entry.DeletedByUserId);
+        Assert.Equal(clock.UtcNow, entry.DeletedAtUtc);
     }
 
     private static JournalEntry CreatePostedReceipt(Guid companyId, Guid cashAccountId, Guid counterpartyAccountId)
@@ -234,6 +302,26 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
         entry.AddLine(cashAccountId, null, 200m, 0m);
         entry.AddLine(counterpartyAccountId, "عميل سابق", null, 0m, 200m);
         entry.Post(Guid.NewGuid(), DateTimeOffset.UtcNow);
+        return entry;
+    }
+
+    private static JournalEntry CreateDraftReceipt(Guid companyId, Guid cashAccountId, Guid counterpartyAccountId)
+    {
+        var entry = new JournalEntry(
+            companyId,
+            "RV-DR-0001",
+            new DateOnly(2026, 3, 28),
+            JournalEntryType.ReceiptVoucher,
+            "USD",
+            1m,
+            200m,
+            Guid.NewGuid(),
+            DateTimeOffset.UtcNow.AddDays(-1),
+            "RV-DR-0001",
+            "قبض مسودة");
+
+        entry.AddLine(cashAccountId, null, 200m, 0m);
+        entry.AddLine(counterpartyAccountId, "عميل مسودة", null, 0m, 200m);
         return entry;
     }
 
@@ -282,4 +370,27 @@ public sealed class UpdateAndDeleteJournalEntryServiceTests
             null,
             null,
             true);
+
+    private static UpdateJournalEntryService CreateUpdateService(
+        Company company,
+        DateOnly entryDate,
+        FakeJournalEntryRepository repository,
+        FakeAccountRepository accountRepository,
+        FakePartyRepository partyRepository,
+        FakeCompanyCurrencyRepository currencyRepository,
+        TestUserContext userContext,
+        FixedDateTimeProvider clock,
+        RebuildPartySettlementsService settlements)
+        => new(
+            repository,
+            userContext,
+            clock,
+            AccountingPostingTestFactory.CreatePostingService(
+                repository,
+                accountRepository,
+                partyRepository,
+                currencyRepository,
+                company,
+                entryDate),
+            settlements);
 }

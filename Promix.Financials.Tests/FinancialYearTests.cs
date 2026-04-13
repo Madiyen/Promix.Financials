@@ -103,7 +103,7 @@ public sealed class FinancialYearTests
 
         await using var writeDb = new PromixDbContext(options);
         var repository = new EfFinancialYearRepository(writeDb);
-        var service = new CreateFinancialYearService(repository);
+        var service = new CreateFinancialYearService(repository, new FakeFinancialPeriodRepository());
 
         var ex = await Assert.ThrowsAsync<BusinessRuleException>(() => service.CreateAsync(new CreateFinancialYearCommand(
             company.Id,

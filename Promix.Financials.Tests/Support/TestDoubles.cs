@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Promix.Financials.Application.Abstractions;
+using Promix.Financials.Application.Features.Journals.Services;
 using Promix.Financials.Application.Features.Accounts.Queries;
 using Promix.Financials.Application.Features.Journals.Queries;
 using Promix.Financials.Application.Features.Parties.Queries;
+using Promix.Financials.Application.Features.Parties.Services;
 using Promix.Financials.Domain.Accounting;
 using Promix.Financials.Domain.Aggregates.Accounts;
 using Promix.Financials.Domain.Aggregates.Journals;
@@ -72,7 +74,7 @@ internal sealed class FakeJournalEntryRepository : IJournalEntryRepository
                 ? entry
                 : null);
 
-    public Task<string> GenerateNextNumberAsync(Guid companyId, JournalEntryType type, CancellationToken ct = default)
+    public Task<string> GenerateNextNumberAsync(Guid companyId, Guid financialYearId, JournalEntryType type, CancellationToken ct = default)
         => Task.FromResult(NextNumber);
 
     public Task<JournalDailyMovementSummary> GetDailyMovementSummaryAsync(Guid companyId, Guid accountId, DateOnly entryDate, CancellationToken ct = default)
@@ -232,6 +234,123 @@ internal sealed class FakeCompanyJournalLockRepository : ICompanyJournalLockRepo
         => Task.FromResult(Company.Id == companyId ? Company : null);
 
     public Task SaveChangesAsync(CancellationToken ct = default) => Task.CompletedTask;
+}
+
+internal sealed class FakeFinancialYearRepository : IFinancialYearRepository
+{
+    private readonly List<FinancialYear> _years;
+
+    public FakeFinancialYearRepository(IEnumerable<FinancialYear>? years = null)
+    {
+        _years = (years ?? Array.Empty<FinancialYear>()).ToList();
+    }
+
+    public Task<FinancialYear?> GetByIdAsync(Guid companyId, Guid financialYearId, CancellationToken ct = default)
+        => Task.FromResult(_years.FirstOrDefault(x => x.CompanyId == companyId && x.Id == financialYearId));
+
+    public Task<IReadOnlyList<FinancialYear>> GetByCompanyAsync(Guid companyId, CancellationToken ct = default)
+        => Task.FromResult<IReadOnlyList<FinancialYear>>(_years.Where(x => x.CompanyId == companyId).OrderBy(x => x.StartDate).ToList());
+
+    public Task<FinancialYear?> GetActiveAsync(Guid companyId, CancellationToken ct = default)
+        => Task.FromResult(_years.FirstOrDefault(x => x.CompanyId == companyId && x.IsActive));
+
+    public Task<bool> CodeExistsAsync(Guid companyId, string code, Guid? excludeFinancialYearId = null, CancellationToken ct = default)
+        => Task.FromResult(_years.Any(x => x.CompanyId == companyId && x.Code == code && (!excludeFinancialYearId.HasValue || x.Id != excludeFinancialYearId.Value)));
+
+    public Task<bool> HasOverlapAsync(Guid companyId, DateOnly startDate, DateOnly endDate, Guid? excludeFinancialYearId = null, CancellationToken ct = default)
+        => Task.FromResult(_years.Any(x => x.CompanyId == companyId
+            && (!excludeFinancialYearId.HasValue || x.Id != excludeFinancialYearId.Value)
+            && x.StartDate <= endDate
+            && x.EndDate >= startDate));
+
+    public Task<bool> HasEntriesAsync(Guid companyId, Guid financialYearId, CancellationToken ct = default)
+        => Task.FromResult(false);
+
+    public Task AddAsync(FinancialYear financialYear, CancellationToken ct = default)
+    {
+        _years.Add(financialYear);
+        return Task.CompletedTask;
+    }
+
+    public Task SaveChangesAsync(CancellationToken ct = default) => Task.CompletedTask;
+}
+
+internal sealed class FakeFinancialPeriodRepository : IFinancialPeriodRepository
+{
+    private readonly List<FinancialPeriod> _periods;
+
+    public FakeFinancialPeriodRepository(IEnumerable<FinancialPeriod>? periods = null)
+    {
+        _periods = (periods ?? Array.Empty<FinancialPeriod>()).ToList();
+    }
+
+    public Task<FinancialPeriod?> GetByIdAsync(Guid companyId, Guid financialPeriodId, CancellationToken ct = default)
+        => Task.FromResult(_periods.FirstOrDefault(x => x.CompanyId == companyId && x.Id == financialPeriodId));
+
+    public Task<IReadOnlyList<FinancialPeriod>> GetByFinancialYearAsync(Guid companyId, Guid financialYearId, CancellationToken ct = default)
+        => Task.FromResult<IReadOnlyList<FinancialPeriod>>(_periods.Where(x => x.CompanyId == companyId && x.FinancialYearId == financialYearId).OrderBy(x => x.StartDate).ToList());
+
+    public Task<FinancialPeriod?> GetByDateAsync(Guid companyId, Guid financialYearId, DateOnly date, CancellationToken ct = default)
+        => Task.FromResult(_periods.FirstOrDefault(x => x.CompanyId == companyId && x.FinancialYearId == financialYearId && x.StartDate <= date && x.EndDate >= date));
+
+    public Task<bool> HasOverlapAsync(Guid companyId, Guid financialYearId, DateOnly startDate, DateOnly endDate, Guid? excludeFinancialPeriodId = null, CancellationToken ct = default)
+        => Task.FromResult(_periods.Any(x => x.CompanyId == companyId
+            && x.FinancialYearId == financialYearId
+            && (!excludeFinancialPeriodId.HasValue || x.Id != excludeFinancialPeriodId.Value)
+            && x.StartDate <= endDate
+            && x.EndDate >= startDate));
+
+    public Task AddRangeAsync(IReadOnlyList<FinancialPeriod> periods, CancellationToken ct = default)
+    {
+        _periods.AddRange(periods);
+        return Task.CompletedTask;
+    }
+
+    public void RemoveRange(IEnumerable<FinancialPeriod> periods)
+    {
+        foreach (var period in periods.ToList())
+            _periods.Remove(period);
+    }
+
+    public Task SaveChangesAsync(CancellationToken ct = default) => Task.CompletedTask;
+}
+
+internal static class AccountingPostingTestFactory
+{
+    public static (FinancialYear Year, FinancialPeriod Period) CreateActiveCalendar(Guid companyId, DateOnly entryDate)
+    {
+        var year = new FinancialYear(
+            companyId,
+            $"FY-{entryDate.Year}",
+            $"السنة المالية {entryDate.Year}",
+            new DateOnly(entryDate.Year, 1, 1),
+            new DateOnly(entryDate.Year, 12, 31),
+            true);
+        var period = year.BuildMonthlyPeriods().Single(x => x.Contains(entryDate));
+        return (year, period);
+    }
+
+    public static AccountingPostingService CreatePostingService(
+        IJournalEntryRepository entries,
+        IAccountRepository accounts,
+        IPartyRepository parties,
+        ICompanyCurrencyRepository currencies,
+        Company company,
+        DateOnly entryDate)
+    {
+        var (year, period) = CreateActiveCalendar(company.Id, entryDate);
+        var yearRepository = new FakeFinancialYearRepository([year]);
+        var periodRepository = new FakeFinancialPeriodRepository([period]);
+        var partyRules = new PartyPostingRulesService(accounts, parties);
+        var guard = new FinancialPeriodGuard(yearRepository, periodRepository, new FakeCompanyJournalLockRepository(company));
+        return new AccountingPostingService(entries, accounts, currencies, partyRules, guard);
+    }
+
+    public static (FakeFinancialYearRepository Years, FakeFinancialPeriodRepository Periods) CreateCalendarRepositories(Company company, DateOnly entryDate)
+    {
+        var (year, period) = CreateActiveCalendar(company.Id, entryDate);
+        return (new FakeFinancialYearRepository([year]), new FakeFinancialPeriodRepository([period]));
+    }
 }
 
 internal sealed class FakeJournalEntriesQuery : IJournalEntriesQuery

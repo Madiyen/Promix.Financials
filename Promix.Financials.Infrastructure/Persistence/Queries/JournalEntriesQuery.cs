@@ -78,7 +78,11 @@ internal sealed class JournalEntriesQuery : IJournalEntriesQuery
                         line.Description,
                         line.PartyId))
                     .ToList(),
-                x.TransferSettlementMode))
+                x.TransferSettlementMode,
+                (int?)x.SourceDocumentType,
+                x.SourceDocumentId,
+                x.SourceDocumentNumber,
+                x.SourceLineId))
             .SingleOrDefaultAsync(ct);
     }
 

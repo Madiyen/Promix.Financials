@@ -22,20 +22,13 @@ public sealed class CreateJournalEntryServiceTests
         var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
         var revenueAccount = new Account(company.Id, "4101", "إيراد خدمات", null, AccountNature.Credit, true, null, null, null, null, true);
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
-        var lockService = new JournalPeriodLockService(
-            new FakeCompanyJournalLockRepository(company),
-            userContext,
-            new FixedDateTimeProvider(DateTimeOffset.UtcNow));
+        var repository = new FakeJournalEntryRepository();
+        var accountRepository = new FakeAccountRepository([cashAccount, revenueAccount]);
+        var partyRepository = new FakePartyRepository();
+        var currencyRepository = new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]);
+        var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
 
-        var service = new CreateJournalEntryService(
-            new FakeJournalEntryRepository(),
-            new FakeAccountRepository([cashAccount, revenueAccount]),
-            new FakePartyRepository(),
-            new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
-            userContext,
-            new FixedDateTimeProvider(DateTimeOffset.UtcNow),
-            lockService,
-            new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, new FixedDateTimeProvider(DateTimeOffset.UtcNow)));
+        var service = CreateService(company, new DateOnly(2026, 3, 15), repository, accountRepository, partyRepository, currencyRepository, userContext, clock);
 
         var command = new CreateJournalEntryCommand(
             company.Id,
@@ -58,6 +51,99 @@ public sealed class CreateJournalEntryServiceTests
     }
 
     [Fact]
+    public async Task CreateAsync_RejectsEntryOutsideActiveFinancialYear()
+    {
+        var company = new Company("CMP1001B", "Main", "USD", new DateOnly(2026, 1, 1));
+        var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
+        var revenueAccount = new Account(company.Id, "4101", "إيراد خدمات", null, AccountNature.Credit, true, null, null, null, null, true);
+        var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
+        var repository = new FakeJournalEntryRepository();
+        var accountRepository = new FakeAccountRepository([cashAccount, revenueAccount]);
+        var partyRepository = new FakePartyRepository();
+        var currencyRepository = new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]);
+        var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
+        var inactiveYear = new FinancialYear(company.Id, "FY-2025", "السنة المالية 2025", new DateOnly(2025, 1, 1), new DateOnly(2025, 12, 31), false);
+        var inactivePeriod = inactiveYear.BuildMonthlyPeriods().First();
+
+        var service = CreateService(
+            company,
+            repository,
+            accountRepository,
+            partyRepository,
+            currencyRepository,
+            userContext,
+            clock,
+            new FakeFinancialYearRepository([inactiveYear]),
+            new FakeFinancialPeriodRepository([inactivePeriod]));
+
+        var command = new CreateJournalEntryCommand(
+            company.Id,
+            new DateOnly(2026, 3, 15),
+            JournalEntryType.ReceiptVoucher,
+            null,
+            "قبض خارج السنة النشطة",
+            "USD",
+            1m,
+            100m,
+            PostNow: true,
+            [
+                new CreateJournalEntryLineCommand(cashAccount.Id, 100m, 0m, null),
+                new CreateJournalEntryLineCommand(revenueAccount.Id, 0m, 100m, null)
+            ]);
+
+        var ex = await Assert.ThrowsAsync<BusinessRuleException>(() => service.CreateAsync(command));
+
+        Assert.Contains("سنة مالية نشطة", ex.Message);
+    }
+
+    [Fact]
+    public async Task CreateAsync_RejectsEntryInsideClosedFinancialPeriod()
+    {
+        var company = new Company("CMP1001C", "Main", "USD", new DateOnly(2026, 1, 1));
+        var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
+        var revenueAccount = new Account(company.Id, "4101", "إيراد خدمات", null, AccountNature.Credit, true, null, null, null, null, true);
+        var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
+        var repository = new FakeJournalEntryRepository();
+        var accountRepository = new FakeAccountRepository([cashAccount, revenueAccount]);
+        var partyRepository = new FakePartyRepository();
+        var currencyRepository = new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]);
+        var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
+        var (year, period) = AccountingPostingTestFactory.CreateActiveCalendar(company.Id, new DateOnly(2026, 3, 15));
+        period.Close();
+
+        var service = CreateService(
+            company,
+            repository,
+            accountRepository,
+            partyRepository,
+            currencyRepository,
+            userContext,
+            clock,
+            new FakeFinancialYearRepository([year]),
+            new FakeFinancialPeriodRepository([period]));
+
+        var command = new CreateJournalEntryCommand(
+            company.Id,
+            new DateOnly(2026, 3, 15),
+            JournalEntryType.ReceiptVoucher,
+            null,
+            "قبض داخل فترة مالية مقفلة",
+            "USD",
+            1m,
+            100m,
+            PostNow: false,
+            [
+                new CreateJournalEntryLineCommand(cashAccount.Id, 100m, 0m, null),
+                new CreateJournalEntryLineCommand(revenueAccount.Id, 0m, 100m, null)
+            ]);
+
+        var ex = await Assert.ThrowsAsync<BusinessRuleException>(() => service.CreateAsync(command));
+
+        Assert.Contains("الفترة المالية", ex.Message);
+        Assert.Contains("مقفلة", ex.Message);
+    }
+
+    [Fact]
     public async Task CreateDailyCashClosingAsync_CanLockThroughEntryDate()
     {
         var company = new Company("CMP1002", "Branch", "USD", new DateOnly(2026, 1, 1));
@@ -75,15 +161,15 @@ public sealed class CreateJournalEntryServiceTests
             DailyMovementSummary = new(320m, 0m)
         };
 
-        var createService = new CreateJournalEntryService(
+        var createService = CreateService(
+            company,
+            new DateOnly(2026, 3, 28),
             journalRepository,
             new FakeAccountRepository([sourceAccount, targetAccount]),
             new FakePartyRepository(),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(companyId, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
-            clock,
-            lockService,
-            new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock));
+            clock);
 
         var cashClosingService = new CreateDailyCashClosingService(
             journalRepository,
@@ -115,15 +201,15 @@ public sealed class CreateJournalEntryServiceTests
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
 
-        var service = new CreateJournalEntryService(
+        var service = CreateService(
+            company,
+            new DateOnly(2026, 3, 30),
             new FakeJournalEntryRepository(),
             new FakeAccountRepository([cashAccount, receivableControlAccount]),
             new FakePartyRepository(),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
-            clock,
-            new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock),
-            new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock));
+            clock);
 
         var command = new CreateJournalEntryCommand(
             company.Id,
@@ -170,15 +256,15 @@ public sealed class CreateJournalEntryServiceTests
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
 
-        var service = new CreateJournalEntryService(
+        var service = CreateService(
+            company,
+            new DateOnly(2026, 3, 30),
             new FakeJournalEntryRepository(),
             new FakeAccountRepository([cashAccount, legacyReceivableAccount]),
             new FakePartyRepository([legacyParty]),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
-            clock,
-            new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock),
-            new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock));
+            clock);
 
         var command = new CreateJournalEntryCommand(
             company.Id,
@@ -226,15 +312,15 @@ public sealed class CreateJournalEntryServiceTests
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
 
-        var service = new CreateJournalEntryService(
+        var service = CreateService(
+            company,
+            new DateOnly(2026, 3, 30),
             repository,
             new FakeAccountRepository([cashAccount, linkedReceivableAccount]),
             new FakePartyRepository([customerParty]),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
-            clock,
-            new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock),
-            new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock));
+            clock);
 
         var entryId = await service.CreateAsync(new CreateJournalEntryCommand(
             company.Id,
@@ -284,15 +370,15 @@ public sealed class CreateJournalEntryServiceTests
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
 
-        var service = new CreateJournalEntryService(
+        var service = CreateService(
+            company,
+            new DateOnly(2026, 3, 30),
             repository,
             new FakeAccountRepository([cashAccount, receivableControlAccount]),
             new FakePartyRepository([customerParty]),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
-            clock,
-            new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock),
-            new RebuildPartySettlementsService(new FakePartySettlementRepository(), userContext, clock));
+            clock);
 
         var entryId = await service.CreateAsync(new CreateJournalEntryCommand(
             company.Id,
@@ -317,6 +403,62 @@ public sealed class CreateJournalEntryServiceTests
     }
 
     [Fact]
+    public async Task CreateAsync_PostNow_AssignsFinancialContextPostingMetadataAndTraceability()
+    {
+        var company = new Company("CMP1005B", "Main", "USD", new DateOnly(2026, 1, 1));
+        var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
+        var revenueAccount = new Account(company.Id, "4101", "إيراد خدمات", null, AccountNature.Credit, true, null, null, null, null, true);
+        var repository = new FakeJournalEntryRepository { NextNumber = "RV-2026-000001" };
+        var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
+        var clock = new FixedDateTimeProvider(new DateTimeOffset(2026, 3, 30, 8, 45, 0, TimeSpan.Zero));
+        var sourceDocumentId = Guid.NewGuid();
+        var sourceLineId = Guid.NewGuid();
+        var (year, period) = AccountingPostingTestFactory.CreateActiveCalendar(company.Id, new DateOnly(2026, 3, 30));
+
+        var service = CreateService(
+            company,
+            repository,
+            new FakeAccountRepository([cashAccount, revenueAccount]),
+            new FakePartyRepository(),
+            new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
+            userContext,
+            clock,
+            new FakeFinancialYearRepository([year]),
+            new FakeFinancialPeriodRepository([period]));
+
+        await service.CreateAsync(new CreateJournalEntryCommand(
+            company.Id,
+            new DateOnly(2026, 3, 30),
+            JournalEntryType.ReceiptVoucher,
+            "RV-SRC-01",
+            "قبض مع تتبع المصدر",
+            "USD",
+            1m,
+            100m,
+            PostNow: true,
+            [
+                new CreateJournalEntryLineCommand(cashAccount.Id, 100m, 0m, "الحساب النقدي"),
+                new CreateJournalEntryLineCommand(revenueAccount.Id, 0m, 100m, "مقابل القبض")
+            ],
+            SourceDocumentType: SourceDocumentType.ReceiptVoucher,
+            SourceDocumentId: sourceDocumentId,
+            SourceDocumentNumber: "RCPT-2026-0001",
+            SourceLineId: sourceLineId));
+
+        Assert.NotNull(repository.AddedEntry);
+        Assert.Equal("RV-2026-000001", repository.AddedEntry!.EntryNumber);
+        Assert.Equal(JournalEntryStatus.Posted, repository.AddedEntry.Status);
+        Assert.Equal(year.Id, repository.AddedEntry.FinancialYearId);
+        Assert.Equal(period.Id, repository.AddedEntry.FinancialPeriodId);
+        Assert.Equal(SourceDocumentType.ReceiptVoucher, repository.AddedEntry.SourceDocumentType);
+        Assert.Equal(sourceDocumentId, repository.AddedEntry.SourceDocumentId);
+        Assert.Equal("RCPT-2026-0001", repository.AddedEntry.SourceDocumentNumber);
+        Assert.Equal(sourceLineId, repository.AddedEntry.SourceLineId);
+        Assert.Equal(userContext.UserId, repository.AddedEntry.PostedByUserId);
+        Assert.Equal(clock.UtcNow, repository.AddedEntry.PostedAtUtc);
+    }
+
+    [Fact]
     public async Task CreateAsync_TransferVoucherWithoutAutomaticSettlement_DoesNotRebuildPartySettlements()
     {
         var company = new Company("CMP1006", "Main", "USD", new DateOnly(2026, 1, 1));
@@ -328,15 +470,16 @@ public sealed class CreateJournalEntryServiceTests
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
 
-        var service = new CreateJournalEntryService(
+        var service = CreateService(
+            company,
+            new DateOnly(2026, 3, 30),
             new FakeJournalEntryRepository(),
             new FakeAccountRepository([sourceAccount, targetAccount]),
             new FakePartyRepository([sourceParty, targetParty]),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
             clock,
-            new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock),
-            new RebuildPartySettlementsService(settlementsRepository, userContext, clock));
+            settlementsRepository);
 
         await service.CreateAsync(new CreateJournalEntryCommand(
             company.Id,
@@ -369,15 +512,16 @@ public sealed class CreateJournalEntryServiceTests
         var userContext = new TestUserContext { UserId = Guid.NewGuid(), IsAuthenticated = true };
         var clock = new FixedDateTimeProvider(DateTimeOffset.UtcNow);
 
-        var service = new CreateJournalEntryService(
+        var service = CreateService(
+            company,
+            new DateOnly(2026, 3, 30),
             new FakeJournalEntryRepository(),
             new FakeAccountRepository([sourceAccount, targetAccount]),
             new FakePartyRepository([sourceParty, targetParty]),
             new FakeCompanyCurrencyRepository([new CompanyCurrency(company.Id, "USD", "دولار", "USD", "$", 2, 1m, true)]),
             userContext,
             clock,
-            new JournalPeriodLockService(new FakeCompanyJournalLockRepository(company), userContext, clock),
-            new RebuildPartySettlementsService(settlementsRepository, userContext, clock));
+            settlementsRepository);
 
         await service.CreateAsync(new CreateJournalEntryCommand(
             company.Id,
@@ -415,4 +559,58 @@ public sealed class CreateJournalEntryServiceTests
             null,
             null,
             true);
+
+    private static CreateJournalEntryService CreateService(
+        Company company,
+        DateOnly entryDate,
+        FakeJournalEntryRepository repository,
+        FakeAccountRepository accountRepository,
+        FakePartyRepository partyRepository,
+        FakeCompanyCurrencyRepository currencyRepository,
+        TestUserContext userContext,
+        FixedDateTimeProvider clock,
+        FakePartySettlementRepository? settlementsRepository = null)
+    {
+        var settlements = new RebuildPartySettlementsService(
+            settlementsRepository ?? new FakePartySettlementRepository(),
+            userContext,
+            clock);
+
+        return new CreateJournalEntryService(
+            repository,
+            userContext,
+            clock,
+            AccountingPostingTestFactory.CreatePostingService(
+                repository,
+                accountRepository,
+                partyRepository,
+                currencyRepository,
+                company,
+                entryDate),
+            settlements);
+    }
+
+    private static CreateJournalEntryService CreateService(
+        Company company,
+        FakeJournalEntryRepository repository,
+        FakeAccountRepository accountRepository,
+        FakePartyRepository partyRepository,
+        FakeCompanyCurrencyRepository currencyRepository,
+        TestUserContext userContext,
+        FixedDateTimeProvider clock,
+        FakeFinancialYearRepository yearRepository,
+        FakeFinancialPeriodRepository periodRepository,
+        FakePartySettlementRepository? settlementsRepository = null)
+    {
+        var settlements = new RebuildPartySettlementsService(
+            settlementsRepository ?? new FakePartySettlementRepository(),
+            userContext,
+            clock);
+
+        var partyRules = new PartyPostingRulesService(accountRepository, partyRepository);
+        var guard = new FinancialPeriodGuard(yearRepository, periodRepository, new FakeCompanyJournalLockRepository(company));
+        var posting = new AccountingPostingService(repository, accountRepository, currencyRepository, partyRules, guard);
+
+        return new CreateJournalEntryService(repository, userContext, clock, posting, settlements);
+    }
 }

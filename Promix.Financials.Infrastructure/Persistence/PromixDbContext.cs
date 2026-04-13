@@ -19,6 +19,7 @@ public sealed class PromixDbContext : DbContext
 
     public DbSet<Account> Accounts => Set<Account>();
     public DbSet<FinancialYear> FinancialYears => Set<FinancialYear>();
+    public DbSet<FinancialPeriod> FinancialPeriods => Set<FinancialPeriod>();
     public DbSet<Party> Parties => Set<Party>();
     public DbSet<PartySettlement> PartySettlements => Set<PartySettlement>();
     public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();

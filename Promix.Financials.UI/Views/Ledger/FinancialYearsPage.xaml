@@ -181,6 +181,125 @@
                                 BorderThickness="1"
                                 CornerRadius="18"
                                 Padding="16">
+                            <Grid RowSpacing="12">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0"
+                                                Spacing="4"
+                                                HorizontalAlignment="Right">
+                                        <TextBlock Text="الفترات المالية"
+                                                   Foreground="{StaticResource PrimaryTextBrush}"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding PeriodsSummaryText}"
+                                                   Foreground="{StaticResource SlateTextBrush}"
+                                                   FontSize="12"/>
+                                    </StackPanel>
+
+                                    <Button Grid.Column="1"
+                                            Content="{Binding SelectedPeriodActionText}"
+                                            Style="{StaticResource SecondaryActionButtonStyle}"
+                                            Click="ToggleFinancialPeriodStatus_Click"
+                                            IsEnabled="{Binding CanToggleSelectedPeriod}"/>
+                                </Grid>
+
+                                <Border Grid.Row="1"
+                                        Background="White"
+                                        BorderBrush="#E2E8F0"
+                                        BorderThickness="1"
+                                        CornerRadius="14"
+                                        Padding="14">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="{Binding SelectedPeriodTitleText}"
+                                                   Foreground="{StaticResource PrimaryTextBrush}"
+                                                   FontSize="16"
+                                                   FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding SelectedPeriodRangeText}"
+                                                   Foreground="{StaticResource SlateTextBrush}"
+                                                   FontSize="12"/>
+                                        <TextBlock Text="{Binding SelectedPeriodStatusText}"
+                                                   Foreground="{StaticResource PrimaryBlueBrush}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <ListView Grid.Row="2"
+                                          x:Name="FinancialPeriodsListView"
+                                          ItemsSource="{Binding Periods}"
+                                          SelectionChanged="FinancialPeriodsListView_SelectionChanged"
+                                          SelectedItem="{Binding SelectedPeriod, Mode=TwoWay}"
+                                          MaxHeight="280">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="#E2E8F0"
+                                                    BorderThickness="1"
+                                                    CornerRadius="14"
+                                                    Padding="12"
+                                                    Margin="0,0,0,8"
+                                                    Background="White">
+                                                <Grid ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel Grid.Column="0"
+                                                                Spacing="4">
+                                                        <TextBlock Text="{Binding DisplayName}"
+                                                                   Foreground="{StaticResource PrimaryTextBrush}"
+                                                                   FontSize="14"
+                                                                   FontWeight="SemiBold"/>
+                                                        <TextBlock Text="{Binding RangeText}"
+                                                                   Foreground="{StaticResource SlateTextBrush}"
+                                                                   FontSize="12"/>
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    Spacing="8"
+                                                                    HorizontalAlignment="Left">
+                                                            <TextBlock Text="{Binding EntryCountText}"
+                                                                       Foreground="{StaticResource PrimaryBlueBrush}"
+                                                                       FontSize="11"
+                                                                       FontWeight="SemiBold"/>
+                                                            <TextBlock Text="{Binding AdjustmentText}"
+                                                                       Foreground="{StaticResource SlateTextBrush}"
+                                                                       FontSize="11"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                    <Border Grid.Column="1"
+                                                            Background="#EFF6FF"
+                                                            BorderBrush="#BFDBFE"
+                                                            BorderThickness="1"
+                                                            CornerRadius="999"
+                                                            Padding="10,4"
+                                                            VerticalAlignment="Top">
+                                                        <TextBlock Text="{Binding StatusText}"
+                                                                   Foreground="{StaticResource PrimaryBlueBrush}"
+                                                                   FontSize="11"
+                                                                   FontWeight="SemiBold"/>
+                                                    </Border>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </Grid>
+                        </Border>
+
+                        <Border Background="#F8FAFC"
+                                BorderBrush="#E2E8F0"
+                                BorderThickness="1"
+                                CornerRadius="18"
+                                Padding="16">
                             <StackPanel Spacing="8">
                                 <TextBlock Text="إرشادات سريعة"
                                            Foreground="{StaticResource PrimaryTextBrush}"

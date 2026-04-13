@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IJournalEntryRepository, EfJournalEntryRepository>();
         services.AddScoped<IPartyRepository, EfPartyRepository>();
         services.AddScoped<IFinancialYearRepository, EfFinancialYearRepository>();
+        services.AddScoped<IFinancialPeriodRepository, EfFinancialPeriodRepository>();
         services.AddScoped<IPartySettlementRepository, EfPartySettlementRepository>();
         services.AddScoped<ICompanyAdminRepository, EfCompanyAdminRepository>();
         services.AddScoped<ICompanyJournalLockRepository, EfCompanyJournalLockRepository>();
@@ -52,6 +53,7 @@ public static class DependencyInjection
         services.AddScoped<IJournalEntriesQuery, JournalEntriesQuery>();
         services.AddScoped<IPartyQuery, PartyQuery>();
         services.AddScoped<IFinancialYearQuery, FinancialYearQuery>();
+        services.AddScoped<IFinancialPeriodQuery, FinancialPeriodQuery>();
 
         // Services — Application
         services.AddScoped<CreateAccountService>();
@@ -63,6 +65,8 @@ public static class DependencyInjection
         services.AddScoped<PostJournalEntryService>();
         services.AddScoped<UpdateJournalEntryService>();
         services.AddScoped<DeleteJournalEntryService>();
+        services.AddScoped<FinancialPeriodGuard>();
+        services.AddScoped<AccountingPostingService>();
         services.AddScoped<JournalPeriodLockService>();
         services.AddScoped<PartyAccountProvisioningService>();
         services.AddScoped<PartyPostingRulesService>();
@@ -74,6 +78,7 @@ public static class DependencyInjection
         services.AddScoped<CreateFinancialYearService>();
         services.AddScoped<EditFinancialYearService>();
         services.AddScoped<ActivateFinancialYearService>();
+        services.AddScoped<SetFinancialPeriodStatusService>();
         services.AddScoped<CreateCompanyService>();
         services.AddScoped<ResetApplicationDataService>();
         services.AddScoped<ICompanySelectionService, CompanySelectionService>();

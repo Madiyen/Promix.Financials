@@ -10,20 +10,20 @@ public sealed class PostJournalEntryService
     private readonly IJournalEntryRepository _entries;
     private readonly IUserContext _userContext;
     private readonly IDateTimeProvider _clock;
-    private readonly JournalPeriodLockService _periodLockService;
+    private readonly AccountingPostingService _posting;
     private readonly RebuildPartySettlementsService _settlements;
 
     public PostJournalEntryService(
         IJournalEntryRepository entries,
         IUserContext userContext,
         IDateTimeProvider clock,
-        JournalPeriodLockService periodLockService,
+        AccountingPostingService posting,
         RebuildPartySettlementsService settlements)
     {
         _entries = entries;
         _userContext = userContext;
         _clock = clock;
-        _periodLockService = periodLockService;
+        _posting = posting;
         _settlements = settlements;
     }
 
@@ -36,8 +36,8 @@ public sealed class PostJournalEntryService
         if (entry is null)
             throw new BusinessRuleException("Journal entry not found.");
 
-        await _periodLockService.EnsureEntryDateIsOpenAsync(command.CompanyId, entry.EntryDate, ct);
-
+        var validation = await _posting.ValidateExistingEntryForPostingAsync(entry, ct);
+        entry.AssignFinancialContext(validation.FinancialYearId, validation.FinancialPeriodId);
         entry.Post(_userContext.UserId, _clock.UtcNow);
         await _entries.SaveChangesAsync(ct);
 

@@ -1,4 +1,3 @@
-using System;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Application.Features.Journals.Commands;
 using Promix.Financials.Application.Features.Parties.Services;
@@ -41,17 +40,11 @@ public sealed class DeleteJournalEntryService
 
         var entry = await _entries.GetByIdAsync(command.CompanyId, command.EntryId, ct)
             ?? throw new BusinessRuleException("The journal entry was not found.");
-        var affectedScopes = entry.Status == Domain.Enums.JournalEntryStatus.Posted
-            ? RebuildPartySettlementsService.CollectScopes(entry.Lines)
-            : Array.Empty<RebuildPartySettlementsService.PartyAccountScope>();
+
+        if (entry.Status == Domain.Enums.JournalEntryStatus.Posted)
+            throw new BusinessRuleException("Posted journal entries are immutable and cannot be deleted.");
 
         entry.Delete(_userContext.UserId, _clock.UtcNow);
         await _entries.SaveChangesAsync(ct);
-
-        if (affectedScopes.Count > 0)
-        {
-            await _settlements.RebuildAsync(command.CompanyId, affectedScopes, ct);
-            await _entries.SaveChangesAsync(ct);
-        }
     }
 }

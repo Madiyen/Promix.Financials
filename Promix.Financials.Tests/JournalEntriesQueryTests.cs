@@ -6,6 +6,7 @@ using Promix.Financials.Domain.Security;
 using Promix.Financials.Infrastructure.Persistence;
 using Promix.Financials.Infrastructure.Persistence.Queries;
 using Promix.Financials.Tests.Support;
+using System.Reflection;
 
 namespace Promix.Financials.Tests;
 
@@ -185,7 +186,7 @@ public sealed class JournalEntriesQueryTests
             deletedEntry.AddLine(cashAccount.Id, null, 250m, 0m);
             deletedEntry.AddLine(revenueAccount.Id, null, 0m, 250m);
             deletedEntry.Post(Guid.NewGuid(), DateTimeOffset.UtcNow);
-            deletedEntry.Delete(Guid.NewGuid(), DateTimeOffset.UtcNow);
+            MarkAsSoftDeleted(deletedEntry, Guid.NewGuid(), DateTimeOffset.UtcNow);
 
             db.JournalEntries.Add(deletedEntry);
             await db.SaveChangesAsync();
@@ -199,5 +200,78 @@ public sealed class JournalEntriesQueryTests
         Assert.Empty(entries);
         Assert.Empty(trialBalance);
         Assert.Empty(cashMovements);
+    }
+
+    [Fact]
+    public async Task GetEntryDetailAsync_ReturnsSourceMetadata()
+    {
+        var databaseName = Guid.NewGuid().ToString("N");
+        var options = new DbContextOptionsBuilder<PromixDbContext>()
+            .UseInMemoryDatabase(databaseName)
+            .Options;
+
+        var company = new Company("CMP2005", "Trace", "USD", new DateOnly(2026, 1, 1));
+        var cashAccount = new Account(company.Id, "1301", "الصندوق", null, AccountNature.Debit, true, null, null, "cash", null, true);
+        var customerAccount = new Account(company.Id, "1220", "مدينون مختلفون", null, AccountNature.Debit, true, null, null, null, null, true);
+        var financialYearId = Guid.NewGuid();
+        var financialPeriodId = Guid.NewGuid();
+        var sourceDocumentId = Guid.NewGuid();
+        var sourceLineId = Guid.NewGuid();
+
+        JournalEntry receiptEntry;
+        await using (var db = new PromixDbContext(options))
+        {
+            db.Companies.Add(company);
+            db.Accounts.AddRange(cashAccount, customerAccount);
+
+            receiptEntry = new JournalEntry(
+                company.Id,
+                "RV-2026-000001",
+                new DateOnly(2026, 3, 15),
+                financialYearId,
+                financialPeriodId,
+                JournalEntryType.ReceiptVoucher,
+                "USD",
+                1m,
+                180m,
+                SourceDocumentType.ReceiptVoucher,
+                sourceDocumentId,
+                "RCPT-2026-15",
+                sourceLineId,
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow,
+                "REF-TRACE",
+                "قبض مع تتبع");
+            receiptEntry.AddLine(cashAccount.Id, null, "الحساب النقدي", 180m, 0m);
+            receiptEntry.AddLine(customerAccount.Id, "عميل مميز", "مقابل القبض", 0m, 180m);
+            receiptEntry.Post(Guid.NewGuid(), DateTimeOffset.UtcNow);
+
+            db.JournalEntries.Add(receiptEntry);
+            await db.SaveChangesAsync();
+        }
+
+        var query = new JournalEntriesQuery(new TestDbContextFactory(options));
+        var detail = await query.GetEntryDetailAsync(company.Id, receiptEntry.Id);
+
+        Assert.NotNull(detail);
+        Assert.Equal((int)SourceDocumentType.ReceiptVoucher, detail!.SourceDocumentType);
+        Assert.Equal(sourceDocumentId, detail.SourceDocumentId);
+        Assert.Equal("RCPT-2026-15", detail.SourceDocumentNumber);
+        Assert.Equal(sourceLineId, detail.SourceLineId);
+    }
+
+    private static void MarkAsSoftDeleted(JournalEntry entry, Guid deletedByUserId, DateTimeOffset deletedAtUtc)
+    {
+        SetAutoProperty(entry, nameof(JournalEntry.IsDeleted), true);
+        SetAutoProperty(entry, nameof(JournalEntry.DeletedByUserId), deletedByUserId);
+        SetAutoProperty(entry, nameof(JournalEntry.DeletedAtUtc), deletedAtUtc);
+    }
+
+    private static void SetAutoProperty<T>(object instance, string propertyName, T value)
+    {
+        var backingField = instance.GetType().GetField($"<{propertyName}>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException($"Could not find backing field for {propertyName}.");
+
+        backingField.SetValue(instance, value);
     }
 }

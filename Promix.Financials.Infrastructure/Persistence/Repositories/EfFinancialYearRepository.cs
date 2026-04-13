@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Domain.Accounting;
+using Promix.Financials.Domain.Aggregates.Journals;
 
 namespace Promix.Financials.Infrastructure.Persistence.Repositories;
 
@@ -38,6 +39,10 @@ public sealed class EfFinancialYearRepository : IFinancialYearRepository
                 && (!excludeFinancialYearId.HasValue || x.Id != excludeFinancialYearId.Value)
                 && x.StartDate <= endDate
                 && x.EndDate >= startDate, ct);
+
+    public Task<bool> HasEntriesAsync(Guid companyId, Guid financialYearId, CancellationToken ct = default)
+        => _db.Set<JournalEntry>()
+            .AnyAsync(x => x.CompanyId == companyId && x.FinancialYearId == financialYearId && !x.IsDeleted, ct);
 
     public Task AddAsync(FinancialYear financialYear, CancellationToken ct = default)
     {

@@ -46,7 +46,11 @@ public sealed record JournalEntryDetailDto(
     Guid? ModifiedByUserId,
     DateTimeOffset? ModifiedAtUtc,
     IReadOnlyList<JournalEntryDetailLineDto> Lines,
-    TransferSettlementMode? TransferSettlementMode = null
+    TransferSettlementMode? TransferSettlementMode = null,
+    int? SourceDocumentType = null,
+    Guid? SourceDocumentId = null,
+    string? SourceDocumentNumber = null,
+    Guid? SourceLineId = null
 );
 
 public sealed record JournalPostingAccountDto(

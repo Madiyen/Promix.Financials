@@ -8,10 +8,12 @@ namespace Promix.Financials.Application.Features.FinancialYears.Services;
 public sealed class CreateFinancialYearService
 {
     private readonly IFinancialYearRepository _financialYears;
+    private readonly IFinancialPeriodRepository _financialPeriods;
 
-    public CreateFinancialYearService(IFinancialYearRepository financialYears)
+    public CreateFinancialYearService(IFinancialYearRepository financialYears, IFinancialPeriodRepository financialPeriods)
     {
         _financialYears = financialYears;
+        _financialPeriods = financialPeriods;
     }
 
     public async Task<Guid> CreateAsync(CreateFinancialYearCommand command, CancellationToken ct = default)
@@ -37,6 +39,10 @@ public sealed class CreateFinancialYearService
 
         await _financialYears.AddAsync(financialYear, ct);
         await _financialYears.SaveChangesAsync(ct);
+
+        var periods = financialYear.BuildMonthlyPeriods();
+        await _financialPeriods.AddRangeAsync(periods, ct);
+        await _financialPeriods.SaveChangesAsync(ct);
         return financialYear.Id;
     }
 }

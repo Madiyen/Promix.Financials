@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Promix.Financials.Domain.Accounting;
+using Promix.Financials.Domain.Aggregates.Journals;
 
 namespace Promix.Financials.Infrastructure.Persistence.Configurations;
 
@@ -38,5 +39,10 @@ public sealed class FinancialYearConfiguration : IEntityTypeConfiguration<Financ
         builder.HasIndex(x => new { x.CompanyId, x.IsActive })
             .HasFilter("[IsActive] = 1")
             .IsUnique();
+
+        builder.HasMany<JournalEntry>()
+            .WithOne()
+            .HasForeignKey(x => x.FinancialYearId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

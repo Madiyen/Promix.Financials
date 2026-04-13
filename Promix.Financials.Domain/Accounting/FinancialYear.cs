@@ -40,6 +40,9 @@ public sealed class FinancialYear : Entity<Guid>
     public DateOnly EndDate { get; private set; }
     public bool IsActive { get; private set; }
 
+    public bool Contains(DateOnly date)
+        => date >= StartDate && date <= EndDate;
+
     public void Update(string code, string name, DateOnly startDate, DateOnly endDate)
     {
         if (string.IsNullOrWhiteSpace(code))
@@ -63,4 +66,29 @@ public sealed class FinancialYear : Entity<Guid>
     public void Activate() => IsActive = true;
 
     public void Deactivate() => IsActive = false;
+
+    public IReadOnlyList<FinancialPeriod> BuildMonthlyPeriods()
+    {
+        var periods = new List<FinancialPeriod>();
+        var cursor = StartDate;
+        var sequence = 1;
+
+        while (cursor <= EndDate)
+        {
+            var monthEnd = new DateOnly(cursor.Year, cursor.Month, DateTime.DaysInMonth(cursor.Year, cursor.Month));
+            var periodEnd = monthEnd < EndDate ? monthEnd : EndDate;
+            periods.Add(new FinancialPeriod(
+                CompanyId,
+                Id,
+                $"P{sequence:00}",
+                $"الفترة {sequence:00}",
+                cursor,
+                periodEnd));
+
+            cursor = periodEnd.AddDays(1);
+            sequence++;
+        }
+
+        return periods;
+    }
 }

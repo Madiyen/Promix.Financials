@@ -13,5 +13,9 @@ public sealed record UpdateJournalEntryCommand(
     decimal? CurrencyAmount,
     bool PostNow,
     IReadOnlyList<CreateJournalEntryLineCommand> Lines,
-    TransferSettlementMode? TransferSettlementMode = null
+    TransferSettlementMode? TransferSettlementMode = null,
+    SourceDocumentType? SourceDocumentType = null,
+    Guid? SourceDocumentId = null,
+    string? SourceDocumentNumber = null,
+    Guid? SourceLineId = null
 );

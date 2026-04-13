@@ -23,6 +23,47 @@ public sealed class JournalEntry : AggregateRoot<Guid>
         string? referenceNo,
         string? description,
         TransferSettlementMode? transferSettlementMode = null)
+        : this(
+            companyId,
+            entryNumber,
+            entryDate,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            type,
+            currencyCode,
+            exchangeRate,
+            currencyAmount,
+            ResolveDefaultSourceDocumentType(type),
+            null,
+            referenceNo ?? entryNumber,
+            null,
+            createdByUserId,
+            createdAtUtc,
+            referenceNo,
+            description,
+            transferSettlementMode)
+    {
+    }
+
+    public JournalEntry(
+        Guid companyId,
+        string entryNumber,
+        DateOnly entryDate,
+        Guid financialYearId,
+        Guid financialPeriodId,
+        JournalEntryType type,
+        string currencyCode,
+        decimal exchangeRate,
+        decimal currencyAmount,
+        SourceDocumentType sourceDocumentType,
+        Guid? sourceDocumentId,
+        string? sourceDocumentNumber,
+        Guid? sourceLineId,
+        Guid createdByUserId,
+        DateTimeOffset createdAtUtc,
+        string? referenceNo,
+        string? description,
+        TransferSettlementMode? transferSettlementMode = null)
     {
         if (companyId == Guid.Empty)
             throw new BusinessRuleException("CompanyId is required.");
@@ -36,6 +77,12 @@ public sealed class JournalEntry : AggregateRoot<Guid>
         if (string.IsNullOrWhiteSpace(currencyCode))
             throw new BusinessRuleException("Currency code is required.");
 
+        if (financialYearId == Guid.Empty)
+            throw new BusinessRuleException("FinancialYearId is required.");
+
+        if (financialPeriodId == Guid.Empty)
+            throw new BusinessRuleException("FinancialPeriodId is required.");
+
         if (exchangeRate <= 0)
             throw new BusinessRuleException("Exchange rate must be greater than zero.");
 
@@ -46,11 +93,17 @@ public sealed class JournalEntry : AggregateRoot<Guid>
         CompanyId = companyId;
         EntryNumber = entryNumber.Trim().ToUpperInvariant();
         EntryDate = entryDate;
+        FinancialYearId = financialYearId;
+        FinancialPeriodId = financialPeriodId;
         Type = type;
         CurrencyCode = currencyCode.Trim().ToUpperInvariant();
         ExchangeRate = decimal.Round(exchangeRate, 8, MidpointRounding.AwayFromZero);
         CurrencyAmount = decimal.Round(currencyAmount, 4, MidpointRounding.AwayFromZero);
         Status = JournalEntryStatus.Draft;
+        SourceDocumentType = sourceDocumentType;
+        SourceDocumentId = sourceDocumentId == Guid.Empty ? null : sourceDocumentId;
+        SourceDocumentNumber = Normalize(sourceDocumentNumber, 50);
+        SourceLineId = sourceLineId == Guid.Empty ? null : sourceLineId;
         CreatedByUserId = createdByUserId;
         CreatedAtUtc = createdAtUtc;
         ReferenceNo = Normalize(referenceNo, 50);
@@ -63,11 +116,17 @@ public sealed class JournalEntry : AggregateRoot<Guid>
     public Guid CompanyId { get; private set; }
     public string EntryNumber { get; private set; } = default!;
     public DateOnly EntryDate { get; private set; }
+    public Guid FinancialYearId { get; private set; }
+    public Guid FinancialPeriodId { get; private set; }
     public JournalEntryType Type { get; private set; }
     public string CurrencyCode { get; private set; } = default!;
     public decimal ExchangeRate { get; private set; }
     public decimal CurrencyAmount { get; private set; }
     public JournalEntryStatus Status { get; private set; }
+    public SourceDocumentType SourceDocumentType { get; private set; }
+    public Guid? SourceDocumentId { get; private set; }
+    public string? SourceDocumentNumber { get; private set; }
+    public Guid? SourceLineId { get; private set; }
     public string? ReferenceNo { get; private set; }
     public string? Description { get; private set; }
     public TransferSettlementMode? TransferSettlementMode { get; private set; }
@@ -125,9 +184,15 @@ public sealed class JournalEntry : AggregateRoot<Guid>
 
     public void Update(
         DateOnly entryDate,
+        Guid financialYearId,
+        Guid financialPeriodId,
         string currencyCode,
         decimal exchangeRate,
         decimal currencyAmount,
+        SourceDocumentType sourceDocumentType,
+        Guid? sourceDocumentId,
+        string? sourceDocumentNumber,
+        Guid? sourceLineId,
         string? referenceNo,
         string? description,
         IReadOnlyList<JournalEntryEditableLine> lines,
@@ -136,12 +201,19 @@ public sealed class JournalEntry : AggregateRoot<Guid>
         TransferSettlementMode? transferSettlementMode = null)
     {
         EnsureNotDeleted();
+        EnsureDraft();
 
         if (modifiedByUserId == Guid.Empty)
             throw new BusinessRuleException("ModifiedByUserId is required.");
 
         if (string.IsNullOrWhiteSpace(currencyCode))
             throw new BusinessRuleException("Currency code is required.");
+
+        if (financialYearId == Guid.Empty)
+            throw new BusinessRuleException("FinancialYearId is required.");
+
+        if (financialPeriodId == Guid.Empty)
+            throw new BusinessRuleException("FinancialPeriodId is required.");
 
         if (exchangeRate <= 0)
             throw new BusinessRuleException("Exchange rate must be greater than zero.");
@@ -160,9 +232,15 @@ public sealed class JournalEntry : AggregateRoot<Guid>
             throw new BusinessRuleException("The journal entry is not balanced.");
 
         EntryDate = entryDate;
+        FinancialYearId = financialYearId;
+        FinancialPeriodId = financialPeriodId;
         CurrencyCode = currencyCode.Trim().ToUpperInvariant();
         ExchangeRate = decimal.Round(exchangeRate, 8, MidpointRounding.AwayFromZero);
         CurrencyAmount = decimal.Round(currencyAmount, 4, MidpointRounding.AwayFromZero);
+        SourceDocumentType = sourceDocumentType;
+        SourceDocumentId = sourceDocumentId == Guid.Empty ? null : sourceDocumentId;
+        SourceDocumentNumber = Normalize(sourceDocumentNumber, 50);
+        SourceLineId = sourceLineId == Guid.Empty ? null : sourceLineId;
         ReferenceNo = Normalize(referenceNo, 50);
         Description = Normalize(description, 500);
         TransferSettlementMode = Type == JournalEntryType.TransferVoucher
@@ -176,12 +254,29 @@ public sealed class JournalEntry : AggregateRoot<Guid>
     {
         EnsureNotDeleted();
 
+        if (Status == JournalEntryStatus.Posted)
+            throw new BusinessRuleException("Posted journal entries cannot be deleted. Use reversal or void in a later correction flow.");
+
         if (deletedByUserId == Guid.Empty)
             throw new BusinessRuleException("DeletedByUserId is required.");
 
         IsDeleted = true;
         DeletedByUserId = deletedByUserId;
         DeletedAtUtc = deletedAtUtc;
+    }
+
+    public void AssignFinancialContext(Guid financialYearId, Guid financialPeriodId)
+    {
+        EnsureNotDeleted();
+
+        if (financialYearId == Guid.Empty)
+            throw new BusinessRuleException("FinancialYearId is required.");
+
+        if (financialPeriodId == Guid.Empty)
+            throw new BusinessRuleException("FinancialPeriodId is required.");
+
+        FinancialYearId = financialYearId;
+        FinancialPeriodId = financialPeriodId;
     }
 
     public void Post(Guid postedByUserId, DateTimeOffset postedAtUtc)
@@ -252,6 +347,18 @@ public sealed class JournalEntry : AggregateRoot<Guid>
         var trimmed = value.Trim();
         return trimmed.Length <= maxLength ? trimmed : trimmed[..maxLength];
     }
+
+    private static SourceDocumentType ResolveDefaultSourceDocumentType(JournalEntryType entryType)
+        => entryType switch
+        {
+            JournalEntryType.ReceiptVoucher => SourceDocumentType.ReceiptVoucher,
+            JournalEntryType.PaymentVoucher => SourceDocumentType.PaymentVoucher,
+            JournalEntryType.TransferVoucher => SourceDocumentType.TransferVoucher,
+            JournalEntryType.OpeningEntry => SourceDocumentType.OpeningEntry,
+            JournalEntryType.Adjustment => SourceDocumentType.Adjustment,
+            JournalEntryType.DailyCashClosing => SourceDocumentType.DailyCashClosing,
+            _ => SourceDocumentType.ManualJournal
+        };
 }
 
 public sealed record JournalEntryEditableLine(

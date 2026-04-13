@@ -25,7 +25,7 @@ public sealed class EfJournalEntryRepository : IJournalEntryRepository
             .Include(x => x.Lines)
             .FirstOrDefaultAsync(x => x.CompanyId == companyId && x.Id == entryId && !x.IsDeleted, ct);
 
-    public async Task<string> GenerateNextNumberAsync(Guid companyId, JournalEntryType type, CancellationToken ct = default)
+    public async Task<string> GenerateNextNumberAsync(Guid companyId, Guid financialYearId, JournalEntryType type, CancellationToken ct = default)
     {
         var prefix = type switch
         {
@@ -38,21 +38,35 @@ public sealed class EfJournalEntryRepository : IJournalEntryRepository
             _ => "JV"
         };
 
+        var yearLabel = await _db.FinancialYears
+            .AsNoTracking()
+            .Where(x => x.CompanyId == companyId && x.Id == financialYearId)
+            .Select(x => x.StartDate.Year)
+            .SingleOrDefaultAsync(ct);
+
+        if (yearLabel == 0)
+            throw new InvalidOperationException("Financial year not found for journal numbering.");
+
+        var numberPrefix = $"{prefix}-{yearLabel:0000}-";
+
         var lastNumber = await _db.JournalEntries
             .AsNoTracking()
-            .Where(x => x.CompanyId == companyId && x.Type == type && x.EntryNumber.StartsWith(prefix))
+            .Where(x => x.CompanyId == companyId
+                && x.FinancialYearId == financialYearId
+                && x.Type == type
+                && x.EntryNumber.StartsWith(numberPrefix))
             .OrderByDescending(x => x.EntryNumber)
             .Select(x => x.EntryNumber)
             .FirstOrDefaultAsync(ct);
 
         if (string.IsNullOrWhiteSpace(lastNumber))
-            return $"{prefix}-000001";
+            return $"{numberPrefix}000001";
 
-        var numericPart = lastNumber[(prefix.Length + 1)..];
+        var numericPart = lastNumber[numberPrefix.Length..];
         if (!int.TryParse(numericPart, out var current))
-            return $"{prefix}-000001";
+            return $"{numberPrefix}000001";
 
-        return $"{prefix}-{current + 1:000000}";
+        return $"{numberPrefix}{current + 1:000000}";
     }
 
     public async Task<JournalDailyMovementSummary> GetDailyMovementSummaryAsync(Guid companyId, Guid accountId, DateOnly entryDate, CancellationToken ct = default)

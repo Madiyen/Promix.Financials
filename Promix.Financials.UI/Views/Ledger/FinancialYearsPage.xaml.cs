@@ -43,10 +43,14 @@ public sealed partial class FinancialYearsPage : Page
         await _vm.RefreshAsync();
     }
 
-    private void FinancialYearsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void FinancialYearsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (FinancialYearsListView.SelectedItem is FinancialYearRowVm row)
-            _vm.SelectedYear = row;
+        await _vm.SelectYearAsync(FinancialYearsListView.SelectedItem as FinancialYearRowVm);
+    }
+
+    private void FinancialPeriodsListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        _vm.SelectPeriod(FinancialPeriodsListView.SelectedItem as FinancialPeriodRowVm);
     }
 
     private async void CreateFinancialYear_Click(object sender, RoutedEventArgs e)
@@ -126,5 +130,26 @@ public sealed partial class FinancialYearsPage : Page
             return;
 
         await _vm.ActivateSelectedAsync();
+    }
+
+    private async void ToggleFinancialPeriodStatus_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vm.SelectedPeriod is null)
+            return;
+
+        var actionText = _vm.SelectedPeriod.IsClosed ? "إعادة فتح" : "إقفال";
+        var confirm = new ContentDialog
+        {
+            Title = $"{actionText} الفترة المالية",
+            Content = $"سيتم {actionText} الفترة {_vm.SelectedPeriod.DisplayName}. هل تريد المتابعة؟",
+            PrimaryButtonText = actionText,
+            CloseButtonText = "إلغاء",
+            XamlRoot = XamlRoot
+        };
+
+        if (await confirm.ShowAsync() != ContentDialogResult.Primary)
+            return;
+
+        await _vm.ToggleSelectedPeriodStatusAsync();
     }
 }
