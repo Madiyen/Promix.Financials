@@ -6,107 +6,71 @@
     Background="{StaticResource AppBackgroundBrush}"
     FlowDirection="RightToLeft">
 
-    <Grid Padding="18" RowSpacing="14">
+    <Grid Padding="24,20,24,20" RowSpacing="6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0"
-                Style="{StaticResource AppSurfaceCardStyle}"
-                Padding="22,18">
-            <Grid ColumnSpacing="18">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="1"
-                            Spacing="4"
-                            HorizontalAlignment="Right">
-                    <TextBlock Text="دفتر الأستاذ"
-                               Style="{StaticResource AppPageTitleTextStyle}"/>
-                    <TextBlock Text="اعمل على الحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية من مساحة واحدة."
-                               Style="{StaticResource AppPageSubtitleTextStyle}"
-                               MaxWidth="720"/>
-                </StackPanel>
-
-                <Border Grid.Column="0"
-                        HorizontalAlignment="Left"
-                        Background="#EEF4FF"
-                        BorderBrush="#D6E4FF"
-                        BorderThickness="1"
-                        CornerRadius="18"
-                        Padding="14,10">
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <FontIcon Glyph="&#xE81D;"
-                                  Foreground="#1D4ED8"
-                                  FontSize="18"
-                                  VerticalAlignment="Center"/>
-                        <TextBlock x:Name="ActiveTabSummaryText"
-                                   Text="الحسابات هي نقطة البداية الافتراضية داخل دفتر الأستاذ."
-                                   Foreground="#1E3A8A"
-                                   FontSize="12"
-                                   FontWeight="SemiBold"
-                                   TextWrapping="WrapWholeWords"
-                                   MaxWidth="480"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
+        <TextBlock Grid.Row="0"
+                   Text="دفتر الأستاذ"
+                   Style="{StaticResource AppSectionTitleCompactTextStyle}"
+                   HorizontalAlignment="Right"
+                   ToolTipService.ToolTip="اعمل على الحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية من مساحة واحدة."/>
 
         <controls:TabView x:Name="LedgerTabView"
                           Grid.Row="1"
                           Style="{StaticResource AppTabViewStyle}"
                           SelectionChanged="LedgerTabView_SelectionChanged"
-                          TabWidthMode="Equal">
+                          TabWidthMode="SizeToContent"
+                          Padding="0">
             <controls:TabView.Resources>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="#F8FAFC"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="#EEF4FB"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#EAF3FF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPressed" Color="#DEE8F5"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForeground" Color="#16324F"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundPointerOver" Color="#16324F"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundSelected" Color="#1D4ED8"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPressed" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderForeground" Color="#64748B"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderForegroundPointerOver" Color="#0F172A"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderForegroundSelected" Color="#0F172A"/>
                 <SolidColorBrush x:Key="TabViewItemHeaderForegroundDisabled" Color="#94A3B8"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrush" Color="#DDE6F0"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushPointerOver" Color="#C4D0DE"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushSelected" Color="#7CB3FF"/>
-                <Style TargetType="controls:TabViewItem" BasedOn="{StaticResource AppTabViewItemStyle}"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrush" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushPointerOver" Color="#BFDBFE"/>
+                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushSelected" Color="#3B82F6"/>
+                <Style TargetType="controls:TabViewItem" BasedOn="{StaticResource AppTabViewItemCompactStyle}"/>
             </controls:TabView.Resources>
             <controls:TabViewItem x:Name="AccountsTab">
                 <controls:TabViewItem.Header>
-                    <TextBlock Text="الحسابات" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                    <TextBlock Text="الحسابات" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
                 </controls:TabViewItem.Header>
                 <Frame x:Name="AccountsFrame"/>
             </controls:TabViewItem>
             <controls:TabViewItem x:Name="JournalsTab">
                 <controls:TabViewItem.Header>
-                    <TextBlock Text="القيود والسندات" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                    <TextBlock Text="القيود والسندات" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
                 </controls:TabViewItem.Header>
                 <Frame x:Name="JournalsFrame"/>
             </controls:TabViewItem>
             <controls:TabViewItem x:Name="StatementTab">
                 <controls:TabViewItem.Header>
-                    <TextBlock Text="كشف الحساب" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                    <TextBlock Text="كشف الحساب" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
                 </controls:TabViewItem.Header>
                 <Frame x:Name="StatementFrame"/>
             </controls:TabViewItem>
             <controls:TabViewItem x:Name="TrialBalanceTab">
                 <controls:TabViewItem.Header>
-                    <TextBlock Text="ميزان المراجعة" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                    <TextBlock Text="ميزان المراجعة" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
                 </controls:TabViewItem.Header>
                 <Frame x:Name="TrialBalanceFrame"/>
             </controls:TabViewItem>
             <controls:TabViewItem x:Name="ReceivablesTab">
                 <controls:TabViewItem.Header>
-                    <TextBlock Text="الذمم" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                    <TextBlock Text="الذمم" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
                 </controls:TabViewItem.Header>
                 <Frame x:Name="ReceivablesFrame"/>
             </controls:TabViewItem>
             <controls:TabViewItem x:Name="FinancialYearsTab">
                 <controls:TabViewItem.Header>
-                    <TextBlock Text="السنة المالية" Style="{StaticResource AppTabHeaderTextStyle}"/>
+                    <TextBlock Text="السنة المالية" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
                 </controls:TabViewItem.Header>
                 <Frame x:Name="FinancialYearsFrame"/>
             </controls:TabViewItem>

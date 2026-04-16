@@ -6,42 +6,14 @@
     FlowDirection="RightToLeft">
 
     <Page.Resources>
-        <Style x:Key="PanelCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#E2E8F0"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="20"/>
-            <Setter Property="Padding" Value="18"/>
-        </Style>
-
-        <Style x:Key="VoucherActionButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
-            <Setter Property="Background" Value="#EFF6FF"/>
-            <Setter Property="Foreground" Value="#1D4ED8"/>
-            <Setter Property="BorderBrush" Value="#BFDBFE"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Padding" Value="16,10"/>
-            <Setter Property="MinHeight" Value="48"/>
-        </Style>
-
-        <Style x:Key="VoucherAuxButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
-            <Setter Property="Background" Value="#F8FAFC"/>
-            <Setter Property="Foreground" Value="#334155"/>
-            <Setter Property="BorderBrush" Value="#CBD5E1"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Padding" Value="16,10"/>
-            <Setter Property="MinHeight" Value="48"/>
-        </Style>
-
         <Style x:Key="QuickViewButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
             <Setter Property="Background" Value="#F8FAFC"/>
             <Setter Property="Foreground" Value="#334155"/>
             <Setter Property="BorderBrush" Value="#CBD5E1"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Padding" Value="16,8"/>
-            <Setter Property="MinHeight" Value="42"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="MinHeight" Value="38"/>
         </Style>
 
         <Style x:Key="QuickViewButtonActiveStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
@@ -49,14 +21,14 @@
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="#0F172A"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Padding" Value="16,8"/>
-            <Setter Property="MinHeight" Value="42"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="MinHeight" Value="38"/>
         </Style>
     </Page.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="24,20,24,24" RowSpacing="18">
+        <Grid Margin="24,20,24,20" RowSpacing="14">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -67,63 +39,50 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="28" Padding="24" MinHeight="168">
-                <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#0F172A" Offset="0"/>
-                        <GradientStop Color="#1D4ED8" Offset="0.55"/>
-                        <GradientStop Color="#38BDF8" Offset="1"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-
-                <Grid ColumnSpacing="18">
+            <Border Grid.Row="0"
+                    Style="{StaticResource AppSurfaceCardCompactStyle}"
+                    Padding="14,12">
+                <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="مركز السندات والقيود" FontSize="28" FontWeight="Bold" Foreground="White"/>
-                        <TextBlock Text="أنشئ السندات، راجع أثرها المحاسبي، وتابع حركة اليوم من شاشة تشغيل واحدة."
-                                   Foreground="#DBEAFE"
-                                   FontSize="13"
-                                   MaxWidth="660"
-                                   TextWrapping="WrapWholeWords"/>
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{Binding LastRefreshedText}" Foreground="#BFDBFE" FontSize="12"/>
-                            <TextBlock Text="•" Foreground="#93C5FD"/>
-                            <TextBlock Text="{Binding FilterSummaryText}" Foreground="#BFDBFE" FontSize="12"/>
-                        </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="القيود والسندات"
+                                   Style="{StaticResource AppSectionTitleCompactTextStyle}"/>
+                        <TextBlock Text="{Binding FilterSummaryText}"
+                                   Foreground="{StaticResource SecondaryTextBrush}"
+                                   FontSize="11.5"
+                                   ToolTipService.ToolTip="{Binding LastRefreshedText}"/>
                     </StackPanel>
 
-                    <Border Grid.Column="1"
-                            Background="#0B1220"
-                            CornerRadius="24"
-                            Padding="18">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="صافي الحركة النقدية" Foreground="White" FontWeight="SemiBold"/>
-                            <ItemsControl ItemsSource="{Binding ActivityBars}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" Spacing="10"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel VerticalAlignment="Bottom" Spacing="4">
-                                            <TextBlock Text="{Binding ValueText}" Foreground="{Binding FillBrush}" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-                                            <Border Width="18" Height="{Binding BarHeight}" Background="{Binding FillBrush}" CornerRadius="9"/>
-                                            <TextBlock Text="{Binding Label}" Foreground="White" FontSize="11" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </Border>
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                VerticalAlignment="Center">
+                        <Button Grid.Column="1"
+                                Content="تحديث"
+                                Style="{StaticResource SecondaryActionCompactButtonStyle}"
+                                Click="Refresh_Click"/>
+                        <DropDownButton Content="+ إنشاء سند"
+                                        Style="{StaticResource PrimaryActionCompactButtonStyle}">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Text="سند قبض" Click="CreateReceipt_Click"/>
+                                    <MenuFlyoutItem Text="سند صرف" Click="CreatePayment_Click"/>
+                                    <MenuFlyoutItem Text="تحويل بين الحسابات" Click="CreateTransfer_Click"/>
+                                    <MenuFlyoutItem Text="قيد يومية" Click="CreateDailyJournal_Click"/>
+                                    <MenuFlyoutItem Text="قيد افتتاحي" Click="CreateOpeningEntry_Click"/>
+                                    <MenuFlyoutItem Text="إقفال صندوق" Click="CreateDailyCashClosing_Click"/>
+                                </MenuFlyout>
+                            </DropDownButton.Flyout>
+                        </DropDownButton>
+                    </StackPanel>
                 </Grid>
             </Border>
 
-            <Grid Grid.Row="1" ColumnSpacing="16">
+            <Grid Grid.Row="1" ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -131,145 +90,59 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Style="{StaticResource PanelCardStyle}">
+                <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardCompactStyle}">
                     <StackPanel Spacing="4">
                         <TextBlock Text="إجمالي السندات" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding TotalEntriesText}" FontSize="28" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding TotalEntriesText}" FontSize="24" FontWeight="Bold"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="1" Style="{StaticResource PanelCardStyle}">
+                <Border Grid.Column="1" Style="{StaticResource AppSurfaceCardCompactStyle}">
                     <StackPanel Spacing="4">
                         <TextBlock Text="المرحل" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding PostedEntriesText}" FontSize="28" FontWeight="Bold" Foreground="#0369A1"/>
+                        <TextBlock Text="{Binding PostedEntriesText}" FontSize="24" FontWeight="Bold" Foreground="#0369A1"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="2" Style="{StaticResource PanelCardStyle}">
+                <Border Grid.Column="2" Style="{StaticResource AppSurfaceCardCompactStyle}">
                     <StackPanel Spacing="4">
                         <TextBlock Text="المسودات" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding DraftEntriesText}" FontSize="28" FontWeight="Bold" Foreground="#B45309"/>
+                        <TextBlock Text="{Binding DraftEntriesText}" FontSize="24" FontWeight="Bold" Foreground="#B45309"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="3" Style="{StaticResource PanelCardStyle}">
+                <Border Grid.Column="3" Style="{StaticResource AppSurfaceCardCompactStyle}">
                     <StackPanel Spacing="4">
                         <TextBlock Text="صافي اليوم" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding TodayNetMovementText}" FontSize="28" FontWeight="Bold" Foreground="#2563EB"/>
+                        <TextBlock Text="{Binding TodayNetMovementText}" FontSize="24" FontWeight="Bold" Foreground="#2563EB"/>
                     </StackPanel>
                 </Border>
             </Grid>
 
-            <Border Grid.Row="2" Style="{StaticResource PanelCardStyle}">
+            <Border Grid.Row="2" Style="{StaticResource AppSurfaceCardCompactStyle}">
                 <Grid RowSpacing="14">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Grid ColumnSpacing="12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Spacing="4">
-                            <TextBlock Text="إنشاء السندات" FontSize="18" FontWeight="SemiBold"/>
-                            <TextBlock Text="الأوامر الأساسية تبقى هنا دائماً لتسريع الإدخال اليومي، مع نقل العمليات الأقل استخداماً إلى القائمة الثانوية."
+                            <TextBlock Text="{Binding PeriodLockSummaryText}" FontSize="15" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding PeriodLockHintText}"
                                        Foreground="{StaticResource SlateTextBrush}"
-                                       FontSize="12"
-                                       TextWrapping="WrapWholeWords"/>
+                                       FontSize="11.5"
+                                       TextTrimming="CharacterEllipsis"
+                                       ToolTipService.ToolTip="{Binding QuickEntryShortcutsText}"/>
                         </StackPanel>
-
-                        <Button Grid.Column="1"
-                                Content="تحديث القائمة"
-                                Style="{StaticResource SecondaryActionButtonStyle}"
-                                Click="Refresh_Click"/>
                     </Grid>
-
-                    <Border Background="#F8FAFC"
-                            BorderBrush="#E2E8F0"
-                            BorderThickness="1"
-                            CornerRadius="16"
-                            Padding="14,12">
-                        <Grid ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <FontIcon Glyph="&#xE8D7;"
-                                      Foreground="#0F766E"
-                                      FontSize="18"
-                                      VerticalAlignment="Top"/>
-
-                            <StackPanel Grid.Column="1" Spacing="4">
-                                <TextBlock Text="{Binding PeriodLockSummaryText}"
-                                           FontWeight="SemiBold"
-                                           Foreground="#0F172A"/>
-                                <TextBlock Text="{Binding PeriodLockHintText}"
-                                           Foreground="{StaticResource SlateTextBrush}"
-                                           FontSize="12"
-                                           TextWrapping="WrapWholeWords"/>
-                                <TextBlock Text="{Binding QuickEntryShortcutsText}"
-                                           Foreground="#0F766E"
-                                           FontSize="12"
-                                           TextWrapping="WrapWholeWords"/>
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <ScrollViewer Grid.Row="1"
-                                  HorizontalScrollBarVisibility="Auto"
-                                  VerticalScrollBarVisibility="Disabled"
-                                  HorizontalScrollMode="Enabled"
-                                  ZoomMode="Disabled">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Button Style="{StaticResource VoucherActionButtonStyle}" Click="CreateReceipt_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE8C7;"/>
-                                    <TextBlock Text="سند قبض"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Style="{StaticResource VoucherActionButtonStyle}" Click="CreatePayment_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xEAFD;"/>
-                                    <TextBlock Text="سند صرف"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Style="{StaticResource VoucherActionButtonStyle}" Click="CreateTransfer_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE8AB;"/>
-                                    <TextBlock Text="تحويل بين الحسابات"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Style="{StaticResource VoucherActionButtonStyle}" Click="CreateDailyJournal_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE8A5;"/>
-                                    <TextBlock Text="قيد يومية"/>
-                                </StackPanel>
-                            </Button>
-
-                            <Border Width="1" Height="42" Background="#E2E8F0" Margin="4,0"/>
-
-                            <Button Style="{StaticResource VoucherAuxButtonStyle}" Click="CreateOpeningEntry_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE8B8;"/>
-                                    <TextBlock Text="قيد افتتاحي"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Style="{StaticResource VoucherAuxButtonStyle}" Click="CreateDailyCashClosing_Click">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE8D4;"/>
-                                    <TextBlock Text="إقفال صندوق"/>
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-                    </ScrollViewer>
                 </Grid>
             </Border>
 
-            <Border Grid.Row="3" Style="{StaticResource PanelCardStyle}" Padding="14,12,14,8">
+            <Border Grid.Row="3" Style="{StaticResource AppSurfaceCardCompactStyle}" Padding="14,12,14,8">
                 <StackPanel Spacing="8">
                     <TextBlock Text="مشاهد سريعة" FontSize="14" FontWeight="SemiBold"/>
                     <ScrollViewer HorizontalScrollBarVisibility="Auto"
@@ -287,7 +160,7 @@
                 </StackPanel>
             </Border>
 
-            <Border Grid.Row="4" Style="{StaticResource PanelCardStyle}">
+            <Border Grid.Row="4" Style="{StaticResource AppSurfaceCardCompactStyle}">
                 <Grid RowSpacing="12">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -355,7 +228,7 @@
                     <ColumnDefinition Width="0.95*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Style="{StaticResource PanelCardStyle}" Padding="0">
+                <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardCompactStyle}" Padding="0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -453,7 +326,7 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Column="1" Style="{StaticResource PanelCardStyle}">
+                <Border Grid.Column="1" Style="{StaticResource AppSurfaceCardCompactStyle}">
                     <Grid>
                         <StackPanel Spacing="12" Visibility="{Binding PreviewPlaceholderVisibility}">
                             <TextBlock Text="لوحة معاينة السند" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>

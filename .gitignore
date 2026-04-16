@@ -37,3 +37,8 @@
 # Local secrets / settings
 # =========================
 appsettings.Local.json
+
+# =========================
+# Local design/reference temp files
+# =========================
+.codex-temp/

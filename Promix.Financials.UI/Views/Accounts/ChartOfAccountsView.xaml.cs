@@ -33,7 +33,6 @@ public sealed partial class ChartOfAccountsView : Page
         _vm.PropertyChanged += ViewModel_PropertyChanged;
         _vm.AccountTree.CollectionChanged += AccountTree_CollectionChanged;
         Loaded += OnLoaded;
-        Unloaded += OnUnloaded;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -52,13 +51,6 @@ public sealed partial class ChartOfAccountsView : Page
         {
             await ShowErrorAsync("خطأ عند التحميل", ex.Message);
         }
-    }
-
-    private void OnUnloaded(object sender, RoutedEventArgs e)
-    {
-        _vm.PropertyChanged -= ViewModel_PropertyChanged;
-        _vm.AccountTree.CollectionChanged -= AccountTree_CollectionChanged;
-        _scope.Dispose();
     }
 
     private void AccountTree_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

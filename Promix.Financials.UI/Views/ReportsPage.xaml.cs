@@ -43,7 +43,6 @@ public sealed partial class ReportsPage : Page
         DataContext = _vm;
 
         Loaded += OnLoaded;
-        Unloaded += (_, _) => _scope.Dispose();
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

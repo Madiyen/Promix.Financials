@@ -35,7 +35,6 @@ public sealed partial class PartiesPage : Page
         _vm.PropertyChanged += ViewModel_PropertyChanged;
         _vm.Parties.CollectionChanged += ViewModelCollectionChanged;
 
-        Unloaded += PartiesPage_Unloaded;
         UpdateMessageBanners();
         UpdateVisualState();
     }
@@ -141,14 +140,6 @@ public sealed partial class PartiesPage : Page
         }
 
         await RunSafeAsync(() => _vm.SelectPartyAsync(PartiesListView.SelectedItem as PartyRowVm));
-    }
-
-    private void PartiesPage_Unloaded(object sender, RoutedEventArgs e)
-    {
-        _vm.PropertyChanged -= ViewModel_PropertyChanged;
-        _vm.Parties.CollectionChanged -= ViewModelCollectionChanged;
-        Unloaded -= PartiesPage_Unloaded;
-        _scope.Dispose();
     }
 
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)

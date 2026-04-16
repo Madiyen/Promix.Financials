@@ -7,7 +7,7 @@
 
     <Grid Background="{StaticResource AppBackgroundBrush}">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="16" Padding="22,18,22,18">
+            <StackPanel Spacing="16" Padding="24,20,24,20">
                 <Border Visibility="{Binding LoadingVisibility}"
                         Background="#E0F2FE"
                         BorderBrush="#BFDBFE"
@@ -30,11 +30,8 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0"
-                            Background="White"
-                            BorderBrush="#F1F5F9"
-                            BorderThickness="1"
-                            CornerRadius="18"
-                            Padding="18">
+                            Style="{StaticResource AppSurfaceCardCompactStyle}"
+                            Padding="16">
                         <StackPanel Spacing="16">
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -42,20 +39,55 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <StackPanel Spacing="3">
-                                    <TextBlock Text="اتجاه الحركة الأسبوعية" FontSize="15" FontWeight="Bold"/>
-                                    <TextBlock Text="صافي الحركة النقدية خلال آخر سبعة أيام بحسب القيود المرحلة."
+                                    <TextBlock Text="الحركة النقدية الأسبوعية" FontSize="15" FontWeight="SemiBold"/>
+                                    <TextBlock Text="ملخص سريع للتدفق الداخل والخارج خلال آخر سبعة أيام."
                                                Foreground="{StaticResource MutedTextBrush}"
                                                FontSize="11.5"/>
                                 </StackPanel>
                                 <Border Grid.Column="1"
-                                        Background="#F8FAFC"
-                                        BorderBrush="#E2E8F0"
-                                        BorderThickness="1"
-                                        CornerRadius="10"
-                                        Padding="10,6"
+                                        Style="{StaticResource AppEnterpriseInfoChipStyle}"
                                         VerticalAlignment="Center">
                                     <TextBlock Text="آخر 7 أيام" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
                                 </Border>
+                            </Grid>
+
+                            <Grid ColumnSpacing="18">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="داخل"
+                                           Foreground="{StaticResource SuccessBrush}"
+                                           FontSize="11.5"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding WeeklyCashInflowText}"
+                                           Foreground="{StaticResource SuccessBrush}"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"
+                                           Language="en-US"
+                                           VerticalAlignment="Center"/>
+                                <Rectangle Grid.Column="2"
+                                           Width="1"
+                                           Height="14"
+                                           Fill="{StaticResource BorderBrushStrong}"
+                                           VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="3"
+                                            Orientation="Horizontal"
+                                            Spacing="6"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="خارج"
+                                               Foreground="{StaticResource DangerBrush}"
+                                               FontSize="11.5"/>
+                                    <TextBlock Text="{Binding WeeklyCashOutflowText}"
+                                               Foreground="{StaticResource DangerBrush}"
+                                               FontSize="15"
+                                               FontWeight="SemiBold"
+                                               Language="en-US"/>
+                                </StackPanel>
                             </Grid>
 
                             <Border Height="188">
@@ -93,11 +125,8 @@
                     </Border>
 
                     <Border Grid.Column="1"
-                            Background="White"
-                            BorderBrush="#F1F5F9"
-                            BorderThickness="1"
-                            CornerRadius="18"
-                            Padding="18">
+                            Style="{StaticResource AppSurfaceCardCompactStyle}"
+                            Padding="16">
                         <StackPanel Spacing="16">
                             <StackPanel Spacing="3">
                                 <TextBlock Text="توزيع السندات" FontSize="15" FontWeight="Bold"/>
@@ -156,10 +185,7 @@
                                 </StackPanel>
                             </StackPanel>
 
-                            <Border Background="#F8FAFC"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="1"
-                                    CornerRadius="14"
+                            <Border Style="{StaticResource AppEnterpriseInnerCardStyle}"
                                     Padding="14">
                                 <StackPanel Spacing="5">
                                     <TextBlock Text="مؤشر اليوم" FontSize="12.5" FontWeight="SemiBold"/>

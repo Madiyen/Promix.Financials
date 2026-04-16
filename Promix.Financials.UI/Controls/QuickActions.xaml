@@ -3,11 +3,19 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Border Background="White"
-            BorderBrush="#F1F5F9"
-            BorderThickness="1"
-            CornerRadius="18"
-            Padding="18">
+    <UserControl.Resources>
+        <Style x:Key="DashboardActionTileButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Style="{StaticResource AppSurfaceCardCompactStyle}"
+            Padding="16">
         <StackPanel Spacing="14">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -16,160 +24,143 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Spacing="3">
-                    <TextBlock Text="إجراءات سريعة" FontSize="15" FontWeight="Bold"/>
-                    <TextBlock Text="تشغيل مباشر لأكثر العمليات استخدامًا دون مغادرة الشاشة الرئيسية."
-                               Foreground="{StaticResource MutedTextBrush}"
-                               FontSize="11.5"/>
+                    <TextBlock Text="إجراءات سريعة" Style="{StaticResource AppSectionTitleTextStyle}"/>
+                    <TextBlock Text="اختصارات تشغيلية مباشرة من الشاشة الرئيسية."
+                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
                 </StackPanel>
 
-                <TextBlock Grid.Column="1"
-                           Text="6 إجراءات"
-                           VerticalAlignment="Center"
-                           Foreground="{StaticResource MutedTextBrush}"
-                           FontSize="12"/>
+                <Border Grid.Column="1"
+                        Style="{StaticResource AppEnterpriseInfoChipStyle}"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="اختصارات"
+                               Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                </Border>
             </Grid>
 
-            <Grid ColumnSpacing="12" RowSpacing="12">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
+            <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0" Grid.Column="0"
+                <Button Grid.Column="0"
                         Click="ReceiptVoucher_Click"
-                        Background="{StaticResource SuccessSurfaceBrush}"
-                        BorderBrush="#A7F3D0"
-                        BorderThickness="1"
-                        CornerRadius="16"
-                        Padding="16,14">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="40" Height="40" Background="#D1FAE5" CornerRadius="12">
-                            <FontIcon Glyph="&#xE8C7;" Foreground="{StaticResource SuccessBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
-                            <TextBlock Text="سند قبض" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13.5" FontWeight="SemiBold"/>
-                            <TextBlock Text="تسجيل تحصيل" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/>
-                        </StackPanel>
-                    </Grid>
+                        Style="{StaticResource DashboardActionTileButtonStyle}">
+                    <Border Background="#1E3A5F"
+                            CornerRadius="12"
+                            Padding="14,12">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" Background="#2B4C74" CornerRadius="10">
+                                <FontIcon Glyph="&#xE8C7;" Foreground="White" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="سند قبض" Foreground="White" FontSize="12.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Button>
 
-                <Button Grid.Row="0" Grid.Column="1"
+                <Button Grid.Column="1"
                         Click="PaymentVoucher_Click"
-                        Background="{StaticResource DangerSurfaceBrush}"
-                        BorderBrush="#FECACA"
-                        BorderThickness="1"
-                        CornerRadius="16"
-                        Padding="16,14">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="40" Height="40" Background="#FEE2E2" CornerRadius="12">
-                            <FontIcon Glyph="&#xEAFD;" Foreground="{StaticResource DangerBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
-                            <TextBlock Text="سند صرف" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13.5" FontWeight="SemiBold"/>
-                            <TextBlock Text="تسجيل دفعة" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/>
-                        </StackPanel>
-                    </Grid>
+                        Style="{StaticResource DashboardActionTileButtonStyle}">
+                    <Border Style="{StaticResource AppEnterpriseInnerCardStyle}" Padding="14,12">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" Background="#FEE2E2" CornerRadius="10">
+                                <FontIcon Glyph="&#xEAFD;" Foreground="{StaticResource DangerBrush}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="سند صرف" Foreground="{StaticResource PrimaryTextBrush}" FontSize="12.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Button>
 
-                <Button Grid.Row="0" Grid.Column="2"
+                <Button Grid.Column="2"
                         Click="TransferVoucher_Click"
-                        Background="#EEF2FF"
-                        BorderBrush="#C7D2FE"
-                        BorderThickness="1"
-                        CornerRadius="16"
-                        Padding="16,14">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="40" Height="40" Background="#E0E7FF" CornerRadius="12">
-                            <FontIcon Glyph="&#xE8AB;" Foreground="#4F46E5" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
-                            <TextBlock Text="تحويل حساب" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13.5" FontWeight="SemiBold"/>
-                            <TextBlock Text="بين الصندوق والبنك" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/>
-                        </StackPanel>
-                    </Grid>
+                        Style="{StaticResource DashboardActionTileButtonStyle}">
+                    <Border Style="{StaticResource AppEnterpriseInnerCardStyle}" Padding="14,12">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" Background="#E0E7FF" CornerRadius="10">
+                                <FontIcon Glyph="&#xE8AB;" Foreground="#4F46E5" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="تحويل" Foreground="{StaticResource PrimaryTextBrush}" FontSize="12.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Button>
 
-                <Button Grid.Row="1" Grid.Column="0"
+                <Button Grid.Column="3"
                         Click="DailyJournal_Click"
-                        Background="#F5F3FF"
-                        BorderBrush="#DDD6FE"
-                        BorderThickness="1"
-                        CornerRadius="16"
-                        Padding="16,14">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="40" Height="40" Background="#EDE9FE" CornerRadius="12">
-                            <FontIcon Glyph="&#xE8A5;" Foreground="#7C3AED" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
-                            <TextBlock Text="قيد يومية" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13.5" FontWeight="SemiBold"/>
-                            <TextBlock Text="إدخال يدوي" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/>
-                        </StackPanel>
-                    </Grid>
+                        Style="{StaticResource DashboardActionTileButtonStyle}">
+                    <Border Style="{StaticResource AppEnterpriseInnerCardStyle}" Padding="14,12">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" Background="#EDE9FE" CornerRadius="10">
+                                <FontIcon Glyph="&#xE8A5;" Foreground="#7C3AED" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="قيد يومية" Foreground="{StaticResource PrimaryTextBrush}" FontSize="12.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Button>
 
-                <Button Grid.Row="1" Grid.Column="1"
+                <Button Grid.Column="4"
                         Click="Accounts_Click"
-                        Background="#FFFBEB"
-                        BorderBrush="#FDE68A"
-                        BorderThickness="1"
-                        CornerRadius="16"
-                        Padding="16,14">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="40" Height="40" Background="#FEF3C7" CornerRadius="12">
-                            <FontIcon Glyph="&#xE8D4;" Foreground="{StaticResource WarningBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
-                            <TextBlock Text="شجرة الحسابات" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13.5" FontWeight="SemiBold"/>
-                            <TextBlock Text="إدارة الحسابات" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/>
-                        </StackPanel>
-                    </Grid>
+                        Style="{StaticResource DashboardActionTileButtonStyle}">
+                    <Border Style="{StaticResource AppEnterpriseInnerCardStyle}" Padding="14,12">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" Background="#FEF3C7" CornerRadius="10">
+                                <FontIcon Glyph="&#xE8D4;" Foreground="{StaticResource WarningBrush}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="الحسابات" Foreground="{StaticResource PrimaryTextBrush}" FontSize="12.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Button>
 
-                <Button Grid.Row="1" Grid.Column="2"
+                <Button Grid.Column="5"
                         Click="Reports_Click"
-                        Background="#ECFEFF"
-                        BorderBrush="#A5F3FC"
-                        BorderThickness="1"
-                        CornerRadius="16"
-                        Padding="16,14">
-                    <Grid ColumnSpacing="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="40" Height="40" Background="#CFFAFE" CornerRadius="12">
-                            <FontIcon Glyph="&#xE9D2;" Foreground="#0891B2" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <StackPanel Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
-                            <TextBlock Text="التقارير" Foreground="{StaticResource PrimaryTextBrush}" FontSize="13.5" FontWeight="SemiBold"/>
-                            <TextBlock Text="كشف الحساب والميزان" Foreground="{StaticResource MutedTextBrush}" FontSize="11"/>
-                        </StackPanel>
-                    </Grid>
+                        Style="{StaticResource DashboardActionTileButtonStyle}">
+                    <Border Style="{StaticResource AppEnterpriseInnerCardStyle}" Padding="14,12">
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="36"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" Background="#CFFAFE" CornerRadius="10">
+                                <FontIcon Glyph="&#xE9D2;" Foreground="#0891B2" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="التقارير" Foreground="{StaticResource PrimaryTextBrush}" FontSize="12.5" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Button>
             </Grid>
         </StackPanel>

@@ -131,15 +131,5 @@ public sealed partial class LedgerWorkspacePage : Page
 
     private void UpdateHeaderSummary(LedgerWorkspaceTab tab)
     {
-        ActiveTabSummaryText.Text = tab switch
-        {
-            LedgerWorkspaceTab.Accounts => "الحسابات هي نقطة البداية الافتراضية داخل دفتر الأستاذ.",
-            LedgerWorkspaceTab.Journals => "أنشئ السندات والقيود وراجع المسودات والترحيل من نفس المساحة.",
-            LedgerWorkspaceTab.AccountStatement => "راجع حركة أي حساب واختر الفترة المناسبة دون مغادرة دفتر الأستاذ.",
-            LedgerWorkspaceTab.TrialBalance => "تابع أرصدة الافتتاح والحركة والختام من تبويب ميزان المراجعة.",
-            LedgerWorkspaceTab.ReceivablesPayables => "أدر الأطراف والذمم والتسويات ضمن نفس سياق الأستاذ العام.",
-            LedgerWorkspaceTab.FinancialYears => "عرّف السنوات المالية وفعّل السنة المعتمدة للتقارير والتشغيل.",
-            _ => "الحسابات هي نقطة البداية الافتراضية داخل دفتر الأستاذ."
-        };
     }
 }

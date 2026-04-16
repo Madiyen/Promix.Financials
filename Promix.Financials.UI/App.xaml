@@ -15,49 +15,54 @@
                 <ResourceDictionary Source="ms-appx:///Styles/VoucherDialogs.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <FontFamily x:Key="AppFontFamily">Inter</FontFamily>
+
             <!-- Brushes -->
-            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F3F6FB"/>
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F1F5F9"/>
             <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="CardSubtleBackgroundBrush" Color="#F8FAFC"/>
-            <SolidColorBrush x:Key="BorderBrushSoft" Color="#DDE6F0"/>
-            <SolidColorBrush x:Key="BorderBrushStrong" Color="#C4D0DE"/>
+            <SolidColorBrush x:Key="BorderBrushSoft" Color="#F1F5F9"/>
+            <SolidColorBrush x:Key="BorderBrushStrong" Color="#E2E8F0"/>
 
-            <SolidColorBrush x:Key="PrimaryTextBrush" Color="#16324F"/>
-            <SolidColorBrush x:Key="SecondaryTextBrush" Color="#41566E"/>
-            <SolidColorBrush x:Key="MutedTextBrush" Color="#6B7E95"/>
-            <SolidColorBrush x:Key="SlateTextBrush" Color="#5F728A"/>
-            <SolidColorBrush x:Key="FocusRingBrush" Color="#2563EB"/>
+            <SolidColorBrush x:Key="PrimaryTextBrush" Color="#0F172A"/>
+            <SolidColorBrush x:Key="MainTitleTextBrush" Color="#0F172A"/>
+            <SolidColorBrush x:Key="BrandNavyBrush" Color="#1E3A5F"/>
+            <SolidColorBrush x:Key="SecondaryTextBrush" Color="#64748B"/>
+            <SolidColorBrush x:Key="MutedTextBrush" Color="#94A3B8"/>
+            <SolidColorBrush x:Key="SlateTextBrush" Color="#64748B"/>
+            <SolidColorBrush x:Key="FocusRingBrush" Color="#3B82F6"/>
 
-            <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#203C61"/>
+            <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#1E3A5F"/>
             <SolidColorBrush x:Key="SidebarActiveBrush" Color="#3B82F6"/>
-            <SolidColorBrush x:Key="SidebarCardBackgroundBrush" Color="#2B537F"/>
-            <SolidColorBrush x:Key="SidebarMutedTextBrush" Color="#E3EDFF"/>
-            <SolidColorBrush x:Key="SidebarSoftTextBrush" Color="#C4D4EA"/>
-            <SolidColorBrush x:Key="SidebarHoverBrush" Color="#1EFFFFFF"/>
+            <SolidColorBrush x:Key="SidebarCardBackgroundBrush" Color="#28486E"/>
+            <SolidColorBrush x:Key="SidebarMutedTextBrush" Color="#DCE8FB"/>
+            <SolidColorBrush x:Key="SidebarSoftTextBrush" Color="#BFD0E8"/>
+            <SolidColorBrush x:Key="SidebarHoverBrush" Color="#143B82F6"/>
 
             <SolidColorBrush x:Key="SuccessBrush" Color="#10B981"/>
             <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
             <SolidColorBrush x:Key="DangerBrush" Color="#EF4444"/>
+            <SolidColorBrush x:Key="PurpleAccentBrush" Color="#8B5CF6"/>
             <SolidColorBrush x:Key="SuccessSurfaceBrush" Color="#ECFDF5"/>
             <SolidColorBrush x:Key="WarningSurfaceBrush" Color="#FFF7ED"/>
             <SolidColorBrush x:Key="DangerSurfaceBrush" Color="#FEF2F2"/>
             <SolidColorBrush x:Key="InfoSurfaceBrush" Color="#EFF6FF"/>
-            <SolidColorBrush x:Key="SelectionHoverBrush" Color="#F1F6FD"/>
-            <SolidColorBrush x:Key="SelectionPressedBrush" Color="#E6EEF9"/>
-            <SolidColorBrush x:Key="SelectionSelectedBrush" Color="#EAF3FF"/>
-            <SolidColorBrush x:Key="SelectionHoverBorderBrush" Color="#C9DAF0"/>
-            <SolidColorBrush x:Key="SelectionSelectedBorderBrush" Color="#7CB3FF"/>
+            <SolidColorBrush x:Key="SelectionHoverBrush" Color="#F8FBFF"/>
+            <SolidColorBrush x:Key="SelectionPressedBrush" Color="#EDF4FF"/>
+            <SolidColorBrush x:Key="SelectionSelectedBrush" Color="#EFF6FF"/>
+            <SolidColorBrush x:Key="SelectionHoverBorderBrush" Color="#DBEAFE"/>
+            <SolidColorBrush x:Key="SelectionSelectedBorderBrush" Color="#93C5FD"/>
 
             <!-- Action Buttons -->
-            <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#2563EB"/>
-            <SolidColorBrush x:Key="PrimaryButtonHoverBrush" Color="#1D4ED8"/>
-            <SolidColorBrush x:Key="PrimaryButtonPressedBrush" Color="#1E40AF"/>
+            <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#3B82F6"/>
+            <SolidColorBrush x:Key="PrimaryButtonHoverBrush" Color="#2563EB"/>
+            <SolidColorBrush x:Key="PrimaryButtonPressedBrush" Color="#1D4ED8"/>
             <SolidColorBrush x:Key="PrimaryButtonDisabledBrush" Color="#BFDBFE"/>
 
-            <SolidColorBrush x:Key="SecondaryButtonBrush" Color="#F8FAFC"/>
-            <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="#EEF4FB"/>
-            <SolidColorBrush x:Key="SecondaryButtonPressedBrush" Color="#DEE8F5"/>
-            <SolidColorBrush x:Key="SecondaryButtonTextBrush" Color="#16324F"/>
+            <SolidColorBrush x:Key="SecondaryButtonBrush" Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="SecondaryButtonHoverBrush" Color="#F8FAFC"/>
+            <SolidColorBrush x:Key="SecondaryButtonPressedBrush" Color="#F1F5F9"/>
+            <SolidColorBrush x:Key="SecondaryButtonTextBrush" Color="#1E3A5F"/>
             <SolidColorBrush x:Key="SecondaryButtonDisabledBrush" Color="#F1F5F9"/>
 
             <SolidColorBrush x:Key="DangerButtonBrush" Color="#DC2626"/>
@@ -65,12 +70,12 @@
             <SolidColorBrush x:Key="DangerButtonPressedBrush" Color="#991B1B"/>
             <SolidColorBrush x:Key="DangerButtonDisabledBrush" Color="#FECACA"/>
 
-            <SolidColorBrush x:Key="GhostButtonHoverBrush" Color="#EEF4FB"/>
-            <SolidColorBrush x:Key="GhostButtonPressedBrush" Color="#DEE8F5"/>
+            <SolidColorBrush x:Key="GhostButtonHoverBrush" Color="#F8FAFC"/>
+            <SolidColorBrush x:Key="GhostButtonPressedBrush" Color="#F1F5F9"/>
             <SolidColorBrush x:Key="GhostButtonDisabledBrush" Color="#F8FAFC"/>
 
-            <SolidColorBrush x:Key="SidebarButtonPressedBrush" Color="#315988"/>
-            <SolidColorBrush x:Key="SidebarButtonDisabledBrush" Color="#294B72"/>
+            <SolidColorBrush x:Key="SidebarButtonPressedBrush" Color="#2A4A72"/>
+            <SolidColorBrush x:Key="SidebarButtonDisabledBrush" Color="#294766"/>
 
             <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#94A3B8"/>
             <SolidColorBrush x:Key="DisabledBorderBrush" Color="#D6E0EB"/>
@@ -96,6 +101,7 @@
             </Style>
 
             <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
             </Style>
         </ResourceDictionary>

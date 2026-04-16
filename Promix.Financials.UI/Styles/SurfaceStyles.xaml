@@ -5,23 +5,33 @@
 
     <Style x:Key="AppSurfaceCardStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="20"/>
-        <Setter Property="Padding" Value="18"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <Style x:Key="AppSurfaceCardCompactStyle" TargetType="Border" BasedOn="{StaticResource AppSurfaceCardStyle}">
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="14"/>
     </Style>
 
     <Style x:Key="AppSubtleSurfaceCardStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource CardSubtleBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Padding" Value="14"/>
     </Style>
 
     <Style x:Key="AppMetricCardStyle" TargetType="Border" BasedOn="{StaticResource AppSurfaceCardStyle}">
         <Setter Property="Padding" Value="18,16"/>
-        <Setter Property="CornerRadius" Value="18"/>
+        <Setter Property="CornerRadius" Value="12"/>
+    </Style>
+
+    <Style x:Key="AppMetricCardCompactStyle" TargetType="Border" BasedOn="{StaticResource AppMetricCardStyle}">
+        <Setter Property="Padding" Value="14,12"/>
+        <Setter Property="CornerRadius" Value="12"/>
     </Style>
 
     <Style x:Key="AppEmptyStateCardStyle" TargetType="Border" BasedOn="{StaticResource AppSubtleSurfaceCardStyle}">
@@ -31,7 +41,11 @@
     <Style x:Key="AppPageTitleTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="24"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource MainTitleTextBrush}"/>
+    </Style>
+
+    <Style x:Key="AppPageTitleCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppPageTitleTextStyle}">
+        <Setter Property="FontSize" Value="20"/>
     </Style>
 
     <Style x:Key="AppPageSubtitleTextStyle" TargetType="TextBlock">
@@ -40,10 +54,18 @@
         <Setter Property="TextWrapping" Value="WrapWholeWords"/>
     </Style>
 
+    <Style x:Key="AppPageSubtitleCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppPageSubtitleTextStyle}">
+        <Setter Property="FontSize" Value="11.5"/>
+    </Style>
+
     <Style x:Key="AppSectionTitleTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="16"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+    </Style>
+
+    <Style x:Key="AppSectionTitleCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppSectionTitleTextStyle}">
+        <Setter Property="FontSize" Value="14"/>
     </Style>
 
     <Style x:Key="AppSectionCaptionTextStyle" TargetType="TextBlock">
@@ -52,9 +74,17 @@
         <Setter Property="TextWrapping" Value="WrapWholeWords"/>
     </Style>
 
+    <Style x:Key="AppSectionCaptionCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppSectionCaptionTextStyle}">
+        <Setter Property="FontSize" Value="11"/>
+    </Style>
+
     <Style x:Key="AppMetricLabelTextStyle" TargetType="TextBlock">
         <Setter Property="FontSize" Value="11.5"/>
         <Setter Property="Foreground" Value="{StaticResource SlateTextBrush}"/>
+    </Style>
+
+    <Style x:Key="AppMetricLabelCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppMetricLabelTextStyle}">
+        <Setter Property="FontSize" Value="10.5"/>
     </Style>
 
     <Style x:Key="AppMetricValueTextStyle" TargetType="TextBlock">
@@ -63,8 +93,12 @@
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
     </Style>
 
+    <Style x:Key="AppMetricValueCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppMetricValueTextStyle}">
+        <Setter Property="FontSize" Value="20"/>
+    </Style>
+
     <Style x:Key="AppBadgeBorderStyle" TargetType="Border">
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="999"/>
         <Setter Property="Padding" Value="10,4"/>
     </Style>
 
@@ -72,6 +106,61 @@
         <Setter Property="FontSize" Value="11.5"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseSectionCardStyle" TargetType="Border" BasedOn="{StaticResource AppSurfaceCardCompactStyle}">
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseInnerCardStyle" TargetType="Border" BasedOn="{StaticResource AppSubtleSurfaceCardStyle}">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="12"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseTableHeaderSurfaceStyle" TargetType="Border">
+        <Setter Property="Background" Value="#F8FAFC"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="12,7"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseTableHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseTableCellTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseDataRowStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Padding" Value="10,8"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseInfoChipStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="#EFF6FF"/>
+        <Setter Property="BorderBrush" Value="#DBEAFE"/>
+    </Style>
+
+    <Style x:Key="AppEnterpriseInfoChipTextStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryButtonBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
     <Style x:Key="AppListViewStyle" TargetType="ListView">
@@ -111,14 +200,20 @@
 
     <Style x:Key="AppTabViewItemStyle" TargetType="controls:TabViewItem">
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
-        <Setter Property="Background" Value="{StaticResource CardSubtleBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="16,10"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0,0,0,2"/>
+        <Setter Property="Padding" Value="10,8"/>
         <Setter Property="Margin" Value="0,0,8,0"/>
-        <Setter Property="MinHeight" Value="44"/>
+        <Setter Property="MinHeight" Value="34"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="AppTabViewItemCompactStyle" TargetType="controls:TabViewItem" BasedOn="{StaticResource AppTabViewItemStyle}">
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Margin" Value="0,0,6,0"/>
+        <Setter Property="MinHeight" Value="38"/>
     </Style>
 
     <Style x:Key="AppTabHeaderTextStyle" TargetType="TextBlock">
@@ -127,6 +222,10 @@
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="AppTabHeaderCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppTabHeaderTextStyle}">
+        <Setter Property="FontSize" Value="12.5"/>
     </Style>
 
     <Style x:Key="AppComboBoxItemStyle" TargetType="ComboBoxItem">

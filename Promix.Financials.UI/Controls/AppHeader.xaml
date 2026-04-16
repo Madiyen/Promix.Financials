@@ -5,7 +5,7 @@
 
     <Grid Height="64"
           Background="{StaticResource CardBackgroundBrush}"
-          BorderBrush="{StaticResource BorderBrushSoft}"
+          BorderBrush="{StaticResource BorderBrushStrong}"
           BorderThickness="0,0,0,1"
           Padding="24,0">
         <Grid.ColumnDefinitions>
@@ -17,21 +17,23 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel VerticalAlignment="Center">
-            <TextBlock x:Name="TitleText"
+                <TextBlock x:Name="TitleText"
                        Text="لوحة القيادة"
-                       Foreground="{StaticResource PrimaryTextBrush}"
-                       FontWeight="Bold"
+                       Foreground="{StaticResource MainTitleTextBrush}"
+                       FontWeight="SemiBold"
                        FontSize="18"/>
             <TextBlock x:Name="SubtitleText"
                        Text="ملخص سريع لأهم المؤشرات والحركات اليومية."
                        Foreground="{StaticResource MutedTextBrush}"
-                       FontSize="11.5"
+                       FontSize="11"
                        Margin="0,3,0,0"/>
         </StackPanel>
 
         <Border Grid.Column="1"
                 VerticalAlignment="Center"
-                Background="#F1F5F9"
+                Background="#FFFFFF"
+                BorderBrush="{StaticResource BorderBrushSoft}"
+                BorderThickness="1"
                 CornerRadius="10"
                 Padding="12,7"
                 Margin="14,0,0,0">
@@ -49,13 +51,13 @@
 
         <Border Grid.Column="2"
                 VerticalAlignment="Center"
-                Background="{StaticResource AppBackgroundBrush}"
-                BorderBrush="#E2E8F0"
+                Background="#FFFFFF"
+                BorderBrush="{StaticResource BorderBrushStrong}"
                 BorderThickness="1"
-                CornerRadius="14"
+                CornerRadius="12"
                 Padding="14,0"
-                Height="42"
-                Width="390"
+                Height="40"
+                Width="392"
                 HorizontalAlignment="Center">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -79,7 +81,7 @@
                          TextAlignment="Right"/>
 
                 <Border Grid.Column="2"
-                        Background="#E2E8F0"
+                        Background="{StaticResource BorderBrushSoft}"
                         CornerRadius="6"
                         Padding="6,2"
                         VerticalAlignment="Center">
@@ -95,19 +97,19 @@
                 x:Name="FiscalYearBadge"
                 VerticalAlignment="Center"
                 Margin="12,0,0,0"
-                Background="{StaticResource InfoSurfaceBrush}"
-                BorderBrush="#BFDBFE"
+                Background="#EFF6FF"
+                BorderBrush="#DBEAFE"
                 BorderThickness="1"
-                CornerRadius="12"
-                Padding="12,8">
+                CornerRadius="10"
+                Padding="12,7">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <TextBlock x:Name="FiscalYearText"
                            Text="الفترة الحالية"
-                           Foreground="#1D4ED8"
+                           Foreground="{StaticResource PrimaryButtonBrush}"
                            FontSize="12.5"
                            FontWeight="SemiBold"/>
                 <FontIcon Glyph="&#xE70D;"
-                          Foreground="#3B82F6"
+                          Foreground="{StaticResource PrimaryButtonBrush}"
                           FontSize="12"
                           VerticalAlignment="Center"/>
             </StackPanel>
@@ -160,5 +162,17 @@
                           Margin="8,0,0,0"/>
             </Grid>
         </StackPanel>
+
+        <Rectangle Grid.ColumnSpan="5"
+                   VerticalAlignment="Bottom"
+                   Height="4"
+                   IsHitTestVisible="False">
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#120F172A" Offset="0"/>
+                    <GradientStop Color="#000F172A" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
     </Grid>
 </UserControl>

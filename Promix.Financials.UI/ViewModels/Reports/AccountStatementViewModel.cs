@@ -314,7 +314,6 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
 
             if (loadStatement)
             {
-                await LoadCashMovementAsync();
                 await LoadStatementCoreAsync();
             }
 

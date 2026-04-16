@@ -18,6 +18,8 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
     private readonly List<JournalEntryRowVm> _allEntries = new();
     private Guid _companyId;
     private bool _isBusy;
+    private decimal _weeklyCashInflow;
+    private decimal _weeklyCashOutflow;
 
     public DashboardViewModel(IJournalEntriesQuery query)
     {
@@ -48,6 +50,8 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
     public string TodayMovementHintText => GetTodayPostedCount() == 0
         ? "لا توجد حركة مرحلة اليوم"
         : $"{GetTodayPostedCount()} حركة مرحلة اليوم";
+    public string WeeklyCashInflowText => _weeklyCashInflow.ToString("N0");
+    public string WeeklyCashOutflowText => _weeklyCashOutflow.ToString("N0");
 
     public int ReceiptShare => GetShare(x => x.Type == JournalEntryType.ReceiptVoucher);
     public int PaymentShare => GetShare(x => x.Type == JournalEntryType.PaymentVoucher);
@@ -134,6 +138,8 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(DraftEntriesText));
         OnPropertyChanged(nameof(TodayNetMovementText));
         OnPropertyChanged(nameof(TodayMovementHintText));
+        OnPropertyChanged(nameof(WeeklyCashInflowText));
+        OnPropertyChanged(nameof(WeeklyCashOutflowText));
         OnPropertyChanged(nameof(ReceiptShare));
         OnPropertyChanged(nameof(PaymentShare));
         OnPropertyChanged(nameof(DailyShare));
@@ -167,6 +173,8 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
     private void RebuildActivityBars(IReadOnlyList<JournalCashMovementDto> cashMovements, DateOnly start)
     {
         ActivityBars.Clear();
+        _weeklyCashInflow = cashMovements.Where(x => x.NetMovement > 0m).Sum(x => x.NetMovement);
+        _weeklyCashOutflow = cashMovements.Where(x => x.NetMovement < 0m).Sum(x => Math.Abs(x.NetMovement));
 
         var grouped = cashMovements.ToDictionary(x => x.EntryDate, x => x.NetMovement);
         var days = Enumerable.Range(0, 7).Select(offset => start.AddDays(offset)).ToList();

@@ -402,10 +402,11 @@
         <Setter Property="BorderBrush" Value="{StaticResource PrimaryButtonBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="MinHeight" Value="40"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template" Value="{StaticResource PrimaryButtonTemplate}"/>
@@ -417,10 +418,11 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="MinHeight" Value="40"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template" Value="{StaticResource SecondaryButtonTemplate}"/>
@@ -432,10 +434,11 @@
         <Setter Property="BorderBrush" Value="{StaticResource DangerButtonBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="MinHeight" Value="40"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template" Value="{StaticResource DangerButtonTemplate}"/>
@@ -447,10 +450,11 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="MinHeight" Value="40"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Template" Value="{StaticResource GhostButtonTemplate}"/>
@@ -462,10 +466,30 @@
         <Setter Property="MinWidth" Value="108"/>
     </Style>
 
+    <Style x:Key="PrimaryActionCompactButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource PrimaryButtonStyle}">
+        <Setter Property="MinWidth" Value="96"/>
+        <Setter Property="MinHeight" Value="38"/>
+        <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="FontSize" Value="12.5"/>
+    </Style>
+
     <Style x:Key="SecondaryActionButtonStyle"
            TargetType="Button"
            BasedOn="{StaticResource SecondaryButtonStyle}">
         <Setter Property="MinWidth" Value="96"/>
+    </Style>
+
+    <Style x:Key="SecondaryActionCompactButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource SecondaryButtonStyle}">
+        <Setter Property="MinWidth" Value="86"/>
+        <Setter Property="MinHeight" Value="38"/>
+        <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="FontSize" Value="12.5"/>
     </Style>
 
     <Style x:Key="DangerActionButtonStyle"
@@ -480,22 +504,37 @@
         <Setter Property="MinWidth" Value="96"/>
     </Style>
 
+    <Style x:Key="DangerGhostActionButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource GhostButtonStyle}">
+        <Setter Property="MinWidth" Value="96"/>
+        <Setter Property="Foreground" Value="{StaticResource DangerBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
     <Style x:Key="FilterChipButtonStyle"
            TargetType="Button"
-           BasedOn="{StaticResource SecondaryButtonStyle}">
-        <Setter Property="MinWidth" Value="132"/>
-        <Setter Property="MinHeight" Value="44"/>
-        <Setter Property="Padding" Value="16,8"/>
-        <Setter Property="CornerRadius" Value="14"/>
+           BasedOn="{StaticResource GhostButtonStyle}">
+        <Setter Property="MinWidth" Value="74"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="FontSize" Value="11.5"/>
     </Style>
 
     <Style x:Key="FilterChipButtonSelectedStyle"
            TargetType="Button"
-           BasedOn="{StaticResource PrimaryButtonStyle}">
-        <Setter Property="MinWidth" Value="132"/>
-        <Setter Property="MinHeight" Value="44"/>
-        <Setter Property="Padding" Value="16,8"/>
-        <Setter Property="CornerRadius" Value="14"/>
+           BasedOn="{StaticResource GhostButtonStyle}">
+        <Setter Property="MinWidth" Value="74"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="CornerRadius" Value="999"/>
+        <Setter Property="Background" Value="#DBEAFE"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryButtonBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="FontSize" Value="11.5"/>
     </Style>
 
     <Style x:Key="CompactTreeRowButtonStyle"
@@ -503,7 +542,7 @@
            BasedOn="{StaticResource GhostButtonStyle}">
         <Setter Property="MinHeight" Value="48"/>
         <Setter Property="Padding" Value="10,8"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
     </Style>
@@ -514,7 +553,7 @@
         <Setter Property="MinWidth" Value="88"/>
         <Setter Property="MinHeight" Value="38"/>
         <Setter Property="Padding" Value="12,6"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="10"/>
         <Setter Property="FontSize" Value="12.5"/>
     </Style>
 
@@ -528,9 +567,10 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Template" Value="{StaticResource SidebarButtonTemplate}"/>
     </Style>
 
@@ -549,7 +589,18 @@
         <Setter Property="MinWidth" Value="40"/>
         <Setter Property="MinHeight" Value="40"/>
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="CornerRadius" Value="10"/>
+    </Style>
+
+    <Style x:Key="IconCompactButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource SecondaryButtonStyle}">
+        <Setter Property="Width" Value="34"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="MinWidth" Value="34"/>
+        <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="CornerRadius" Value="10"/>
     </Style>
 
     <Style TargetType="Button"

@@ -11,122 +11,183 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0"
-                Background="White"
-                BorderBrush="#F1F5F9"
-                BorderThickness="1"
-                CornerRadius="18"
-                Padding="18">
+        <Border Grid.Column="0" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
             <Grid>
                 <Border Height="3"
                         VerticalAlignment="Top"
                         Background="{StaticResource SidebarActiveBrush}"
-                        CornerRadius="18,18,0,0"
-                        Margin="-18,-18,-18,0"/>
-
-                <StackPanel Spacing="14">
-                    <Border Width="44" Height="44" Background="{StaticResource InfoSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
-                        <FontIcon Glyph="&#xE80F;" Foreground="{StaticResource SidebarActiveBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
+                        CornerRadius="12,12,0,0"/>
+                <StackPanel Spacing="12" Padding="16,14,16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="42"
+                                Height="42"
+                                Background="{StaticResource InfoSurfaceBrush}"
+                                CornerRadius="12"
+                                HorizontalAlignment="Left">
+                            <FontIcon Glyph="&#xE80F;"
+                                      Foreground="{StaticResource SidebarActiveBrush}"
+                                      FontSize="16"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <Border Grid.Column="1"
+                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="إجمالي"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                    </Grid>
 
                     <StackPanel Spacing="4">
-                        <TextBlock Text="إجمالي السندات" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
-                        <TextBlock Text="{Binding TotalEntriesText}" FontSize="24" FontWeight="Bold"/>
+                        <TextBlock Text="إجمالي السندات" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                        <TextBlock Text="{Binding TotalEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
                     </StackPanel>
 
+                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
+
                     <TextBlock Text="كل القيود والسندات المسجلة حتى الآن"
-                               Foreground="{StaticResource MutedTextBrush}"
-                               FontSize="11"/>
+                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Column="1"
-                Background="White"
-                BorderBrush="#F1F5F9"
-                BorderThickness="1"
-                CornerRadius="18"
-                Padding="18">
+        <Border Grid.Column="1" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
             <Grid>
                 <Border Height="3"
                         VerticalAlignment="Top"
                         Background="{StaticResource SuccessBrush}"
-                        CornerRadius="18,18,0,0"
-                        Margin="-18,-18,-18,0"/>
-
-                <StackPanel Spacing="14">
-                    <Border Width="44" Height="44" Background="{StaticResource SuccessSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
-                        <FontIcon Glyph="&#xE8FB;" Foreground="{StaticResource SuccessBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
+                        CornerRadius="12,12,0,0"/>
+                <StackPanel Spacing="12" Padding="16,14,16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="42"
+                                Height="42"
+                                Background="{StaticResource SuccessSurfaceBrush}"
+                                CornerRadius="12"
+                                HorizontalAlignment="Left">
+                            <FontIcon Glyph="&#xE8FB;"
+                                      Foreground="{StaticResource SuccessBrush}"
+                                      FontSize="16"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <Border Grid.Column="1"
+                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="معتمد"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                    </Grid>
 
                     <StackPanel Spacing="4">
-                        <TextBlock Text="المرحل" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
-                        <TextBlock Text="{Binding PostedEntriesText}" FontSize="24" FontWeight="Bold"/>
+                        <TextBlock Text="المرحل" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                        <TextBlock Text="{Binding PostedEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
                     </StackPanel>
 
+                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
+
                     <TextBlock Text="سندات مؤثرة على الأرصدة والتقارير"
-                               Foreground="{StaticResource MutedTextBrush}"
-                               FontSize="11"/>
+                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Column="2"
-                Background="White"
-                BorderBrush="#F1F5F9"
-                BorderThickness="1"
-                CornerRadius="18"
-                Padding="18">
+        <Border Grid.Column="2" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
             <Grid>
                 <Border Height="3"
                         VerticalAlignment="Top"
                         Background="{StaticResource WarningBrush}"
-                        CornerRadius="18,18,0,0"
-                        Margin="-18,-18,-18,0"/>
-
-                <StackPanel Spacing="14">
-                    <Border Width="44" Height="44" Background="{StaticResource WarningSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
-                        <FontIcon Glyph="&#xE70F;" Foreground="{StaticResource WarningBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
+                        CornerRadius="12,12,0,0"/>
+                <StackPanel Spacing="12" Padding="16,14,16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="42"
+                                Height="42"
+                                Background="{StaticResource WarningSurfaceBrush}"
+                                CornerRadius="12"
+                                HorizontalAlignment="Left">
+                            <FontIcon Glyph="&#xE70F;"
+                                      Foreground="{StaticResource WarningBrush}"
+                                      FontSize="16"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <Border Grid.Column="1"
+                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="مراجعة"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                    </Grid>
 
                     <StackPanel Spacing="4">
-                        <TextBlock Text="المسودات" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
-                        <TextBlock Text="{Binding DraftEntriesText}" FontSize="24" FontWeight="Bold"/>
+                        <TextBlock Text="المسودات" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                        <TextBlock Text="{Binding DraftEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
                     </StackPanel>
 
+                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
+
                     <TextBlock Text="سندات بانتظار المراجعة أو الترحيل"
-                               Foreground="{StaticResource MutedTextBrush}"
-                               FontSize="11"/>
+                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Column="3"
-                Background="White"
-                BorderBrush="#F1F5F9"
-                BorderThickness="1"
-                CornerRadius="18"
-                Padding="18">
+        <Border Grid.Column="3" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
             <Grid>
                 <Border Height="3"
                         VerticalAlignment="Top"
                         Background="{StaticResource DangerBrush}"
-                        CornerRadius="18,18,0,0"
-                        Margin="-18,-18,-18,0"/>
-
-                <StackPanel Spacing="14">
-                    <Border Width="44" Height="44" Background="{StaticResource DangerSurfaceBrush}" CornerRadius="14" HorizontalAlignment="Left">
-                        <FontIcon Glyph="&#xE81C;" Foreground="{StaticResource DangerBrush}" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
+                        CornerRadius="12,12,0,0"/>
+                <StackPanel Spacing="12" Padding="16,14,16,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Width="42"
+                                Height="42"
+                                Background="{StaticResource DangerSurfaceBrush}"
+                                CornerRadius="12"
+                                HorizontalAlignment="Left">
+                            <FontIcon Glyph="&#xE81C;"
+                                      Foreground="{StaticResource DangerBrush}"
+                                      FontSize="16"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <Border Grid.Column="1"
+                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="اليوم"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                    </Grid>
 
                     <StackPanel Spacing="4">
-                        <TextBlock Text="صافي اليوم" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
-                        <TextBlock Text="{Binding TodayNetMovementText}" FontSize="24" FontWeight="Bold"/>
+                        <TextBlock Text="صافي اليوم" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                        <TextBlock Text="{Binding TodayNetMovementText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
                     </StackPanel>
 
+                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
+
                     <TextBlock Text="{Binding TodayMovementHintText}"
-                               Foreground="{StaticResource MutedTextBrush}"
-                               FontSize="11"/>
+                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"
+                               MaxWidth="220"/>
                 </StackPanel>
             </Grid>
         </Border>

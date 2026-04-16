@@ -9,6 +9,7 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="12,8"/>
         <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="MinHeight" Value="42"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
         <Setter Property="PlaceholderForeground" Value="{StaticResource SlateTextBrush}"/>
@@ -36,6 +37,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="MinHeight" Value="42"/>
         <Setter Property="HorizontalAlignment" Value="Stretch"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
@@ -47,6 +49,7 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="MinHeight" Value="42"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
     </Style>
@@ -56,12 +59,14 @@
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="MinHeight" Value="42"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
     </Style>
 
     <Style x:Key="InputDatePickerStyle" TargetType="DatePicker">
         <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="MinHeight" Value="42"/>
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
     </Style>
@@ -69,6 +74,7 @@
     <Style x:Key="InputToggleSwitchStyle" TargetType="ToggleSwitch">
         <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
         <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="OnContent" Value="نشط"/>
         <Setter Property="OffContent" Value="موقوف التعامل"/>
     </Style>

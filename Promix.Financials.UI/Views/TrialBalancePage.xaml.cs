@@ -26,7 +26,6 @@ public sealed partial class TrialBalancePage : Page
         DataContext = _vm;
 
         Loaded += OnLoaded;
-        Unloaded += (_, _) => _scope.Dispose();
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)

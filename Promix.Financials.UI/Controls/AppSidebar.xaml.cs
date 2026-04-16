@@ -12,6 +12,7 @@ namespace Promix.Financials.UI.Controls;
 public sealed partial class AppSidebar : UserControl
 {
     private readonly Dictionary<SidebarDestination, Button> _buttonMap;
+    private readonly Dictionary<SidebarDestination, Border> _indicatorMap;
 
     public event EventHandler<SidebarNavigateEventArgs>? NavigateRequested;
     public event EventHandler? LogoutRequested;
@@ -29,6 +30,15 @@ public sealed partial class AppSidebar : UserControl
             [SidebarDestination.Settings] = BtnSettings,
         };
 
+        _indicatorMap = new()
+        {
+            [SidebarDestination.Dashboard] = DashboardActiveIndicator,
+            [SidebarDestination.Ledger] = LedgerActiveIndicator,
+            [SidebarDestination.Currencies] = CurrenciesActiveIndicator,
+            [SidebarDestination.Items] = ItemsActiveIndicator,
+            [SidebarDestination.Settings] = SettingsActiveIndicator,
+        };
+
         SetActiveDestination(SidebarDestination.Dashboard);
     }
 
@@ -44,23 +54,24 @@ public sealed partial class AppSidebar : UserControl
     {
         foreach (var pair in _buttonMap)
         {
-            ApplyButtonState(pair.Value, pair.Key == destination);
+            ApplyButtonState(pair.Value, _indicatorMap[pair.Key], pair.Key == destination);
         }
     }
 
-    private static void ApplyButtonState(Button button, bool isActive)
+    private static void ApplyButtonState(Button button, Border indicator, bool isActive)
     {
         button.Background = new SolidColorBrush(isActive
-            ? ColorHelper.FromArgb(0x38, 0x3B, 0x82, 0xF6)
+            ? ColorHelper.FromArgb(0x28, 0x3B, 0x82, 0xF6)
             : Colors.Transparent);
         button.BorderBrush = new SolidColorBrush(isActive
-            ? ColorHelper.FromArgb(0x66, 0x60, 0xA5, 0xFA)
+            ? ColorHelper.FromArgb(0x4C, 0x60, 0xA5, 0xFA)
             : Colors.Transparent);
         button.BorderThickness = isActive ? new Thickness(1) : new Thickness(1);
         button.Foreground = new SolidColorBrush(isActive
             ? Colors.White
             : ColorHelper.FromArgb(0xF2, 0xFF, 0xFF, 0xFF));
         button.FontWeight = isActive ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal;
+        indicator.Opacity = isActive ? 1 : 0;
     }
 
     private static string BuildInitials(string username)

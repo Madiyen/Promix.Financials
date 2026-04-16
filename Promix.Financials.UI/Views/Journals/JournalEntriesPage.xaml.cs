@@ -57,7 +57,6 @@ public sealed partial class JournalEntriesPage : Page
         };
 
         Loaded += OnLoaded;
-        Unloaded += (_, __) => _scope.Dispose();
         _isUiReady = true;
         SyncQuickViewButtons();
     }

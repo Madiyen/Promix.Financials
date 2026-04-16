@@ -10,8 +10,8 @@
         <Style x:Key="PartyListItemStyle"
                TargetType="ListViewItem"
                BasedOn="{StaticResource AppSelectableListViewItemStyle}">
-            <Setter Property="MinHeight" Value="132"/>
-            <Setter Property="Padding" Value="16,16"/>
+            <Setter Property="MinHeight" Value="116"/>
+            <Setter Property="Padding" Value="14,14"/>
         </Style>
 
         <Style x:Key="DetailsPlainItemStyle"
@@ -28,7 +28,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid Padding="24,18,24,20" RowSpacing="14">
+    <Grid Padding="24,20,24,20" RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -36,42 +36,15 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" ColumnSpacing="14">
+        <Grid Grid.Row="0" ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Grid ColumnSpacing="14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="58"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Border Width="54"
-                        Height="54"
-                        CornerRadius="18"
-                        VerticalAlignment="Center">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                            <GradientStop Color="#0F766E" Offset="0"/>
-                            <GradientStop Color="#2563EB" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.Background>
-                    <FontIcon Glyph="&#xE716;"
-                              Foreground="White"
-                              FontSize="24"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"/>
-                </Border>
-
-                <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                    <TextBlock Text="العملاء والموردون" Style="{StaticResource AppPageTitleTextStyle}"/>
-                    <TextBlock Text="إدارة الأطراف وكشف الحساب والبنود المفتوحة والتسويات من مساحة عمل واحدة وواضحة."
-                               Style="{StaticResource AppPageSubtitleTextStyle}"
-                               MaxWidth="640"/>
-                </StackPanel>
-            </Grid>
+            <TextBlock Text="الذمم"
+                       Style="{StaticResource AppSectionTitleCompactTextStyle}"
+                       VerticalAlignment="Center"/>
 
             <StackPanel Grid.Column="1"
                         Orientation="Horizontal"
@@ -79,10 +52,10 @@
                         VerticalAlignment="Center">
                 <Button Content="تحديث"
                         Click="Refresh_Click"
-                        Style="{StaticResource SecondaryActionButtonStyle}"/>
+                        Style="{StaticResource SecondaryActionCompactButtonStyle}"/>
                 <Button Content="+ إضافة طرف"
                         Click="AddParty_Click"
-                        Style="{StaticResource PrimaryActionButtonStyle}"/>
+                        Style="{StaticResource PrimaryActionCompactButtonStyle}"/>
             </StackPanel>
         </Grid>
 
@@ -105,7 +78,7 @@
             </Border>
         </StackPanel>
 
-        <Grid Grid.Row="2" ColumnSpacing="12">
+        <Grid Grid.Row="2" ColumnSpacing="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -113,51 +86,51 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Style="{StaticResource AppMetricCardStyle}">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="إجمالي الأطراف" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                    <TextBlock Text="{Binding TotalPartiesText}" Style="{StaticResource AppMetricValueTextStyle}"/>
+            <Border Grid.Column="0" Style="{StaticResource AppMetricCardCompactStyle}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="إجمالي الأطراف" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                    <TextBlock Text="{Binding TotalPartiesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="1" Style="{StaticResource AppMetricCardStyle}">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="الأطراف النشطة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+            <Border Grid.Column="1" Style="{StaticResource AppMetricCardCompactStyle}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="الأطراف النشطة" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
                     <TextBlock Text="{Binding ActivePartiesText}"
-                               Style="{StaticResource AppMetricValueTextStyle}"
+                               Style="{StaticResource AppMetricValueCompactTextStyle}"
                                Foreground="{StaticResource SuccessBrush}"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="2" Style="{StaticResource AppMetricCardStyle}">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="ذمم مدينة مفتوحة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+            <Border Grid.Column="2" Style="{StaticResource AppMetricCardCompactStyle}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="ذمم مدينة مفتوحة" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
                     <TextBlock Text="{Binding ReceivableOpenText}"
-                               Style="{StaticResource AppMetricValueTextStyle}"
+                               Style="{StaticResource AppMetricValueCompactTextStyle}"
                                Foreground="#1D4ED8"
                                Language="en-US"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="3" Style="{StaticResource AppMetricCardStyle}">
-                <StackPanel Spacing="6">
-                    <TextBlock Text="ذمم دائنة مفتوحة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+            <Border Grid.Column="3" Style="{StaticResource AppMetricCardCompactStyle}">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="ذمم دائنة مفتوحة" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
                     <TextBlock Text="{Binding PayableOpenText}"
-                               Style="{StaticResource AppMetricValueTextStyle}"
+                               Style="{StaticResource AppMetricValueCompactTextStyle}"
                                Foreground="{StaticResource DangerBrush}"
                                Language="en-US"/>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <Grid Grid.Row="3" ColumnSpacing="14">
+        <Grid Grid.Row="3" ColumnSpacing="12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="398"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardStyle}">
-                <Grid RowSpacing="14">
+            <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardCompactStyle}">
+                <Grid RowSpacing="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -280,45 +253,43 @@
                                         <TextBlock Text="{Binding ContactSummaryText}"
                                                    Style="{StaticResource AppSectionCaptionTextStyle}"/>
 
-                                        <Grid ColumnSpacing="8">
+                                        <Grid ColumnSpacing="10">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <Border Grid.Column="0"
-                                                    Style="{StaticResource AppSubtleSurfaceCardStyle}"
-                                                    Background="#F0F7FF"
-                                                    BorderBrush="#C5DBFF">
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Text="مدين مفتوح"
-                                                               Foreground="#1D4ED8"
-                                                               FontSize="11.5"
-                                                               FontWeight="SemiBold"/>
-                                                    <TextBlock Text="{Binding ReceivableOpenText}"
-                                                               Foreground="#1D4ED8"
-                                                               FontSize="18"
-                                                               FontWeight="Bold"
-                                                               Language="en-US"/>
-                                                </StackPanel>
-                                            </Border>
-
-                                            <Border Grid.Column="1"
-                                                    Style="{StaticResource AppSubtleSurfaceCardStyle}"
-                                                    Background="#FEF4F4"
-                                                    BorderBrush="#F8C8C8">
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Text="دائن مفتوح"
-                                                               Foreground="{StaticResource DangerBrush}"
-                                                               FontSize="11.5"
-                                                               FontWeight="SemiBold"/>
-                                                    <TextBlock Text="{Binding PayableOpenText}"
-                                                               Foreground="{StaticResource DangerBrush}"
-                                                               FontSize="18"
-                                                               FontWeight="Bold"
-                                                               Language="en-US"/>
-                                                </StackPanel>
-                                            </Border>
+                                            <TextBlock Text="مدين مفتوح"
+                                                       Foreground="#1D4ED8"
+                                                       FontSize="11.5"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding ReceivableOpenText}"
+                                                       Foreground="#1D4ED8"
+                                                       FontSize="15"
+                                                       FontWeight="SemiBold"
+                                                       Language="en-US"
+                                                       VerticalAlignment="Center"/>
+                                            <Rectangle Grid.Column="2"
+                                                       Width="1"
+                                                       Height="14"
+                                                       Fill="{StaticResource BorderBrushStrong}"
+                                                       VerticalAlignment="Center"/>
+                                            <StackPanel Grid.Column="3"
+                                                        Orientation="Horizontal"
+                                                        Spacing="6"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="دائن مفتوح"
+                                                           Foreground="{StaticResource DangerBrush}"
+                                                           FontSize="11.5"/>
+                                                <TextBlock Text="{Binding PayableOpenText}"
+                                                           Foreground="{StaticResource DangerBrush}"
+                                                           FontSize="15"
+                                                           FontWeight="SemiBold"
+                                                           Language="en-US"/>
+                                            </StackPanel>
                                         </Grid>
                                     </StackPanel>
                                 </DataTemplate>
@@ -349,109 +320,64 @@
                               HorizontalScrollBarVisibility="Disabled"
                               Visibility="Collapsed">
                     <StackPanel Spacing="14">
-                        <Border CornerRadius="22" Padding="18">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                    <GradientStop Color="#1E3A5F" Offset="0"/>
-                                    <GradientStop Color="#0F766E" Offset="1"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-
+                        <Border Style="{StaticResource AppSurfaceCardCompactStyle}" Padding="18">
                             <Grid ColumnSpacing="18">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="250"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Spacing="10">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Border Style="{StaticResource AppBadgeBorderStyle}"
-                                                Background="#1D4ED8"
+                                                Background="#DBEAFE"
                                                 Padding="10,4">
                                             <TextBlock Text="{Binding SelectedParty.TypeText}"
                                                        Style="{StaticResource AppBadgeTextStyle}"
-                                                       Foreground="White"/>
+                                                       Foreground="{StaticResource PrimaryButtonBrush}"/>
                                         </Border>
                                         <Border Style="{StaticResource AppBadgeBorderStyle}"
-                                                Background="#164E63"
+                                                Background="#F8FAFC"
                                                 Padding="10,4">
                                             <TextBlock Text="{Binding SelectedParty.StatusText}"
                                                        Style="{StaticResource AppBadgeTextStyle}"
-                                                       Foreground="#E0F2FE"/>
+                                                       Foreground="{Binding SelectedParty.StatusForegroundBrush}"/>
                                         </Border>
                                     </StackPanel>
 
                                     <TextBlock Text="{Binding SelectedPartyTitle}"
-                                               Foreground="White"
-                                               FontSize="24"
+                                               Foreground="{StaticResource MainTitleTextBrush}"
+                                               FontSize="22"
                                                FontWeight="Bold"
                                                TextWrapping="WrapWholeWords"/>
 
                                     <TextBlock Text="{Binding SelectedPartySubtitle}"
-                                               Foreground="#D8ECFF"
-                                               FontSize="12.5"/>
+                                               Foreground="{StaticResource SecondaryTextBrush}"
+                                               FontSize="12"/>
 
                                     <TextBlock Text="{Binding SelectedParty.ContactSummaryText}"
-                                               Foreground="#E0F2FE"
+                                               Foreground="{StaticResource SecondaryTextBrush}"
                                                FontSize="11.5"
                                                TextWrapping="WrapWholeWords"/>
                                 </StackPanel>
 
                                 <Border Grid.Column="1"
-                                        Background="#15081420"
-                                        BorderBrush="#2FD8ECFF"
-                                        BorderThickness="1"
-                                        CornerRadius="18"
-                                        Padding="14">
-                                    <StackPanel Spacing="10">
-                                        <TextBlock Text="ملخص الذمة"
-                                                   Foreground="#BFDBFE"
-                                                   FontSize="10.5"
-                                                   FontWeight="SemiBold"/>
-
-                                        <Grid ColumnSpacing="10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <StackPanel Grid.Column="0" Spacing="4">
-                                                <TextBlock Text="مدين مفتوح"
-                                                           Foreground="#BFDBFE"
-                                                           FontSize="11"/>
-                                                <TextBlock Text="{Binding SelectedParty.ReceivableOpenText}"
-                                                           Foreground="White"
-                                                           FontSize="18"
-                                                           FontWeight="Bold"
-                                                           Language="en-US"/>
-                                            </StackPanel>
-
-                                            <StackPanel Grid.Column="1" Spacing="4">
-                                                <TextBlock Text="دائن مفتوح"
-                                                           Foreground="#BFDBFE"
-                                                           FontSize="11"/>
-                                                <TextBlock Text="{Binding SelectedParty.PayableOpenText}"
-                                                           Foreground="White"
-                                                           FontSize="18"
-                                                           FontWeight="Bold"
-                                                           Language="en-US"/>
-                                            </StackPanel>
-                                        </Grid>
-
-                                        <Border Background="#104455"
-                                                CornerRadius="14"
-                                                Padding="10,8">
-                                            <StackPanel Spacing="2">
-                                                <TextBlock Text="الرصيد الختامي"
-                                                           Foreground="#A5F3FC"
-                                                           FontSize="10.5"/>
-                                                <TextBlock Text="{Binding ClosingBalanceText}"
-                                                           Foreground="White"
-                                                           FontSize="18"
-                                                           FontWeight="Bold"
-                                                           Language="en-US"/>
-                                            </StackPanel>
-                                        </Border>
+                                        Padding="6,0,0,0"
+                                        Background="Transparent">
+                                    <StackPanel Spacing="8"
+                                                VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="مدين مفتوح" Foreground="#1D4ED8" FontSize="11.5"/>
+                                            <TextBlock Text="{Binding SelectedParty.ReceivableOpenText}" Foreground="#1D4ED8" FontSize="15.5" FontWeight="SemiBold" Language="en-US"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="دائن مفتوح" Foreground="{StaticResource DangerBrush}" FontSize="11.5"/>
+                                            <TextBlock Text="{Binding SelectedParty.PayableOpenText}" Foreground="{StaticResource DangerBrush}" FontSize="15.5" FontWeight="SemiBold" Language="en-US"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="الرصيد الختامي" Foreground="{StaticResource SecondaryTextBrush}" FontSize="11.5"/>
+                                            <TextBlock Text="{Binding ClosingBalanceText}" Foreground="{StaticResource MainTitleTextBrush}" FontSize="15.5" FontWeight="SemiBold" Language="en-US"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </Border>
                             </Grid>
@@ -480,7 +406,7 @@
                                     Grid.Column="2"
                                     Content="إيقاف التعامل"
                                     Click="DeactivateParty_Click"
-                                    Style="{StaticResource DangerActionButtonStyle}"
+                                    Style="{StaticResource DangerGhostActionButtonStyle}"
                                     IsEnabled="{Binding CanDeactivateSelectedParty}"/>
 
                             <Button x:Name="ActivatePartyButton"
@@ -500,41 +426,33 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <Border Grid.Column="0" Style="{StaticResource AppSubtleSurfaceCardStyle}">
-                                <StackPanel Spacing="6">
-                                    <TextBlock Text="الرصيد أول المدة" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                                    <TextBlock Text="{Binding OpeningBalanceText}" FontSize="20" FontWeight="Bold" Language="en-US"/>
-                                </StackPanel>
-                            </Border>
+                            <StackPanel Grid.Column="0" Spacing="6">
+                                <TextBlock Text="الرصيد أول المدة" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                <TextBlock Text="{Binding OpeningBalanceText}" FontSize="18" FontWeight="SemiBold" Language="en-US"/>
+                            </StackPanel>
 
-                            <Border Grid.Column="1" Style="{StaticResource AppSubtleSurfaceCardStyle}">
-                                <StackPanel Spacing="6">
-                                    <TextBlock Text="الرصيد الختامي" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                                    <TextBlock Text="{Binding ClosingBalanceText}" FontSize="20" FontWeight="Bold" Language="en-US"/>
-                                </StackPanel>
-                            </Border>
+                            <StackPanel Grid.Column="1" Spacing="6">
+                                <TextBlock Text="الرصيد الختامي" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                <TextBlock Text="{Binding ClosingBalanceText}" FontSize="18" FontWeight="SemiBold" Language="en-US"/>
+                            </StackPanel>
 
-                            <Border Grid.Column="2" Style="{StaticResource AppSubtleSurfaceCardStyle}">
-                                <StackPanel Spacing="6">
-                                    <TextBlock Text="مدين مفتوح" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                                    <TextBlock Text="{Binding SelectedParty.ReceivableOpenText}"
-                                               FontSize="20"
-                                               FontWeight="Bold"
-                                               Foreground="#1D4ED8"
-                                               Language="en-US"/>
-                                </StackPanel>
-                            </Border>
+                            <StackPanel Grid.Column="2" Spacing="6">
+                                <TextBlock Text="مدين مفتوح" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                <TextBlock Text="{Binding SelectedParty.ReceivableOpenText}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="#1D4ED8"
+                                           Language="en-US"/>
+                            </StackPanel>
 
-                            <Border Grid.Column="3" Style="{StaticResource AppSubtleSurfaceCardStyle}">
-                                <StackPanel Spacing="6">
-                                    <TextBlock Text="دائن مفتوح" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                                    <TextBlock Text="{Binding SelectedParty.PayableOpenText}"
-                                               FontSize="20"
-                                               FontWeight="Bold"
-                                               Foreground="{StaticResource DangerBrush}"
-                                               Language="en-US"/>
-                                </StackPanel>
-                            </Border>
+                            <StackPanel Grid.Column="3" Spacing="6">
+                                <TextBlock Text="دائن مفتوح" Style="{StaticResource AppMetricLabelTextStyle}"/>
+                                <TextBlock Text="{Binding SelectedParty.PayableOpenText}"
+                                           FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource DangerBrush}"
+                                           Language="en-US"/>
+                            </StackPanel>
                         </Grid>
 
                         <Border Style="{StaticResource AppSubtleSurfaceCardStyle}">
