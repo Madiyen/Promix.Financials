@@ -23,6 +23,7 @@ public sealed partial class OpeningEntryDialog : ContentDialog
         _companyId = companyId;
         ViewModel = new JournalEntryEditorViewModel(
             accounts,
+            null,
             parties,
             JournalEntryType.OpeningEntry,
             "قيد افتتاحي",

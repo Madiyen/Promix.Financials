@@ -134,7 +134,14 @@ public sealed partial class JournalEntriesPage : Page
             return;
 
         var parties = await LoadActivePartyOptionsAsync(_userContext.CompanyId.Value);
-        var dialog = new DailyJournalDialog(_userContext.CompanyId.Value, _vm.AccountOptions.ToList(), parties) { XamlRoot = XamlRoot };
+        var dialog = new DailyJournalDialog(
+            _userContext.CompanyId.Value,
+            _vm.AccountOptions.ToList(),
+            _vm.CurrencyOptions.ToList(),
+            parties)
+        {
+            XamlRoot = XamlRoot
+        };
         await ShowJournalDialogAsync(dialog);
     }
 

@@ -17,12 +17,17 @@ public sealed partial class DailyJournalDialog : ContentDialog
 {
     private readonly Guid _companyId;
 
-    public DailyJournalDialog(Guid companyId, IReadOnlyList<JournalAccountOptionVm> accounts, IReadOnlyList<PartyOptionVm> parties)
+    public DailyJournalDialog(
+        Guid companyId,
+        IReadOnlyList<JournalAccountOptionVm> accounts,
+        IReadOnlyList<JournalCurrencyOptionVm> currencies,
+        IReadOnlyList<PartyOptionVm> parties)
     {
         InitializeComponent();
         _companyId = companyId;
         ViewModel = new JournalEntryEditorViewModel(
             accounts,
+            currencies,
             parties,
             JournalEntryType.DailyJournal,
             "قيد يومية",

@@ -15,6 +15,7 @@ namespace Promix.Financials.UI.ViewModels.Journals;
 public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
 {
     public ObservableCollection<JournalAccountOptionVm> AccountOptions { get; }
+    public ObservableCollection<JournalCurrencyOptionVm> CurrencyOptions { get; }
     public ObservableCollection<PartyOptionVm> PartyOptions { get; }
     public ObservableCollection<JournalEntryLineEditorVm> Lines { get; } = new();
 
@@ -22,9 +23,12 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
     private DateTimeOffset _entryDate = DateTimeOffset.Now;
     private string _referenceNo = string.Empty;
     private string _description = string.Empty;
+    private string? _selectedCurrencyCode;
+    private double _exchangeRate = 1;
 
     public JournalEntryEditorViewModel(
         IEnumerable<JournalAccountOptionVm> accountOptions,
+        IEnumerable<JournalCurrencyOptionVm>? currencyOptions,
         IEnumerable<PartyOptionVm> partyOptions,
         JournalEntryType entryType,
         string title,
@@ -32,11 +36,21 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
         string noteText)
     {
         AccountOptions = new ObservableCollection<JournalAccountOptionVm>(accountOptions);
+        CurrencyOptions = new ObservableCollection<JournalCurrencyOptionVm>(
+            (currencyOptions ?? Enumerable.Empty<JournalCurrencyOptionVm>())
+                .OrderByDescending(x => x.IsBaseCurrency)
+                .ThenBy(x => x.CurrencyCode));
         PartyOptions = new ObservableCollection<PartyOptionVm>(partyOptions.Where(x => x.IsActive).OrderBy(x => x.Code));
         _entryType = entryType;
         Title = title;
         Subtitle = subtitle;
         NoteText = noteText;
+
+        var initialCurrency = CurrencyOptions.FirstOrDefault(x => x.IsBaseCurrency) ?? CurrencyOptions.FirstOrDefault();
+        _selectedCurrencyCode = initialCurrency?.CurrencyCode;
+        _exchangeRate = initialCurrency is null
+            ? 1
+            : Convert.ToDouble(initialCurrency.IsBaseCurrency ? 1m : initialCurrency.ExchangeRate);
 
         AddLine();
         AddLine();
@@ -47,11 +61,15 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
     public string NoteText { get; }
     private Guid? ReceivableControlAccountId => AccountOptions.FirstOrDefault(x => x.IsReceivableControl)?.Id;
     private Guid? PayableControlAccountId => AccountOptions.FirstOrDefault(x => x.IsPayableControl)?.Id;
+    public string EntryNumberPreviewText => $"{GetEntryPrefix(_entryType)}-AUTO";
     public string EntryTypeText => _entryType switch
     {
         JournalEntryType.OpeningEntry => "قيد افتتاحي",
         _ => "قيد يومية"
     };
+    public JournalCurrencyOptionVm? SelectedCurrency => CurrencyOptions.FirstOrDefault(x => x.CurrencyCode == SelectedCurrencyCode);
+    public string BaseCurrencyCode => CurrencyOptions.FirstOrDefault(x => x.IsBaseCurrency)?.CurrencyCode ?? "الأساسية";
+    public bool CanEditExchangeRate => SelectedCurrency is not { IsBaseCurrency: true };
 
     public DateTimeOffset EntryDate
     {
@@ -61,6 +79,36 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
             if (_entryDate == value) return;
             _entryDate = value;
             OnPropertyChanged();
+        }
+    }
+
+    public string? SelectedCurrencyCode
+    {
+        get => _selectedCurrencyCode;
+        set
+        {
+            if (_selectedCurrencyCode == value) return;
+            _selectedCurrencyCode = value;
+
+            var selected = SelectedCurrency;
+            if (selected is not null)
+                _exchangeRate = Convert.ToDouble(selected.IsBaseCurrency ? 1m : selected.ExchangeRate);
+
+            OnPropertyChanged();
+            NotifyCurrencyState();
+        }
+    }
+
+    public double ExchangeRate
+    {
+        get => _exchangeRate;
+        set
+        {
+            var normalized = value <= 0 ? 0 : Math.Round(value, 8);
+            if (Math.Abs(_exchangeRate - normalized) < 0.00000001) return;
+            _exchangeRate = normalized;
+            OnPropertyChanged();
+            NotifyCurrencyState();
         }
     }
 
@@ -89,7 +137,14 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
     public double TotalDebit => Lines.Sum(x => x.Debit);
     public double TotalCredit => Lines.Sum(x => x.Credit);
     public double Difference => Math.Round(TotalDebit - TotalCredit, 2);
-    public string BalanceStateText => Math.Abs(Difference) < 0.009 ? "متوازن" : "غير متوازن";
+    public bool IsBalanced => Math.Abs(Difference) < 0.009;
+    public string TotalDebitText => TotalDebit.ToString("N2");
+    public string TotalCreditText => TotalCredit.ToString("N2");
+    public string DifferenceText => Math.Abs(Difference).ToString("N2");
+    public string CurrencySummaryText => SelectedCurrency?.DisplayText ?? BaseCurrencyCode;
+    public string BalanceStateText => IsBalanced ? "القيد متوازن" : "القيد غير متوازن";
+    public string BalanceBarText => IsBalanced ? "القيد متوازن وجاهز للترحيل" : $"يوجد فرق بقيمة {DifferenceText}";
+    public string BalanceHintText => IsBalanced ? "إجمالي المدين يساوي إجمالي الدائن." : "عدّل أحد الأسطر حتى يصبح الفرق صفراً.";
     public Brush BalanceStateBrush => JournalActivityBarVm.FromHex(Math.Abs(Difference) < 0.009 ? "#16A34A" : "#DC2626");
 
     public void AddLine()
@@ -97,6 +152,7 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
         var line = new JournalEntryLineEditorVm();
         line.PropertyChanged += OnLineChanged;
         Lines.Add(line);
+        ApplyLineRules(line);
         NotifyTotals();
     }
 
@@ -170,6 +226,18 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
             }
         }
 
+        if (SelectedCurrency is null && CurrencyOptions.Count > 0)
+        {
+            error = "اختر العملة المستخدمة في القيد.";
+            return false;
+        }
+
+        if (SelectedCurrency is not null && ExchangeRate <= 0)
+        {
+            error = "سعر الصرف يجب أن يكون أكبر من صفر.";
+            return false;
+        }
+
         if (TotalDebit <= 0 || TotalCredit <= 0)
         {
             error = "يجب أن يحتوي السند على قيم مدينة ودائنة.";
@@ -188,9 +256,9 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
             Type: _entryType,
             ReferenceNo: ReferenceNo,
             Description: Description,
-            CurrencyCode: null,
-            ExchangeRate: null,
-            CurrencyAmount: null,
+            CurrencyCode: SelectedCurrency?.CurrencyCode,
+            ExchangeRate: SelectedCurrency is null ? null : Convert.ToDecimal(Math.Max(ExchangeRate, 0.00000001)),
+            CurrencyAmount: SelectedCurrency is null ? null : ResolveCurrencyAmount(),
             PostNow: postNow,
             Lines: usableLines
                 .Select(x => new CreateJournalEntryLineCommand(
@@ -215,12 +283,27 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
         {
             if (sender is JournalEntryLineEditorVm line)
             {
-                ApplyPartyDefaults(line);
-                EnsurePartyStillMatches(line);
+                ApplyLineRules(line);
             }
 
             NotifyTotals();
         }
+    }
+
+    private void ApplyLineRules(JournalEntryLineEditorVm line)
+    {
+        UpdatePartyRequirement(line);
+        ApplyPartyDefaults(line);
+        EnsurePartyStillMatches(line);
+    }
+
+    private void UpdatePartyRequirement(JournalEntryLineEditorVm line)
+    {
+        var account = line.SelectedAccountId is Guid accountId
+            ? AccountOptions.FirstOrDefault(x => x.Id == accountId)
+            : null;
+
+        line.RequiresPartySelection = account?.IsPartyControlAccount == true || account?.IsLegacyPartyLinkedAccount == true;
     }
 
     private void ApplyPartyDefaults(JournalEntryLineEditorVm line)
@@ -260,11 +343,44 @@ public sealed class JournalEntryEditorViewModel : INotifyPropertyChanged
     private void NotifyTotals()
     {
         OnPropertyChanged(nameof(TotalDebit));
+        OnPropertyChanged(nameof(TotalDebitText));
         OnPropertyChanged(nameof(TotalCredit));
+        OnPropertyChanged(nameof(TotalCreditText));
         OnPropertyChanged(nameof(Difference));
+        OnPropertyChanged(nameof(DifferenceText));
+        OnPropertyChanged(nameof(IsBalanced));
         OnPropertyChanged(nameof(BalanceStateText));
+        OnPropertyChanged(nameof(BalanceBarText));
+        OnPropertyChanged(nameof(BalanceHintText));
         OnPropertyChanged(nameof(BalanceStateBrush));
     }
+
+    private void NotifyCurrencyState()
+    {
+        OnPropertyChanged(nameof(SelectedCurrency));
+        OnPropertyChanged(nameof(CanEditExchangeRate));
+        OnPropertyChanged(nameof(CurrencySummaryText));
+    }
+
+    private decimal ResolveCurrencyAmount()
+    {
+        var currency = SelectedCurrency;
+        if (currency is null)
+            return 0;
+
+        var baseAmount = Convert.ToDecimal(TotalDebit);
+        if (currency.IsBaseCurrency)
+            return decimal.Round(baseAmount, currency.DecimalPlaces, MidpointRounding.AwayFromZero);
+
+        var rate = Convert.ToDecimal(Math.Max(ExchangeRate, 0.00000001));
+        return decimal.Round(baseAmount / rate, currency.DecimalPlaces, MidpointRounding.AwayFromZero);
+    }
+
+    private static string GetEntryPrefix(JournalEntryType entryType) => entryType switch
+    {
+        JournalEntryType.OpeningEntry => "OPN",
+        _ => "JV"
+    };
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

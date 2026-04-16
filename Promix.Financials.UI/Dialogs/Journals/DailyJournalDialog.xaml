@@ -3,7 +3,7 @@
     x:Name="RootDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Promix.Financials.UI.Controls.Journals"
+    xmlns:converters="using:Promix.Financials.UI.Converters"
     Title=""
     FlowDirection="RightToLeft"
     RequestedTheme="Light"
@@ -13,11 +13,69 @@
     VerticalContentAlignment="Stretch">
 
     <ContentDialog.Resources>
-        <x:Double x:Key="ContentDialogMaxWidth">980</x:Double>
-        <x:Double x:Key="ContentDialogMinWidth">900</x:Double>
+        <x:Double x:Key="ContentDialogMaxWidth">1180</x:Double>
+        <x:Double x:Key="ContentDialogMinWidth">1080</x:Double>
+
+        <converters:BoolToCollapsedVisibilityConverter x:Key="BoolToCollapsedVisibilityConverter"/>
+        <converters:BoolToBalanceBackgroundBrushConverter x:Key="BoolToBalanceBackgroundBrushConverter"/>
+
+        <DataTemplate x:Key="JournalAccountItemTemplate">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding Code}"
+                           Foreground="{StaticResource PrimaryButtonBrush}"
+                           FontWeight="SemiBold"
+                           FontSize="11.5"
+                           Language="en-US"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding NameAr}"
+                           FontSize="12"
+                           TextTrimming="CharacterEllipsis"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="PartyItemTemplate">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding Code}"
+                           Foreground="{StaticResource PurpleAccentBrush}"
+                           FontWeight="SemiBold"
+                           FontSize="11.5"
+                           Language="en-US"/>
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding NameAr}"
+                           FontSize="12"
+                           TextTrimming="CharacterEllipsis"/>
+            </Grid>
+        </DataTemplate>
+
+        <Style x:Key="JournalGridCellTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextBoxStyle}">
+            <Setter Property="MinHeight" Value="38"/>
+        </Style>
+
+        <Style x:Key="JournalGridCellComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource InputComboBoxStyle}">
+            <Setter Property="MinHeight" Value="38"/>
+            <Setter Property="Padding" Value="10,0,10,0"/>
+        </Style>
+
+        <Style x:Key="JournalGridCellNumberBoxStyle" TargetType="NumberBox" BasedOn="{StaticResource InputNumberBoxStyle}">
+            <Setter Property="MinHeight" Value="38"/>
+        </Style>
     </ContentDialog.Resources>
 
-    <Grid Width="920" MaxWidth="960" MaxHeight="700" RowSpacing="12">
+    <Grid Width="1120" MaxWidth="1160" MaxHeight="780" RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -26,398 +84,376 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0"
-                CornerRadius="18"
-                Padding="18"
-                MinHeight="104">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#17345E" Offset="0"/>
-                    <GradientStop Color="#0F766E" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
+                Style="{StaticResource AppSurfaceCardStyle}"
+                Padding="18">
+            <StackPanel Spacing="16">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <Grid ColumnSpacing="14">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="68"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="230"/>
-                </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0"
+                                Spacing="4"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Title}"
+                                   Style="{StaticResource AppSectionTitleTextStyle}"/>
+                        <TextBlock Text="أدخل بيانات السند أولًا، ثم أكمل أسطر القيد حتى يصبح الفرق صفرًا."
+                                   Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+                    </StackPanel>
 
-                <Border Width="52"
-                        Height="52"
-                        Background="#115E59"
-                        CornerRadius="16"
-                        VerticalAlignment="Top">
-                    <FontIcon Glyph="&#xE8A5;"
-                              Foreground="White"
-                              FontSize="24"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"/>
-                </Border>
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                VerticalAlignment="Center">
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
+                            <TextBlock Text="{Binding EntryTypeText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
 
-                <StackPanel Grid.Column="1"
-                            Spacing="4"
-                            VerticalAlignment="Center">
-                    <Border Background="#14806C"
-                            CornerRadius="12"
-                            Padding="10,4"
-                            HorizontalAlignment="Right">
-                        <TextBlock Text="{Binding EntryTypeText}"
-                                   Foreground="White"
-                                   Style="{StaticResource VoucherDialogBadgeTextStyle}"/>
-                    </Border>
+                        <Border Background="{Binding IsBalanced, Converter={StaticResource BoolToBalanceBackgroundBrushConverter}}"
+                                CornerRadius="999"
+                                Padding="10,4">
+                            <TextBlock Text="{Binding BalanceStateText}"
+                                       Foreground="{Binding BalanceStateBrush}"
+                                       Style="{StaticResource AppBadgeTextStyle}"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
 
-                    <TextBlock Text="{Binding Title}"
-                               Foreground="White"
-                               FontSize="22"
-                               FontWeight="Bold"/>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210"/>
+                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="140"/>
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="{Binding Subtitle}"
-                               Foreground="#CCFBF1"
-                               FontSize="11.5"
-                               TextWrapping="WrapWholeWords"/>
-                </StackPanel>
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="رقم السند" Style="{StaticResource FieldLabelStyle}"/>
+                        <Border Style="{StaticResource AppEnterpriseTableHeaderSurfaceStyle}"
+                                Padding="12,10">
+                            <TextBlock Text="{Binding EntryNumberPreviewText}"
+                                       FontSize="12.5"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource BrandNavyBrush}"
+                                       Language="en-US"/>
+                        </Border>
+                    </StackPanel>
 
-                <Border Grid.Column="2"
-                        Background="#1AFFFFFF"
-                        BorderBrush="#22FFFFFF"
-                        BorderThickness="1"
-                        CornerRadius="14"
-                        Padding="12"
-                        VerticalAlignment="Center">
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="ملخص التوازن"
-                                   Foreground="#99F6E4"
-                                   FontSize="10.5"/>
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock Text="تاريخ السند" Style="{StaticResource FieldLabelStyle}"/>
+                        <DatePicker Style="{StaticResource InputDatePickerStyle}"
+                                    Date="{Binding EntryDate, Mode=TwoWay}"/>
+                    </StackPanel>
 
-                        <Grid ColumnSpacing="8">
+                    <StackPanel Grid.Column="2" Spacing="4">
+                        <TextBlock Text="العملة" Style="{StaticResource FieldLabelStyle}"/>
+                        <ComboBox Style="{StaticResource InputComboBoxStyle}"
+                                  ItemsSource="{Binding CurrencyOptions}"
+                                  DisplayMemberPath="DisplayText"
+                                  SelectedValuePath="CurrencyCode"
+                                  SelectedValue="{Binding SelectedCurrencyCode, Mode=TwoWay}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" Spacing="4">
+                        <TextBlock Text="سعر الصرف" Style="{StaticResource FieldLabelStyle}"/>
+                        <NumberBox Style="{StaticResource InputNumberBoxStyle}"
+                                   Value="{Binding ExchangeRate, Mode=TwoWay}"
+                                   IsEnabled="{Binding CanEditExchangeRate}"
+                                   SpinButtonPlacementMode="Hidden"/>
+                    </StackPanel>
+                </Grid>
+
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="220"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="البيان العام" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Style="{StaticResource MultilineTextBoxStyle}"
+                                 Text="{Binding Description, Mode=TwoWay}"
+                                 Height="72"
+                                 PlaceholderText="اكتب البيان العام الذي سيظهر في رأس القيد"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="4">
+                        <TextBlock Text="الرقم المرجعي" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBox Style="{StaticResource InputTextBoxStyle}"
+                                 Text="{Binding ReferenceNo, Mode=TwoWay}"
+                                 PlaceholderText="اختياري"/>
+                        <TextBlock Text="{Binding CurrencySummaryText}"
+                                   Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1"
+                Style="{StaticResource AppSurfaceCardStyle}"
+                Padding="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0"
+                      Padding="18,16,18,12"
+                      ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Spacing="3"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="أسطر القيد"
+                                   Style="{StaticResource AppSectionTitleTextStyle}"/>
+                        <TextBlock Text="الحساب ثم الطرف عند الحاجة، وبعدها البيان والمدين أو الدائن فقط."
+                                   Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Spacing="2"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="إجمالي المدين"
+                                   Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                        <TextBlock Text="{Binding TotalDebitText}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource BrandNavyBrush}"
+                                   Language="en-US"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Spacing="2"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="إجمالي الدائن"
+                                   Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                        <TextBlock Text="{Binding TotalCreditText}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource SuccessBrush}"
+                                   Language="en-US"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3"
+                                Spacing="2"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="الفرق"
+                                   Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                        <TextBlock Text="{Binding DifferenceText}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{Binding BalanceStateBrush}"
+                                   Language="en-US"/>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel Grid.Row="1"
+                            Margin="18,0,18,0"
+                            Spacing="0">
+                    <Border Style="{StaticResource AppEnterpriseTableHeaderSurfaceStyle}"
+                            CornerRadius="10,10,0,0"
+                            Padding="12,10">
+                        <Grid ColumnSpacing="10">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2.3*"/>
+                                <ColumnDefinition Width="1.7*"/>
+                                <ColumnDefinition Width="1.9*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="72"/>
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0" Spacing="2">
-                                <TextBlock Text="مدين" Foreground="#CCFBF1" FontSize="10.5"/>
-                                <TextBlock Text="{Binding TotalDebit}"
-                                           Foreground="White"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Language="en-US"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1" Spacing="2">
-                                <TextBlock Text="دائن" Foreground="#CCFBF1" FontSize="10.5"/>
-                                <TextBlock Text="{Binding TotalCredit}"
-                                           Foreground="White"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Language="en-US"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="2" Spacing="2">
-                                <TextBlock Text="الفرق" Foreground="#CCFBF1" FontSize="10.5"/>
-                                <TextBlock Text="{Binding Difference}"
-                                           Foreground="White"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Language="en-US"/>
-                            </StackPanel>
+                            <TextBlock Text="الحساب" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                            <TextBlock Grid.Column="1" Text="الطرف / الحساب الفرعي" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                            <TextBlock Grid.Column="2" Text="البيان" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                            <TextBlock Grid.Column="3" Text="مدين" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                            <TextBlock Grid.Column="4" Text="دائن" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                            <TextBlock Grid.Column="5" Text="إجراء" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}" HorizontalAlignment="Center"/>
                         </Grid>
+                    </Border>
 
-                        <TextBlock Text="{Binding BalanceStateText}"
-                                   Foreground="{Binding BalanceStateBrush}"
-                                   FontSize="12"
-                                   FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Border>
+                    <ListView ItemsSource="{Binding Lines}"
+                              Style="{StaticResource AppPlainListViewStyle}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem" BasedOn="{StaticResource AppPlainListViewItemStyle}">
+                                <Setter Property="Margin" Value="0"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource AppEnterpriseDataRowStyle}"
+                                        Padding="12,8">
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2.3*"/>
+                                            <ColumnDefinition Width="1.7*"/>
+                                            <ColumnDefinition Width="1.9*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="72"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <ComboBox Style="{StaticResource JournalGridCellComboBoxStyle}"
+                                                  ItemsSource="{Binding DataContext.AccountOptions, ElementName=RootDialog}"
+                                                  ItemTemplate="{StaticResource JournalAccountItemTemplate}"
+                                                  SelectedValuePath="Id"
+                                                  SelectedValue="{Binding SelectedAccountId, Mode=TwoWay}"/>
+
+                                        <Grid Grid.Column="1">
+                                            <ComboBox Style="{StaticResource JournalGridCellComboBoxStyle}"
+                                                      Visibility="{Binding PartySelectionVisibility}"
+                                                      ItemsSource="{Binding DataContext.PartyOptions, ElementName=RootDialog}"
+                                                      ItemTemplate="{StaticResource PartyItemTemplate}"
+                                                      SelectedValuePath="Id"
+                                                      SelectedValue="{Binding SelectedPartyId, Mode=TwoWay}"/>
+
+                                            <TextBlock Text="لا يلزم طرف لهذا الحساب"
+                                                       Visibility="{Binding ShowPartySelection, Converter={StaticResource BoolToCollapsedVisibilityConverter}}"
+                                                       Foreground="{StaticResource MutedTextBrush}"
+                                                       FontSize="11.5"
+                                                       VerticalAlignment="Center"/>
+                                        </Grid>
+
+                                        <TextBox Grid.Column="2"
+                                                 Style="{StaticResource JournalGridCellTextBoxStyle}"
+                                                 Text="{Binding Description, Mode=TwoWay}"
+                                                 PlaceholderText="بيان السطر"/>
+
+                                        <NumberBox Grid.Column="3"
+                                                   Style="{StaticResource JournalGridCellNumberBoxStyle}"
+                                                   Value="{Binding Debit, Mode=TwoWay}"/>
+
+                                        <NumberBox Grid.Column="4"
+                                                   Style="{StaticResource JournalGridCellNumberBoxStyle}"
+                                                   Value="{Binding Credit, Mode=TwoWay}"/>
+
+                                        <Button Grid.Column="5"
+                                                Content="حذف"
+                                                Style="{StaticResource SecondaryActionCompactButtonStyle}"
+                                                Click="RemoveLine_Click"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+
+                <Grid Grid.Row="2"
+                      Padding="18,12,18,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Ctrl+Shift+N لإضافة سطر جديد  •  Tab للتنقل السريع بين الخلايا"
+                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"
+                               VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1"
+                            Content="+ إضافة سطر جديد"
+                            Style="{StaticResource PrimaryActionCompactButtonStyle}"
+                            Click="AddLine_Click"/>
+                </Grid>
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Row="1"
-                      VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled"
-                      ZoomMode="Disabled">
-            <StackPanel Spacing="12">
-                <Border Style="{StaticResource VoucherDialogCardStyle}">
-                    <StackPanel Spacing="14">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Spacing="3">
-                                <TextBlock Text="بيانات القيد" Style="{StaticResource VoucherDialogSectionTitleStyle}"/>
-                                <TextBlock Text="أدخل تاريخ القيد ووصفه العام، ثم وزّع السطور المدينة والدائنة مع مراجعة التوازن قبل الترحيل."
-                                           Style="{StaticResource VoucherDialogSubtleTextStyle}"/>
-                            </StackPanel>
-
-                            <Border Grid.Column="1"
-                                    Background="#F0FDFA"
-                                    BorderBrush="#99F6E4"
-                                    BorderThickness="1"
-                                    CornerRadius="12"
-                                    Padding="10,5"
-                                    VerticalAlignment="Center">
-                                <TextBlock Text="{Binding BalanceStateText}"
-                                           Foreground="{Binding BalanceStateBrush}"
-                                           Style="{StaticResource VoucherDialogBadgeTextStyle}"/>
-                            </Border>
-                        </Grid>
-
-                        <Grid ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Text="التاريخ" Style="{StaticResource FieldLabelStyle}"/>
-                                <DatePicker Style="{StaticResource InputDatePickerStyle}"
-                                            Date="{Binding EntryDate, Mode=TwoWay}"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1" Spacing="4">
-                                <TextBlock Text="الرقم المرجعي" Style="{StaticResource FieldLabelStyle}"/>
-                                <TextBox Style="{StaticResource InputTextBoxStyle}"
-                                         Text="{Binding ReferenceNo, Mode=TwoWay}"
-                                         PlaceholderText="اختياري"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="البيان العام" Style="{StaticResource FieldLabelStyle}"/>
-                            <TextBox Style="{StaticResource MultilineTextBoxStyle}"
-                                     Text="{Binding Description, Mode=TwoWay}"
-                                     Height="88"
-                                     PlaceholderText="وصف مختصر يظهر في اليومية وعلى سطور القيد عند الحاجة"/>
-                        </StackPanel>
-
-                        <Border Background="#F8FAFC"
-                                BorderBrush="#E2E8F0"
-                                BorderThickness="1"
-                                CornerRadius="14"
-                                Padding="12,10">
-                            <TextBlock Text="{Binding NoteText}"
-                                       Style="{StaticResource VoucherDialogHintTextStyle}"/>
-                        </Border>
-                    </StackPanel>
-                </Border>
-
-                <Border Style="{StaticResource VoucherDialogCardStyle}">
-                    <StackPanel Spacing="14">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Spacing="3">
-                                <TextBlock Text="سطور القيد" Style="{StaticResource VoucherDialogSectionTitleStyle}"/>
-                                <TextBlock Text="كل سطر يجب أن يحتوي حساباً واحداً وطرفاً واحداً فقط: مدين أو دائن."
-                                           Style="{StaticResource VoucherDialogSubtleTextStyle}"/>
-                            </StackPanel>
-
-                            <Button Grid.Column="1"
-                                    Content="+ إضافة سطر"
-                                    Style="{StaticResource PrimaryActionButtonStyle}"
-                                    Click="AddLine_Click"/>
-                        </Grid>
-
-                        <Grid ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Border Grid.Column="0"
-                                    Style="{StaticResource VoucherDialogInfoCardStyle}">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="إجمالي المدين"
-                                               Foreground="#1D4ED8"
-                                               FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding TotalDebit}"
-                                               Foreground="#1D4ED8"
-                                               FontSize="18"
-                                               FontWeight="Bold"
-                                               Language="en-US"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Grid.Column="1"
-                                    Style="{StaticResource VoucherDialogInfoCardStyle}">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="إجمالي الدائن"
-                                               Foreground="#16A34A"
-                                               FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding TotalCredit}"
-                                               Foreground="#16A34A"
-                                               FontSize="18"
-                                               FontWeight="Bold"
-                                               Language="en-US"/>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Grid.Column="2"
-                                    Style="{StaticResource VoucherDialogInfoCardStyle}">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="فرق التوازن"
-                                               Foreground="{Binding BalanceStateBrush}"
-                                               FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding Difference}"
-                                               Foreground="{Binding BalanceStateBrush}"
-                                               FontSize="18"
-                                               FontWeight="Bold"
-                                               Language="en-US"/>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-
-                        <ItemsControl ItemsSource="{Binding Lines}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="10"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="#F8FAFC"
-                                            BorderBrush="#D7E0EA"
-                                            BorderThickness="1"
-                                            CornerRadius="18"
-                                            Padding="14">
-                                        <StackPanel Spacing="12">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <StackPanel Spacing="3">
-                                                    <Border Background="#E0F2FE"
-                                                            CornerRadius="12"
-                                                            Padding="10,4"
-                                                            HorizontalAlignment="Right">
-                                                        <TextBlock Text="سطر محاسبي"
-                                                                   Foreground="#075985"
-                                                                   Style="{StaticResource VoucherDialogBadgeTextStyle}"/>
-                                                    </Border>
-
-                                                    <TextBlock Text="اختر الحساب ثم أدخل مبلغاً مدينة أو دائناً فقط، وسيُصفّر الطرف الآخر تلقائياً."
-                                                               Style="{StaticResource VoucherDialogHintTextStyle}"/>
-                                                </StackPanel>
-
-                                                <Button Grid.Column="1"
-                                                        VerticalAlignment="Top"
-                                                        Content="حذف"
-                                                        Style="{StaticResource SecondaryActionButtonStyle}"
-                                                        Click="RemoveLine_Click"/>
-                                            </Grid>
-
-                                            <controls:AccountLookupBox Header="الحساب"
-                                                                       PlaceholderText="ابحث بالكود أو الاسم"
-                                                                       ItemsSource="{Binding DataContext.AccountOptions, ElementName=RootDialog}"
-                                                                       SelectedAccountId="{Binding SelectedAccountId, Mode=TwoWay}"/>
-
-                                            <StackPanel Spacing="4">
-                                                <TextBlock Text="الطرف" Style="{StaticResource FieldLabelStyle}"/>
-                                                <ComboBox Style="{StaticResource InputComboBoxStyle}"
-                                                          ItemsSource="{Binding DataContext.PartyOptions, ElementName=RootDialog}"
-                                                          DisplayMemberPath="DisplayText"
-                                                          SelectedValuePath="Id"
-                                                          SelectedValue="{Binding SelectedPartyId, Mode=TwoWay}"
-                                                          PlaceholderText="اختياري عند العمل على ذمم عميل أو مورد"/>
-                                            </StackPanel>
-
-                                            <StackPanel Spacing="4">
-                                                <TextBlock Text="وصف السطر" Style="{StaticResource FieldLabelStyle}"/>
-                                                <TextBox Style="{StaticResource InputTextBoxStyle}"
-                                                         Text="{Binding Description, Mode=TwoWay}"
-                                                         PlaceholderText="شرح مختصر للسطر"/>
-                                            </StackPanel>
-
-                                            <Grid ColumnSpacing="12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <StackPanel Grid.Column="0" Spacing="4">
-                                                    <TextBlock Text="مدين" Style="{StaticResource FieldLabelStyle}"/>
-                                                    <NumberBox Style="{StaticResource InputNumberBoxStyle}"
-                                                               Value="{Binding Debit, Mode=TwoWay}"/>
-                                                </StackPanel>
-
-                                                <StackPanel Grid.Column="1" Spacing="4">
-                                                    <TextBlock Text="دائن" Style="{StaticResource FieldLabelStyle}"/>
-                                                    <NumberBox Style="{StaticResource InputNumberBoxStyle}"
-                                                               Value="{Binding Credit, Mode=TwoWay}"/>
-                                                </StackPanel>
-                                            </Grid>
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </ScrollViewer>
-
         <Border Grid.Row="2"
                 x:Name="ErrorBanner"
-                Background="#FEF2F2"
-                BorderBrush="#FECACA"
-                BorderThickness="1"
-                CornerRadius="14"
-                Padding="14,12"
+                Style="{StaticResource InlineErrorBannerStyle}"
                 Visibility="Collapsed">
-            <TextBlock x:Name="ErrorText" Foreground="#DC2626" TextWrapping="WrapWholeWords"/>
+            <TextBlock x:Name="ErrorText"
+                       Foreground="{StaticResource DangerBrush}"
+                       TextWrapping="WrapWholeWords"/>
         </Border>
 
         <Border Grid.Row="3"
-                Background="White"
-                BorderBrush="#E2E8F0"
-                BorderThickness="1"
-                CornerRadius="16"
-                Padding="14">
-            <Grid ColumnSpacing="10">
+                Background="{Binding IsBalanced, Converter={StaticResource BoolToBalanceBackgroundBrushConverter}}"
+                CornerRadius="14"
+                Padding="16">
+            <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Ctrl+Shift+N لإضافة سطر  •  Ctrl+S للحفظ كمسودة  •  Ctrl+Enter للحفظ والترحيل"
-                           VerticalAlignment="Center"
-                           Foreground="{StaticResource MutedTextBrush}"
-                           FontSize="11.5"
-                           TextWrapping="WrapWholeWords"/>
+                <StackPanel Grid.Column="0"
+                            Spacing="2"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="{Binding BalanceBarText}"
+                               Foreground="{Binding BalanceStateBrush}"
+                               FontSize="16"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding BalanceHintText}"
+                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+                </StackPanel>
 
-                <Button Grid.Column="1"
-                        Click="CancelButton_Click"
-                        Style="{StaticResource SecondaryActionButtonStyle}"
-                        Content="إلغاء"
-                        MinWidth="108"/>
+                <StackPanel Grid.Column="1"
+                            Spacing="2"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="مدين"
+                               Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                    <TextBlock Text="{Binding TotalDebitText}"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Language="en-US"/>
+                </StackPanel>
 
-                <Button Grid.Column="2"
-                        Click="SaveDraftButton_Click"
-                        Style="{StaticResource SecondaryActionButtonStyle}"
-                        Background="White"
-                        BorderBrush="{StaticResource PrimaryTextBrush}"
-                        Foreground="{StaticResource PrimaryTextBrush}"
-                        BorderThickness="1"
-                        Content="حفظ كمسودة"
-                        MinWidth="132"/>
+                <StackPanel Grid.Column="2"
+                            Spacing="2"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="دائن"
+                               Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                    <TextBlock Text="{Binding TotalCreditText}"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Language="en-US"/>
+                </StackPanel>
 
-                <Button Grid.Column="3"
-                        Click="SaveAndPostButton_Click"
-                        Style="{StaticResource PrimaryActionButtonStyle}"
-                        Content="حفظ وترحيل"
-                        MinWidth="136"/>
+                <StackPanel Grid.Column="3"
+                            Spacing="2"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="الفرق"
+                               Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                    <TextBlock Text="{Binding DifferenceText}"
+                               Foreground="{Binding BalanceStateBrush}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Language="en-US"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                    <Button Click="CancelButton_Click"
+                            Style="{StaticResource SecondaryActionCompactButtonStyle}"
+                            Content="إلغاء"
+                            MinWidth="104"/>
+
+                    <Button Click="SaveDraftButton_Click"
+                            Style="{StaticResource SecondaryActionCompactButtonStyle}"
+                            Content="حفظ كمسودة"
+                            MinWidth="126"/>
+
+                    <Button Click="SaveAndPostButton_Click"
+                            Style="{StaticResource PrimaryActionCompactButtonStyle}"
+                            Content="حفظ وترحيل"
+                            MinWidth="132"/>
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>

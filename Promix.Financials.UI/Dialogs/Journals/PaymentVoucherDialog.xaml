@@ -26,78 +26,63 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0"
-                CornerRadius="18"
-                Padding="18"
-                MinHeight="108">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#1E3A5F" Offset="0"/>
-                    <GradientStop Color="#7F1D1D" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-
-            <Grid ColumnSpacing="14">
+                Style="{StaticResource VoucherDialogHeaderCardStyle}">
+            <Grid ColumnSpacing="16">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="68"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Width="52"
-                        Height="52"
-                        Background="#7F1D1D"
-                        CornerRadius="16"
-                        VerticalAlignment="Top">
-                    <FontIcon Glyph="&#xEAFD;"
-                              Foreground="White"
-                              FontSize="24"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"/>
-                </Border>
-
-                <StackPanel Grid.Column="1"
-                            Spacing="4"
+                <StackPanel Grid.Column="0"
+                            Spacing="6"
                             VerticalAlignment="Center">
-                    <Border Background="#991B1B"
-                            CornerRadius="12"
-                            Padding="10,4"
-                            HorizontalAlignment="Right">
-                        <TextBlock Text="سند صرف"
-                                   Foreground="White"
-                                   Style="{StaticResource VoucherDialogBadgeTextStyle}"/>
-                    </Border>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Background="#FEF2F2"
+                                CornerRadius="999"
+                                Padding="10,4">
+                            <TextBlock Text="سند صرف"
+                                       Foreground="#B91C1C"
+                                       Style="{StaticResource VoucherDialogBadgeTextStyle}"/>
+                        </Border>
+
+                        <Border Background="#EFF6FF"
+                                CornerRadius="999"
+                                Padding="10,4">
+                            <TextBlock Text="{Binding EntryMetaText}"
+                                       Foreground="#2563EB"
+                                       Style="{StaticResource VoucherDialogBadgeTextStyle}"/>
+                        </Border>
+                    </StackPanel>
 
                     <TextBlock Text="{Binding Title}"
-                               Foreground="White"
-                               FontSize="22"
-                               FontWeight="Bold"/>
-
-                    <TextBlock Text="{Binding Subtitle}"
-                               Foreground="#FEE2E2"
-                               FontSize="11.5"
-                               TextWrapping="WrapWholeWords"/>
+                               Style="{StaticResource AppSectionTitleTextStyle}"/>
+                    <TextBlock Text="حدّد بيانات الصرف العامة ثم أضف الجهات أو الحسابات المصروف عليها من نفس التدفق."
+                               Style="{StaticResource VoucherDialogSubtleTextStyle}"/>
                 </StackPanel>
 
-                <Border Grid.Column="2"
-                        Background="#1AFFFFFF"
-                        BorderBrush="#22FFFFFF"
-                        BorderThickness="1"
-                        CornerRadius="14"
-                        Padding="12"
-                        VerticalAlignment="Center">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="{Binding EntryMetaText}"
-                                   Foreground="#FECACA"
-                                   FontSize="10.5"/>
+                <Border Grid.Column="1"
+                        Style="{StaticResource VoucherDialogCompactStripStyle}"
+                        Background="#FEF2F2">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="المكافئ"
+                                   Style="{StaticResource VoucherDialogMetricLabelStyle}"/>
                         <TextBlock Text="{Binding EquivalentAmountText}"
-                                   Foreground="White"
-                                   FontSize="20"
-                                   FontWeight="Bold"
+                                   Style="{StaticResource VoucherDialogMetricValueStyle}"
+                                   Foreground="#B91C1C"
                                    Language="en-US"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2"
+                        Style="{StaticResource VoucherDialogCompactStripStyle}">
+                    <StackPanel Spacing="2">
                         <TextBlock Text="{Binding TotalLinesText}"
-                                   Foreground="#FEE2E2"
-                                   FontSize="10.5"
-                                   TextWrapping="WrapWholeWords"/>
+                                   Style="{StaticResource VoucherDialogMetricLabelStyle}"/>
+                        <TextBlock Text="{Binding EffectBadgeText}"
+                                   Style="{StaticResource VoucherDialogMetricValueStyle}"
+                                   FontSize="14"
+                                   Foreground="#0F172A"/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -118,7 +103,7 @@
 
                             <StackPanel Spacing="3">
                                 <TextBlock Text="بيانات السند" Style="{StaticResource VoucherDialogSectionTitleStyle}"/>
-                                <TextBlock Text="أدخل بيانات رأس السند أولًا، ثم أضف الحسابات المصروف عليها بالأسفل."
+                                <TextBlock Text="المعلومات العامة أولًا ثم الجهات المصروف عليها."
                                            Style="{StaticResource VoucherDialogSubtleTextStyle}"/>
                             </StackPanel>
 
@@ -273,10 +258,10 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="#F8FAFC"
-                                            BorderBrush="#E2E8F0"
-                                            BorderThickness="1"
-                                            CornerRadius="16"
+                                    <Border Background="White"
+                                            BorderBrush="Transparent"
+                                            BorderThickness="0"
+                                            CornerRadius="12"
                                             Padding="14">
                                         <StackPanel Spacing="10">
                                             <Grid ColumnSpacing="10">
@@ -552,11 +537,7 @@
         </Border>
 
         <Border Grid.Row="3"
-                Background="White"
-                BorderBrush="#E2E8F0"
-                BorderThickness="1"
-                CornerRadius="16"
-                Padding="14">
+                Style="{StaticResource VoucherDialogFooterCardStyle}">
             <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -566,58 +547,66 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{Binding FooterHintText}"
-                           VerticalAlignment="Center"
-                           Foreground="{StaticResource MutedTextBrush}"
-                           FontSize="11.5"
-                           TextWrapping="WrapWholeWords"/>
+                <StackPanel Spacing="2"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="إجمالي السند"
+                               Style="{StaticResource VoucherDialogMetricLabelStyle}"/>
+                    <TextBlock Text="{Binding TotalAmountText}"
+                               Style="{StaticResource VoucherDialogMetricValueStyle}"
+                               Foreground="#B91C1C"
+                               Language="en-US"/>
+                </StackPanel>
 
                 <Button Grid.Column="1"
-                        Click="EditButton_Click"
-                        Visibility="{Binding ViewManageButtonsVisibility}"
-                        Style="{StaticResource SecondaryActionButtonStyle}"
-                        Content="{Binding EditButtonText}"
-                        MinWidth="120"/>
+                        Content="إغلاق"
+                        Click="CancelButton_Click"
+                        Style="{StaticResource SecondaryActionCompactButtonStyle}"
+                        MinWidth="96"/>
 
                 <Button Grid.Column="2"
-                        Click="DeleteButton_Click"
-                        Visibility="{Binding DeleteButtonVisibility}"
-                        Style="{StaticResource SecondaryActionButtonStyle}"
-                        Content="{Binding DeleteButtonText}"
+                        Click="EditButton_Click"
+                        Visibility="{Binding ViewManageButtonsVisibility}"
+                        Style="{StaticResource SecondaryActionCompactButtonStyle}"
+                        Content="{Binding EditButtonText}"
                         MinWidth="110"/>
 
                 <Button Grid.Column="3"
-                        Click="CancelButton_Click"
-                        Style="{StaticResource SecondaryActionButtonStyle}"
-                        Content="{Binding CloseButtonText}"
-                        MinWidth="108"/>
+                        Click="DeleteButton_Click"
+                        Visibility="{Binding DeleteButtonVisibility}"
+                        Style="{StaticResource SecondaryActionCompactButtonStyle}"
+                        Content="{Binding DeleteButtonText}"
+                        MinWidth="104"/>
 
                 <Button Grid.Column="4"
                         Click="SaveDraftButton_Click"
                         Visibility="{Binding SaveDraftButtonVisibility}"
-                        Style="{StaticResource SecondaryActionButtonStyle}"
-                        Background="White"
-                        BorderBrush="{StaticResource PrimaryTextBrush}"
-                        Foreground="{StaticResource PrimaryTextBrush}"
-                        BorderThickness="1"
+                        Style="{StaticResource SecondaryActionCompactButtonStyle}"
                         Content="{Binding SaveDraftButtonText}"
                         MinWidth="126"/>
 
                 <Button Grid.Column="5"
                         Click="SaveAndPostButton_Click"
                         Visibility="{Binding SaveAndPostButtonVisibility}"
-                        Style="{StaticResource PrimaryActionButtonStyle}"
+                        Style="{StaticResource PrimaryActionCompactButtonStyle}"
                         Content="{Binding SaveAndPostButtonText}"
                         MinWidth="132"/>
 
                 <Button Grid.Column="6"
                         Click="SaveChangesButton_Click"
                         Visibility="{Binding SaveChangesButtonVisibility}"
-                        Style="{StaticResource PrimaryActionButtonStyle}"
+                        Style="{StaticResource PrimaryActionCompactButtonStyle}"
                         Content="{Binding SaveChangesButtonText}"
                         MinWidth="132"/>
+
+                <TextBlock Grid.Column="7"
+                           Text="{Binding FooterHintText}"
+                           VerticalAlignment="Center"
+                           Foreground="{StaticResource MutedTextBrush}"
+                           FontSize="11"
+                           TextWrapping="WrapWholeWords"/>
             </Grid>
         </Border>
     </Grid>

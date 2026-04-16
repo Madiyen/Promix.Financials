@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Microsoft.UI.Xaml;
 
 namespace Promix.Financials.UI.ViewModels.Journals.Models;
 
@@ -12,6 +13,7 @@ public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
     private string _description = string.Empty;
     private double _debit;
     private double _credit;
+    private bool _requiresPartySelection;
 
     public Guid? SelectedAccountId
     {
@@ -33,6 +35,8 @@ public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
             if (_selectedPartyId == value) return;
             _selectedPartyId = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowPartySelection));
+            OnPropertyChanged(nameof(PartySelectionVisibility));
             OnPropertyChanged(nameof(IsEmpty));
         }
     }
@@ -96,6 +100,23 @@ public sealed class JournalEntryLineEditorVm : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsEmpty));
         }
     }
+
+    public bool RequiresPartySelection
+    {
+        get => _requiresPartySelection;
+        set
+        {
+            if (_requiresPartySelection == value) return;
+            _requiresPartySelection = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowPartySelection));
+            OnPropertyChanged(nameof(PartySelectionVisibility));
+        }
+    }
+
+    public bool ShowPartySelection => RequiresPartySelection || SelectedPartyId is Guid;
+
+    public Visibility PartySelectionVisibility => ShowPartySelection ? Visibility.Visible : Visibility.Collapsed;
 
     public bool IsEmpty =>
         SelectedAccountId is null &&

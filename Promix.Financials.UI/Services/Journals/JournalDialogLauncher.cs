@@ -53,16 +53,14 @@ public sealed class JournalDialogLauncher
             var parties = action is JournalQuickAction.TransferVoucher or JournalQuickAction.ReceiptVoucher or JournalQuickAction.PaymentVoucher or JournalQuickAction.DailyJournal
                 ? await LoadPartiesAsync(companyId)
                 : Array.Empty<PartyOptionVm>();
-            var currencies = action is JournalQuickAction.DailyJournal
-                ? Array.Empty<JournalCurrencyOptionVm>()
-                : await LoadCurrenciesAsync(companyId);
+            var currencies = await LoadCurrenciesAsync(companyId);
 
             ContentDialog dialog = action switch
             {
                 JournalQuickAction.ReceiptVoucher => new ReceiptVoucherDialog(companyId, accounts, currencies, parties, _query),
                 JournalQuickAction.PaymentVoucher => new PaymentVoucherDialog(companyId, accounts, currencies, parties, _query),
                 JournalQuickAction.TransferVoucher => new TransferVoucherDialog(companyId, accounts, currencies, parties, _query),
-                JournalQuickAction.DailyJournal => new DailyJournalDialog(companyId, accounts, parties),
+                JournalQuickAction.DailyJournal => new DailyJournalDialog(companyId, accounts, currencies, parties),
                 _ => throw new InvalidOperationException("Unsupported journal action.")
             };
 

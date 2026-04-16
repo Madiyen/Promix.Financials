@@ -4,18 +4,35 @@
 
     <Style x:Key="VoucherDialogCardStyle" TargetType="Border">
         <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="#E2E8F0"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="18"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Padding" Value="16"/>
     </Style>
 
     <Style x:Key="VoucherDialogInfoCardStyle" TargetType="Border">
         <Setter Property="Background" Value="#F8FAFC"/>
-        <Setter Property="BorderBrush" Value="#CBD5E1"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="12"/>
         <Setter Property="Padding" Value="12"/>
+    </Style>
+
+    <Style x:Key="VoucherDialogHeaderCardStyle" TargetType="Border" BasedOn="{StaticResource VoucherDialogCardStyle}">
+        <Setter Property="Padding" Value="16,14"/>
+    </Style>
+
+    <Style x:Key="VoucherDialogCompactStripStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="Background" Value="#F8FAFC"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style x:Key="VoucherDialogFooterCardStyle" TargetType="Border" BasedOn="{StaticResource VoucherDialogCardStyle}">
+        <Setter Property="Padding" Value="14"/>
+        <Setter Property="CornerRadius" Value="12"/>
     </Style>
 
     <Style x:Key="VoucherDialogSectionTitleStyle" TargetType="TextBlock">
@@ -34,6 +51,17 @@
         <Setter Property="FontSize" Value="11"/>
         <Setter Property="Foreground" Value="#475569"/>
         <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+    </Style>
+
+    <Style x:Key="VoucherDialogMetricLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10.5"/>
+        <Setter Property="Foreground" Value="#64748B"/>
+    </Style>
+
+    <Style x:Key="VoucherDialogMetricValueStyle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="19"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="#0F172A"/>
     </Style>
 
     <Style x:Key="VoucherDialogBadgeTextStyle" TargetType="TextBlock">
