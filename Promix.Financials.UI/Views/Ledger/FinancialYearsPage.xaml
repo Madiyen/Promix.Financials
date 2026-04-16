@@ -42,14 +42,13 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1"
-                                Spacing="4"
+                                Orientation="Horizontal"
+                                Spacing="8"
                                 HorizontalAlignment="Right">
-                        <TextBlock Text="السنة المالية"
-                                   Style="{StaticResource AppPageTitleCompactTextStyle}"/>
-                        <TextBlock Text="{Binding SummaryText}"
-                                   Style="{StaticResource AppPageSubtitleCompactTextStyle}"
-                                   MaxWidth="560"
-                                   ToolTipService.ToolTip="أنشئ السنوات المالية، فعّل سنة واحدة معتمدة، وراقب فتراتها المفتوحة والمقفلة من نفس الشاشة."/>
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
+                            <TextBlock Text="{Binding SummaryText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
                     </StackPanel>
                 </Grid>
             </Border>

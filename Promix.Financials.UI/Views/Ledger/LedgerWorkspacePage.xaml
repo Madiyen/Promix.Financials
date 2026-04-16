@@ -8,18 +8,11 @@
 
     <Grid Padding="24,20,24,20" RowSpacing="6">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
-                   Text="دفتر الأستاذ"
-                   Style="{StaticResource AppSectionTitleCompactTextStyle}"
-                   HorizontalAlignment="Right"
-                   ToolTipService.ToolTip="اعمل على الحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية من مساحة واحدة."/>
-
         <controls:TabView x:Name="LedgerTabView"
-                          Grid.Row="1"
+                          Grid.Row="0"
                           Style="{StaticResource AppTabViewStyle}"
                           SelectionChanged="LedgerTabView_SelectionChanged"
                           TabWidthMode="SizeToContent"

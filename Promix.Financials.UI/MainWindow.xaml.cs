@@ -18,6 +18,7 @@ public sealed partial class MainWindow : Window
     private readonly IUserContext _userContext;
     private readonly IAuthService _authService;
     private readonly IUserContextBootstrapper _bootstrapper;
+    private LedgerWorkspacePage? _activeLedgerWorkspace;
     public MainWindow()
     {
         InitializeComponent();
@@ -140,65 +141,84 @@ public sealed partial class MainWindow : Window
             return;
         }
 
+        if (_activeLedgerWorkspace is not null)
+        {
+            _activeLedgerWorkspace.HeaderContextChanged -= LedgerWorkspace_HeaderContextChanged;
+            _activeLedgerWorkspace = null;
+        }
+
         var (destination, title, subtitle) = ResolveShellState(e.SourcePageType);
         Sidebar.SetActiveDestination(destination);
         Header.SetContext(title, subtitle);
         Header.RefreshDate();
+
+        if (RootFrame.Content is LedgerWorkspacePage ledgerWorkspace)
+        {
+            _activeLedgerWorkspace = ledgerWorkspace;
+            _activeLedgerWorkspace.HeaderContextChanged += LedgerWorkspace_HeaderContextChanged;
+            var context = _activeLedgerWorkspace.GetHeaderContext();
+            Header.SetContext(context.Title, context.Subtitle);
+        }
+    }
+
+    private void LedgerWorkspace_HeaderContextChanged(object? sender, LedgerWorkspaceHeaderContextChangedEventArgs e)
+    {
+        Header.SetContext(e.Title, e.Subtitle);
     }
 
     private static (SidebarDestination Destination, string Title, string Subtitle) ResolveShellState(Type pageType)
     {
         if (pageType == typeof(DashboardView))
         {
-            return (SidebarDestination.Dashboard, "لوحة القيادة", "صورة سريعة للحركة اليومية والمؤشرات المالية الأساسية.");
+            return (SidebarDestination.Dashboard, "لوحة القيادة", string.Empty);
         }
 
         if (pageType == typeof(LedgerWorkspacePage))
         {
-            return (SidebarDestination.Ledger, "دفتر الأستاذ", "مساحة موحّدة للحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية.");
+            return (SidebarDestination.Ledger, "دفتر الأستاذ", string.Empty);
         }
 
         if (pageType == typeof(Promix.Financials.UI.Views.Accounts.ChartOfAccountsView))
         {
-            return (SidebarDestination.Ledger, "دفتر الأستاذ", "مساحة موحّدة للحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية.");
+            return (SidebarDestination.Ledger, "الحسابات", string.Empty);
         }
 
         if (pageType == typeof(JournalEntriesPage))
         {
-            return (SidebarDestination.Ledger, "دفتر الأستاذ", "مساحة موحّدة للحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية.");
+            return (SidebarDestination.Ledger, "القيود والسندات", string.Empty);
         }
 
         if (pageType == typeof(Promix.Financials.UI.Views.Parties.PartiesPage))
         {
-            return (SidebarDestination.Ledger, "دفتر الأستاذ", "مساحة موحّدة للحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية.");
+            return (SidebarDestination.Ledger, "الذمم", string.Empty);
         }
 
         if (pageType == typeof(Promix.Financials.UI.Views.ReportsPage))
         {
-            return (SidebarDestination.Ledger, "دفتر الأستاذ", "مساحة موحّدة للحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية.");
+            return (SidebarDestination.Ledger, "كشف الحساب", string.Empty);
         }
 
         if (pageType == typeof(Promix.Financials.UI.Views.TrialBalancePage))
         {
-            return (SidebarDestination.Ledger, "دفتر الأستاذ", "مساحة موحّدة للحسابات والقيود وكشف الحساب وميزان المراجعة والذمم والسنة المالية.");
+            return (SidebarDestination.Ledger, "ميزان المراجعة", string.Empty);
         }
 
         if (pageType == typeof(Promix.Financials.UI.Views.Currencies.CompanyCurrenciesView))
         {
-            return (SidebarDestination.Currencies, "العملات", "إدارة العملات الافتراضية وأسعار الصرف حسب الشركة.");
+            return (SidebarDestination.Currencies, "العملات", string.Empty);
         }
 
         if (pageType == typeof(Promix.Financials.UI.Views.ItemsPage))
         {
-            return (SidebarDestination.Items, "الأصناف", "واجهة مبدئية محفوظة لمسار الأصناف عند تفعيله لاحقًا.");
+            return (SidebarDestination.Items, "الأصناف", string.Empty);
         }
 
         if (pageType == typeof(SettingsView))
         {
-            return (SidebarDestination.Settings, "الإعدادات", "ضبط النظام والمظهر والخيارات العامة للتطبيق.");
+            return (SidebarDestination.Settings, "الإعدادات", string.Empty);
         }
 
-        return (SidebarDestination.Dashboard, "لوحة القيادة", "صورة سريعة للحركة اليومية والمؤشرات المالية الأساسية.");
+        return (SidebarDestination.Dashboard, "لوحة القيادة", string.Empty);
     }
 
 

@@ -52,29 +52,22 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1"
-                                Spacing="6"
+                                Orientation="Horizontal"
+                                Spacing="8"
                                 HorizontalAlignment="Right">
-                        <TextBlock Text="ميزان المراجعة"
-                                   Style="{StaticResource AppPageTitleCompactTextStyle}"/>
-                        <TextBlock Text="{Binding TrialBalanceSummaryText}"
-                                   Style="{StaticResource AppPageSubtitleCompactTextStyle}"
-                                   MaxWidth="560"
-                                   ToolTipService.ToolTip="يعرض ميزان المراجعة الأرصدة الافتتاحية، وحركة الفترة، والأرصدة الختامية مع مؤشر واضح لحالة التوازن."/>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
-                                <TextBlock Text="{Binding TrialBalanceRangeText}"
-                                           Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                            </Border>
-                            <Border Style="{StaticResource AppEnterpriseInfoChipStyle}"
-                                    ToolTipService.ToolTip="{Binding PeriodLockHintText}">
-                                <TextBlock Text="{Binding PeriodLockSummaryText}"
-                                           Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                            </Border>
-                            <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
-                                <TextBlock Text="{Binding TrialBalanceRowsCountText}"
-                                           Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                            </Border>
-                        </StackPanel>
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
+                            <TextBlock Text="{Binding TrialBalanceRangeText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}"
+                                ToolTipService.ToolTip="{Binding PeriodLockHintText}">
+                            <TextBlock Text="{Binding PeriodLockSummaryText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
+                            <TextBlock Text="{Binding TrialBalanceRowsCountText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
                     </StackPanel>
                 </Grid>
             </Border>

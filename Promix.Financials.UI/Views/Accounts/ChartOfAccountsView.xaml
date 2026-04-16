@@ -27,8 +27,8 @@
 
         <Grid Grid.Row="0" ColumnSpacing="12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0"
@@ -48,12 +48,6 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
-
-            <TextBlock Grid.Column="1"
-                       Text="الحسابات"
-                       Style="{StaticResource AppSectionTitleCompactTextStyle}"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Right"/>
         </Grid>
 
         <InfoBar Grid.Row="1"

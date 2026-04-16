@@ -38,15 +38,11 @@
 
         <Grid Grid.Row="0" ColumnSpacing="12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Text="الذمم"
-                       Style="{StaticResource AppSectionTitleCompactTextStyle}"
-                       VerticalAlignment="Center"/>
-
-            <StackPanel Grid.Column="1"
+            <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
                         Spacing="10"
                         VerticalAlignment="Center">
@@ -57,6 +53,14 @@
                         Click="AddParty_Click"
                         Style="{StaticResource PrimaryActionCompactButtonStyle}"/>
             </StackPanel>
+
+            <Border Grid.Column="1"
+                    Style="{StaticResource AppEnterpriseInfoChipStyle}"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+                <TextBlock Text="{Binding TotalPartiesText}"
+                           Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+            </Border>
         </Grid>
 
         <StackPanel Grid.Row="1" Spacing="10">

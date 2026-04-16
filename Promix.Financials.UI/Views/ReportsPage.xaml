@@ -53,29 +53,21 @@
                     </StackPanel>
 
                     <StackPanel Grid.Column="1"
-                                Spacing="6"
+                                Orientation="Horizontal"
+                                Spacing="8"
                                 HorizontalAlignment="Right">
-                        <TextBlock Text="كشف الحساب"
-                                   Style="{StaticResource AppPageTitleCompactTextStyle}"/>
-                        <TextBlock Text="{Binding NetPeriodMovementLabelText}"
-                                   Style="{StaticResource AppPageSubtitleCompactTextStyle}"
-                                   MaxWidth="560"
-                                   ToolTipService.ToolTip="يعرض كشف الحساب الرصيد الافتتاحي، والحركة المدينة والدائنة، والرصيد الجاري للحساب المحدد اعتمادًا على السندات المرحلة فقط."/>
-                        <StackPanel Orientation="Horizontal"
-                                    Spacing="8">
-                            <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
-                                <TextBlock Text="{Binding AccountTitleText}"
-                                           Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                            </Border>
-                            <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
-                                <TextBlock Text="{Binding PeriodSummaryText}"
-                                           Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                            </Border>
-                            <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
-                                <TextBlock Text="{Binding PostedEntriesCountText}"
-                                           Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                            </Border>
-                        </StackPanel>
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
+                            <TextBlock Text="{Binding AccountTitleText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
+                            <TextBlock Text="{Binding PeriodSummaryText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                        <Border Style="{StaticResource AppEnterpriseInfoChipStyle}">
+                            <TextBlock Text="{Binding PostedEntriesCountText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
                     </StackPanel>
                 </Grid>
             </Border>

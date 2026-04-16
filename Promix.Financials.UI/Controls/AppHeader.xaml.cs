@@ -22,6 +22,9 @@ public sealed partial class AppHeader : UserControl
     {
         TitleText.Text = title;
         SubtitleText.Text = subtitle;
+        SubtitleText.Visibility = string.IsNullOrWhiteSpace(subtitle)
+            ? Microsoft.UI.Xaml.Visibility.Collapsed
+            : Microsoft.UI.Xaml.Visibility.Visible;
     }
 
     public void SetUser(string username)
