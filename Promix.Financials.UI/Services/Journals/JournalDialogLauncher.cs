@@ -136,7 +136,8 @@ public enum JournalQuickAction
     ReceiptVoucher,
     PaymentVoucher,
     TransferVoucher,
-    DailyJournal
+    DailyJournal,
+    OpeningEntry
 }
 
 public sealed record JournalDialogLaunchResult(bool Saved, bool Cancelled, string? ErrorMessage)

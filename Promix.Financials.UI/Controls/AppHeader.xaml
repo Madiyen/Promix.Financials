@@ -77,8 +77,12 @@
                          Style="{StaticResource SearchBoxStyle}"
                          BorderThickness="0"
                          Background="Transparent"
+                         IsReadOnly="True"
                          VerticalAlignment="Center"
-                         TextAlignment="Right"/>
+                         TextAlignment="Right"
+                         GotFocus="SearchBox_GotFocus"
+                         Tapped="SearchBox_Tapped"
+                         KeyDown="SearchBox_KeyDown"/>
 
                 <Border Grid.Column="2"
                         Background="{StaticResource BorderBrushSoft}"

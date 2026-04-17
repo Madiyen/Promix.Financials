@@ -145,6 +145,11 @@
                         <TextBlock Text="تاريخ السند" Style="{StaticResource FieldLabelStyle}"/>
                         <DatePicker Style="{StaticResource InputDatePickerStyle}"
                                     Date="{Binding EntryDate, Mode=TwoWay}"/>
+                        <TextBox x:Name="QuickDateInputBox"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 PlaceholderText="اختصار: t أو -1"
+                                 LostFocus="QuickDateInputBox_LostFocus"
+                                 KeyDown="QuickDateInputBox_KeyDown"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" Spacing="4">
@@ -161,7 +166,9 @@
                         <NumberBox Style="{StaticResource InputNumberBoxStyle}"
                                    Value="{Binding ExchangeRate, Mode=TwoWay}"
                                    IsEnabled="{Binding CanEditExchangeRate}"
-                                   SpinButtonPlacementMode="Hidden"/>
+                                   SpinButtonPlacementMode="Hidden"
+                                   LostFocus="SmartAmountBox_LostFocus"
+                                   KeyDown="SmartAmountBox_KeyDown"/>
                     </StackPanel>
                 </Grid>
 
@@ -332,11 +339,15 @@
 
                                         <NumberBox Grid.Column="3"
                                                    Style="{StaticResource JournalGridCellNumberBoxStyle}"
-                                                   Value="{Binding Debit, Mode=TwoWay}"/>
+                                                   Value="{Binding Debit, Mode=TwoWay}"
+                                                   LostFocus="SmartAmountBox_LostFocus"
+                                                   KeyDown="SmartAmountBox_KeyDown"/>
 
                                         <NumberBox Grid.Column="4"
                                                    Style="{StaticResource JournalGridCellNumberBoxStyle}"
-                                                   Value="{Binding Credit, Mode=TwoWay}"/>
+                                                   Value="{Binding Credit, Mode=TwoWay}"
+                                                   LostFocus="SmartAmountBox_LostFocus"
+                                                   KeyDown="SmartAmountBox_KeyDown"/>
 
                                         <Button Grid.Column="5"
                                                 Content="حذف"

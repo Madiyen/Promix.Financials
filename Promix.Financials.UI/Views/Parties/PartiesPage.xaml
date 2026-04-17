@@ -201,12 +201,20 @@
                             <StackPanel HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         Spacing="10">
+                                <FontIcon Glyph="&#xE716;"
+                                          FontSize="34"
+                                          Foreground="{StaticResource MutedTextBrush}"
+                                          HorizontalAlignment="Center"/>
                                 <TextBlock Text="لا توجد أطراف مطابقة"
                                            Style="{StaticResource AppSectionTitleTextStyle}"
                                            TextAlignment="Center"/>
                                 <TextBlock Text="جرّب تغيير الفلاتر أو أضف طرفًا جديدًا للبدء."
                                            Style="{StaticResource AppSectionCaptionTextStyle}"
                                            TextAlignment="Center"/>
+                                <Button Content="+ إضافة أول طرف"
+                                        Style="{StaticResource PrimaryActionCompactButtonStyle}"
+                                        Click="AddFirstParty_Click"
+                                        HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Border>
 

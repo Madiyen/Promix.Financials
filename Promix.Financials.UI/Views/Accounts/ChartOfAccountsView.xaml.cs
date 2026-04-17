@@ -7,6 +7,7 @@ using Promix.Financials.Application.Features.Accounts.Commands;
 using Promix.Financials.Application.Features.Accounts.Services;
 using Promix.Financials.Domain.Enums;
 using Promix.Financials.UI.Dialogs.Accounts;
+using Promix.Financials.UI.Services;
 using Promix.Financials.UI.ViewModels.Accounts;
 using Promix.Financials.UI.ViewModels.Accounts.Models;
 using System;
@@ -15,6 +16,8 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.System;
 
 namespace Promix.Financials.UI.Views.Accounts;
 
@@ -22,6 +25,7 @@ public sealed partial class ChartOfAccountsView : Page
 {
     private readonly ChartOfAccountsViewModel _vm;
     private readonly IServiceScope _scope;
+    private readonly TransientMessageService _messageService;
 
     public ChartOfAccountsView()
     {
@@ -29,10 +33,12 @@ public sealed partial class ChartOfAccountsView : Page
         var app = (App)Microsoft.UI.Xaml.Application.Current;
         _scope = app.Services.CreateScope();
         _vm = _scope.ServiceProvider.GetRequiredService<ChartOfAccountsViewModel>();
+        _messageService = _scope.ServiceProvider.GetRequiredService<TransientMessageService>();
         DataContext = _vm;
         _vm.PropertyChanged += ViewModel_PropertyChanged;
         _vm.AccountTree.CollectionChanged += AccountTree_CollectionChanged;
         Loaded += OnLoaded;
+        RegisterKeyboardAccelerators();
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -57,6 +63,9 @@ public sealed partial class ChartOfAccountsView : Page
         => RebuildTreeNodes();
 
     private async void NewAccount_Click(object sender, RoutedEventArgs e)
+        => await OpenNewAccountDialogAsync(preselectedParentCode: null);
+
+    private async void AddFirstAccount_Click(object sender, RoutedEventArgs e)
         => await OpenNewAccountDialogAsync(preselectedParentCode: null);
 
     private async void AddChildFromDetails_Click(object sender, RoutedEventArgs e)
@@ -176,14 +185,15 @@ public sealed partial class ChartOfAccountsView : Page
 
             await _vm.InitializeAsync(companyId);
             await _vm.SelectAccountAsync(result.AccountId);
+            _messageService.ShowSuccess("تم إنشاء الحساب الجديد.");
         }
         catch (Promix.Financials.Domain.Exceptions.BusinessRuleException ex)
         {
-            await ShowErrorAsync("تعذّر إنشاء الحساب", ex.Message);
+            _messageService.ShowError(ex.Message, "تعذّر إنشاء الحساب");
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync("خطأ غير متوقع", ex.Message);
+            _messageService.ShowError(ex.Message, "خطأ غير متوقع");
         }
     }
 
@@ -206,14 +216,15 @@ public sealed partial class ChartOfAccountsView : Page
             await editService.EditAsync(vm.BuildCommand());
             await _vm.InitializeAsync(companyId);
             await _vm.SelectAccountAsync(node.Id);
+            _messageService.ShowSuccess("تم تحديث الحساب.");
         }
         catch (Promix.Financials.Domain.Exceptions.BusinessRuleException ex)
         {
-            await ShowErrorAsync("تعذّر تعديل الحساب", ex.Message);
+            _messageService.ShowError(ex.Message, "تعذّر تعديل الحساب");
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync("خطأ غير متوقع", ex.Message);
+            _messageService.ShowError(ex.Message, "خطأ غير متوقع");
         }
     }
 
@@ -242,14 +253,15 @@ public sealed partial class ChartOfAccountsView : Page
             await deleteService.DeleteAsync(node.Id, companyId);
 
             await _vm.InitializeAsync(companyId);
+            _messageService.ShowSuccess("تم حذف الحساب.");
         }
         catch (Promix.Financials.Domain.Exceptions.BusinessRuleException ex)
         {
-            await ShowErrorAsync("تعذّر حذف الحساب", ex.Message);
+            _messageService.ShowError(ex.Message, "تعذّر حذف الحساب");
         }
         catch (Exception ex)
         {
-            await ShowErrorAsync("خطأ غير متوقع", ex.Message);
+            _messageService.ShowError(ex.Message, "خطأ غير متوقع");
         }
     }
 
@@ -423,6 +435,29 @@ public sealed partial class ChartOfAccountsView : Page
         };
 
         await dialog.ShowAsync();
+    }
+
+    private void RegisterKeyboardAccelerators()
+    {
+        KeyboardAccelerators.Add(CreateAccelerator(VirtualKey.N, async (_, args) =>
+        {
+            args.Handled = true;
+            await OpenNewAccountDialogAsync(preselectedParentCode: null);
+        }));
+    }
+
+    private static KeyboardAccelerator CreateAccelerator(
+        VirtualKey key,
+        TypedEventHandler<KeyboardAccelerator, KeyboardAcceleratorInvokedEventArgs> handler,
+        VirtualKeyModifiers modifiers = VirtualKeyModifiers.Control)
+    {
+        var accelerator = new KeyboardAccelerator
+        {
+            Key = key,
+            Modifiers = modifiers
+        };
+        accelerator.Invoked += handler;
+        return accelerator;
     }
 
     private async Task OpenAccountDetailsDialogAsync(Guid accountId)

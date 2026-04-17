@@ -80,20 +80,43 @@ public sealed partial class OpeningEntryDialog : ContentDialog
         return true;
     }
 
+    private void QuickDateInputBox_LostFocus(object sender, RoutedEventArgs e)
+        => ApplyQuickDateInput();
+
+    private void QuickDateInputBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key is not (VirtualKey.Enter or VirtualKey.Tab))
+            return;
+
+        e.Handled = true;
+        ApplyQuickDateInput();
+    }
+
+    private void SmartAmountBox_LostFocus(object sender, RoutedEventArgs e)
+        => DialogSmartInputHelper.TryApplyAmount(sender as NumberBox, ShowValidationError);
+
+    private void SmartAmountBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key is not (VirtualKey.Enter or VirtualKey.Tab))
+            return;
+
+        e.Handled = true;
+        DialogSmartInputHelper.TryApplyAmount(sender as NumberBox, ShowValidationError);
+    }
+
     private void RegisterKeyboardAccelerators()
     {
-        KeyboardAccelerators.Add(CreateAccelerator(
+        KeyboardAccelerators.Add(DialogSmartInputHelper.CreateAccelerator(
             VirtualKey.N,
-            VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift,
             (_, args) =>
             {
                 args.Handled = true;
                 ViewModel.AddLine();
-            }));
+            },
+            VirtualKeyModifiers.Control | VirtualKeyModifiers.Shift));
 
-        KeyboardAccelerators.Add(CreateAccelerator(
+        KeyboardAccelerators.Add(DialogSmartInputHelper.CreateAccelerator(
             VirtualKey.S,
-            VirtualKeyModifiers.Control,
             (_, args) =>
             {
                 args.Handled = true;
@@ -101,28 +124,31 @@ public sealed partial class OpeningEntryDialog : ContentDialog
                     Hide();
             }));
 
-        KeyboardAccelerators.Add(CreateAccelerator(
+        KeyboardAccelerators.Add(DialogSmartInputHelper.CreateAccelerator(
             VirtualKey.Enter,
-            VirtualKeyModifiers.Control,
             (_, args) =>
             {
                 args.Handled = true;
                 if (TryComplete(postNow: true))
                     Hide();
             }));
+
+        KeyboardAccelerators.Add(DialogSmartInputHelper.CreateAccelerator(
+            VirtualKey.Escape,
+            (_, args) =>
+            {
+                args.Handled = true;
+                Hide();
+            },
+            VirtualKeyModifiers.None));
     }
 
-    private static KeyboardAccelerator CreateAccelerator(
-        VirtualKey key,
-        VirtualKeyModifiers modifiers,
-        TypedEventHandler<KeyboardAccelerator, KeyboardAcceleratorInvokedEventArgs> handler)
+    private void ApplyQuickDateInput()
+        => DialogSmartInputHelper.TryApplyDate(QuickDateInputBox, value => ViewModel.EntryDate = value, ShowValidationError);
+
+    private void ShowValidationError(string message)
     {
-        var accelerator = new KeyboardAccelerator
-        {
-            Key = key,
-            Modifiers = modifiers
-        };
-        accelerator.Invoked += handler;
-        return accelerator;
+        ErrorText.Text = message;
+        ErrorBanner.Visibility = Visibility.Visible;
     }
 }

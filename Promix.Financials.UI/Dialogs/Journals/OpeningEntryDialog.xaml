@@ -76,6 +76,11 @@
                         <TextBlock Text="التاريخ" Style="{StaticResource FieldLabelStyle}"/>
                         <DatePicker Style="{StaticResource InputDatePickerStyle}"
                                     Date="{Binding EntryDate, Mode=TwoWay}"/>
+                        <TextBox x:Name="QuickDateInputBox"
+                                 Style="{StaticResource InputTextBoxStyle}"
+                                 PlaceholderText="اختصار: t أو -1"
+                                 LostFocus="QuickDateInputBox_LostFocus"
+                                 KeyDown="QuickDateInputBox_KeyDown"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Spacing="6">
@@ -195,13 +200,17 @@
                                         <StackPanel Grid.Column="0" Spacing="6">
                                             <TextBlock Text="مدين" Style="{StaticResource FieldLabelStyle}"/>
                                             <NumberBox Style="{StaticResource InputNumberBoxStyle}"
-                                                       Value="{Binding Debit, Mode=TwoWay}"/>
+                                                       Value="{Binding Debit, Mode=TwoWay}"
+                                                       LostFocus="SmartAmountBox_LostFocus"
+                                                       KeyDown="SmartAmountBox_KeyDown"/>
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="1" Spacing="6">
                                             <TextBlock Text="دائن" Style="{StaticResource FieldLabelStyle}"/>
                                             <NumberBox Style="{StaticResource InputNumberBoxStyle}"
-                                                       Value="{Binding Credit, Mode=TwoWay}"/>
+                                                       Value="{Binding Credit, Mode=TwoWay}"
+                                                       LostFocus="SmartAmountBox_LostFocus"
+                                                       KeyDown="SmartAmountBox_KeyDown"/>
                                         </StackPanel>
 
                                         <Button Grid.Column="2"

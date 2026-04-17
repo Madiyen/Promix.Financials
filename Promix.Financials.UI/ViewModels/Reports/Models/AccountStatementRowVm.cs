@@ -43,6 +43,7 @@ public sealed class AccountStatementRowVm
 
     public string EntryDateText => IsOpeningBalanceRow ? "—" : EntryDate.ToString("yyyy-MM-dd");
     public string EntryNumberDisplay => string.IsNullOrWhiteSpace(EntryNumber) ? "—" : EntryNumber;
+    public bool CanOpenSourceEntry => !IsOpeningBalanceRow && EntryId != Guid.Empty && !string.IsNullOrWhiteSpace(EntryNumber);
     public string ReferenceDisplay => string.IsNullOrWhiteSpace(ReferenceNo) ? "—" : ReferenceNo!;
     public string DescriptionDisplay => string.IsNullOrWhiteSpace(Description) ? "بدون بيان" : Description!;
     public string DebitText => Debit == 0m ? "—" : Debit.ToString("N2");

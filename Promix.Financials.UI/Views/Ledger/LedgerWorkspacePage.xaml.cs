@@ -69,6 +69,11 @@ public sealed partial class LedgerWorkspacePage : Page
             StatementFrame.Navigate(typeof(ReportsPage), accountId);
             _initializedTabs.Add(LedgerWorkspaceTab.AccountStatement);
         }
+        else if (request.InitialTab == LedgerWorkspaceTab.Journals && request.EntryId is Guid entryId && entryId != Guid.Empty)
+        {
+            JournalsFrame.Navigate(typeof(JournalEntriesPage), entryId);
+            _initializedTabs.Add(LedgerWorkspaceTab.Journals);
+        }
         else
         {
             EnsureTabInitialized(request.InitialTab);

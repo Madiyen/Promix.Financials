@@ -14,4 +14,5 @@ public enum LedgerWorkspaceTab
 
 public sealed record LedgerWorkspaceNavigationRequest(
     LedgerWorkspaceTab InitialTab,
-    Guid? AccountId = null);
+    Guid? AccountId = null,
+    Guid? EntryId = null);

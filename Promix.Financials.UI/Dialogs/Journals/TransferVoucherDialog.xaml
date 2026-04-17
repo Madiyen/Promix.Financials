@@ -131,6 +131,12 @@
                                 <DatePicker Style="{StaticResource InputDatePickerStyle}"
                                             Date="{Binding EntryDate, Mode=TwoWay}"
                                             IsEnabled="{Binding IsEditing}"/>
+                                <TextBox x:Name="QuickDateInputBox"
+                                         Style="{StaticResource InputTextBoxStyle}"
+                                         PlaceholderText="اختصار: t أو -1"
+                                         Visibility="{Binding EditControlsVisibility}"
+                                         LostFocus="QuickDateInputBox_LostFocus"
+                                         KeyDown="QuickDateInputBox_KeyDown"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Spacing="4">
@@ -299,7 +305,9 @@
                                 <TextBlock Text="المبلغ بالعملة" Style="{StaticResource FieldLabelStyle}"/>
                                 <NumberBox Style="{StaticResource InputNumberBoxStyle}"
                                            Value="{Binding Amount, Mode=TwoWay}"
-                                           IsEnabled="{Binding IsEditing}"/>
+                                           IsEnabled="{Binding IsEditing}"
+                                           LostFocus="SmartAmountBox_LostFocus"
+                                           KeyDown="SmartAmountBox_KeyDown"/>
                             </StackPanel>
                         </Grid>
 
@@ -313,7 +321,9 @@
                                 <TextBlock Text="سعر الصرف" Style="{StaticResource FieldLabelStyle}"/>
                                 <NumberBox Style="{StaticResource InputNumberBoxStyle}"
                                            Value="{Binding ExchangeRate, Mode=TwoWay}"
-                                           IsEnabled="{Binding CanEditExchangeRate}"/>
+                                           IsEnabled="{Binding CanEditExchangeRate}"
+                                           LostFocus="SmartAmountBox_LostFocus"
+                                           KeyDown="SmartAmountBox_KeyDown"/>
                             </StackPanel>
 
                             <Border Grid.Column="1"

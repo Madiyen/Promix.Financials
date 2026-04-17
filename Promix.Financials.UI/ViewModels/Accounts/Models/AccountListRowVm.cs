@@ -97,6 +97,22 @@ public sealed class AccountListRowVm : INotifyPropertyChanged
     });
     public Brush StatusSurfaceBrush => CreateBrush(IsActive ? "#ECFDF5" : "#FEF2F2");
     public Brush StatusForegroundBrush => CreateBrush(IsActive ? "#166534" : "#B91C1C");
+    public Brush ClassificationSurfaceBrush => CreateBrush(Classification switch
+    {
+        AccountClass.Assets => "#DCFCE7",
+        AccountClass.Liabilities => "#FEE2E2",
+        AccountClass.Equity => "#EDE9FE",
+        AccountClass.Revenue => "#DBEAFE",
+        _ => "#FFEDD5"
+    });
+    public Brush ClassificationForegroundBrush => CreateBrush(Classification switch
+    {
+        AccountClass.Assets => "#166534",
+        AccountClass.Liabilities => "#B91C1C",
+        AccountClass.Equity => "#6D28D9",
+        AccountClass.Revenue => "#1D4ED8",
+        _ => "#C2410C"
+    });
     public Brush BalanceForegroundBrush => CreateBrush(Balance switch
     {
         > 0m => "#1D4ED8",

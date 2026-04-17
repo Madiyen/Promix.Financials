@@ -6,14 +6,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Navigation;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Application.Features.Journals.Commands;
 using Promix.Financials.Application.Features.Journals.Queries;
 using Promix.Financials.Application.Features.Parties.Queries;
 using Promix.Financials.Domain.Enums;
 using Promix.Financials.UI.Dialogs.Journals;
+using Promix.Financials.UI.Services;
 using Promix.Financials.UI.ViewModels.Journals;
 using Promix.Financials.UI.ViewModels.Parties.Models;
+using Windows.Foundation;
 using Windows.System;
 
 namespace Promix.Financials.UI.Views.Journals;
@@ -25,8 +28,10 @@ public sealed partial class JournalEntriesPage : Page
     private readonly IUserContext _userContext;
     private readonly IJournalEntriesQuery _query;
     private readonly IPartyQuery _partyQuery;
+    private readonly TransientMessageService _messageService;
     private bool _isUiReady;
     private bool _isApplyingQuickView;
+    private Guid? _requestedEntryId;
 
     public JournalEntriesPage()
     {
@@ -36,6 +41,7 @@ public sealed partial class JournalEntriesPage : Page
         _userContext = _scope.ServiceProvider.GetRequiredService<IUserContext>();
         _query = _scope.ServiceProvider.GetRequiredService<IJournalEntriesQuery>();
         _partyQuery = _scope.ServiceProvider.GetRequiredService<IPartyQuery>();
+        _messageService = _scope.ServiceProvider.GetRequiredService<TransientMessageService>();
 
         InitializeComponent();
 
@@ -43,20 +49,15 @@ public sealed partial class JournalEntriesPage : Page
 
         _vm.PropertyChanged += (_, args) =>
         {
-            if (args.PropertyName is nameof(_vm.ErrorMessage) or null)
-            {
-                ErrorBannerText.Text = _vm.ErrorMessage ?? string.Empty;
-                ErrorBanner.Visibility = _vm.HasError ? Visibility.Visible : Visibility.Collapsed;
-            }
+            if (args.PropertyName == nameof(_vm.ErrorMessage) && _vm.HasError)
+                _messageService.ShowError(_vm.ErrorMessage!);
 
-            if (args.PropertyName is nameof(_vm.SuccessMessage) or null)
-            {
-                SuccessBannerText.Text = _vm.SuccessMessage ?? string.Empty;
-                SuccessBanner.Visibility = _vm.HasSuccess ? Visibility.Visible : Visibility.Collapsed;
-            }
+            if (args.PropertyName == nameof(_vm.SuccessMessage) && _vm.HasSuccess)
+                _messageService.ShowSuccess(_vm.SuccessMessage!);
         };
 
         Loaded += OnLoaded;
+        RegisterKeyboardAccelerators();
         _isUiReady = true;
         SyncQuickViewButtons();
     }
@@ -67,6 +68,18 @@ public sealed partial class JournalEntriesPage : Page
             return;
 
         await _vm.InitializeAsync(_userContext.CompanyId.Value);
+        ApplyRequestedEntryFocus();
+    }
+
+    protected override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        _requestedEntryId = e.Parameter is Guid entryId && entryId != Guid.Empty
+            ? entryId
+            : null;
+
+        ApplyRequestedEntryFocus();
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e)
@@ -144,6 +157,9 @@ public sealed partial class JournalEntriesPage : Page
         };
         await ShowJournalDialogAsync(dialog);
     }
+
+    private void CreateFirstJournal_Click(object sender, RoutedEventArgs e)
+        => CreateDailyJournal_Click(sender, e);
 
     private async void CreateOpeningEntry_Click(object sender, RoutedEventArgs e)
     {
@@ -330,6 +346,15 @@ public sealed partial class JournalEntriesPage : Page
         await ShowJournalDialogAsync(dialog);
     }
 
+    private void ApplyRequestedEntryFocus()
+    {
+        if (_requestedEntryId is not Guid entryId || entryId == Guid.Empty)
+            return;
+
+        _vm.FocusEntry(entryId);
+        _requestedEntryId = null;
+    }
+
     private static bool IsSupportedVoucherType(JournalEntryType type)
         => type is JournalEntryType.ReceiptVoucher
             or JournalEntryType.PaymentVoucher
@@ -470,5 +495,28 @@ public sealed partial class JournalEntriesPage : Page
             return;
 
         button.Style = (Style)Resources[isActive ? "QuickViewButtonActiveStyle" : "QuickViewButtonStyle"];
+    }
+
+    private void RegisterKeyboardAccelerators()
+    {
+        KeyboardAccelerators.Add(CreateAccelerator(VirtualKey.N, (_, args) =>
+        {
+            args.Handled = true;
+            CreateDailyJournal_Click(this, new RoutedEventArgs());
+        }));
+    }
+
+    private static KeyboardAccelerator CreateAccelerator(
+        VirtualKey key,
+        TypedEventHandler<KeyboardAccelerator, KeyboardAcceleratorInvokedEventArgs> handler,
+        VirtualKeyModifiers modifiers = VirtualKeyModifiers.Control)
+    {
+        var accelerator = new KeyboardAccelerator
+        {
+            Key = key,
+            Modifiers = modifiers
+        };
+        accelerator.Invoked += handler;
+        return accelerator;
     }
 }

@@ -9,6 +9,7 @@ using Promix.Financials.Infrastructure.Persistence;
 using Promix.Financials.Infrastructure.Persistence.Seeding;
 using Promix.Financials.Infrastructure.Security;
 using Promix.Financials.UI.Security;
+using Promix.Financials.UI.Services;
 using Promix.Financials.UI.Services.Journals;
 using Promix.Financials.UI.ViewModels.Accounts;
 using Promix.Financials.UI.ViewModels.Currencies;
@@ -80,6 +81,7 @@ public partial class App : Microsoft.UI.Xaml.Application
                 services.AddTransient<TrialBalanceViewModel>();
                 services.AddSingleton<IJournalQuickDefaultsStore, LocalSettingsJournalQuickDefaultsStore>();
                 services.AddSingleton<ISessionStore, LocalSettingsSessionStore>();
+                services.AddSingleton<TransientMessageService>();
                 services.AddTransient<JournalDialogLauncher>();
                 services.AddTransient<ChartOfAccountsViewModel>();
                 services.AddTransient<NewAccountDialogViewModel>();
