@@ -201,7 +201,7 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         ? "اختر سنداً لعرض الخيارات المتاحة."
         : SelectedEntry.IsDraft
             ? "يمكن ترحيل هذا السند الآن بعد مراجعته."
-            : "السند مرحل ومؤثر على الأرصدة.";
+            : "السند مرحل للعرض فقط ولا يمكن تعديله أو حذفه.";
 
     public async Task InitializeAsync(Guid companyId)
     {
@@ -215,6 +215,25 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             return;
 
         await LoadAsync();
+    }
+
+    public async Task EnsureEntryDetailsLoadedAsync(JournalEntryRowVm? entry)
+    {
+        if (_companyId == Guid.Empty || entry is null || entry.HasLoadedDetails || entry.IsDetailsLoading)
+            return;
+
+        entry.BeginDetailsLoading();
+
+        try
+        {
+            var detail = await _query.GetEntryDetailAsync(_companyId, entry.Id);
+            var details = detail?.Lines.Select(MapLineDetail).ToList() ?? [];
+            entry.SetDetails(details);
+        }
+        catch
+        {
+            entry.SetDetails([]);
+        }
     }
 
     public async Task<bool> CreateAsync(CreateJournalEntryCommand command)
@@ -408,6 +427,7 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
             _lockedThroughDate = periodLock.LockedThroughDate;
             _lastRefreshedAt = DateTimeOffset.Now;
             ApplyFilters(preferredSelectionId ?? SelectedEntry?.Id);
+            await EnsureEntryDetailsLoadedAsync(SelectedEntry);
 
             OnPropertyChanged(nameof(LastRefreshedText));
             OnPropertyChanged(nameof(PeriodLockSummaryText));
@@ -553,6 +573,18 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         "month" => "هذا الشهر",
         _ => "كل الفترات"
     };
+
+    private JournalEntryLineDetailVm MapLineDetail(JournalEntryDetailLineDto line)
+    {
+        var accountName = AccountOptions.FirstOrDefault(x => x.Id == line.AccountId)?.DisplayText ?? "حساب غير معروف";
+        var description = string.IsNullOrWhiteSpace(line.PartyName)
+            ? (line.Description ?? string.Empty)
+            : string.IsNullOrWhiteSpace(line.Description)
+                ? line.PartyName!
+                : $"{line.PartyName} • {line.Description}";
+
+        return new JournalEntryLineDetailVm(accountName, line.Debit, line.Credit, description);
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

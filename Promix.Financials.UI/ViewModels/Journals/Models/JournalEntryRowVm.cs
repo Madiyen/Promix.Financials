@@ -1,12 +1,20 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Promix.Financials.Domain.Enums;
 using Windows.UI;
 
 namespace Promix.Financials.UI.ViewModels.Journals.Models;
 
-public sealed class JournalEntryRowVm
+public sealed class JournalEntryRowVm : INotifyPropertyChanged
 {
+    private bool _isDetailsLoading;
+    private bool _hasLoadedDetails;
+
     public JournalEntryRowVm(
         Guid id,
         string entryNumber,
@@ -63,6 +71,34 @@ public sealed class JournalEntryRowVm
     public DateTimeOffset CreatedAtUtc { get; }
     public DateTimeOffset? PostedAtUtc { get; }
     public DateTimeOffset? ModifiedAtUtc { get; }
+    public ObservableCollection<JournalEntryLineDetailVm> Details { get; } = new();
+    public bool IsDetailsLoading
+    {
+        get => _isDetailsLoading;
+        private set
+        {
+            if (_isDetailsLoading == value) return;
+            _isDetailsLoading = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(DetailsLoadingVisibility));
+            OnPropertyChanged(nameof(DetailsVisibility));
+            OnPropertyChanged(nameof(DetailsEmptyVisibility));
+        }
+    }
+
+    public bool HasLoadedDetails
+    {
+        get => _hasLoadedDetails;
+        private set
+        {
+            if (_hasLoadedDetails == value) return;
+            _hasLoadedDetails = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(DetailsLoadingVisibility));
+            OnPropertyChanged(nameof(DetailsVisibility));
+            OnPropertyChanged(nameof(DetailsEmptyVisibility));
+        }
+    }
 
     public bool IsDraft => Status == JournalEntryStatus.Draft;
     public bool IsBalanced => TotalDebit == TotalCredit && TotalDebit > 0;
@@ -148,7 +184,7 @@ public sealed class JournalEntryRowVm
     public Brush StatusForegroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#0369A1") : CreateBrush("#B45309");
 
     public string StatusNoteText => Status == JournalEntryStatus.Posted
-        ? "تم ترحيل هذا السند وهو مؤثر على الأرصدة والتقارير."
+        ? "تم ترحيل هذا السند وهو مؤثر على الأرصدة والتقارير. السندات المرحلة للعرض فقط ولا يمكن تعديلها أو حذفها."
         : "السند ما يزال مسودة ويمكن مراجعته وتعديله قبل الترحيل.";
 
     public string BalanceText => IsBalanced ? "متوازن" : $"فرق {DifferenceText}";
@@ -191,6 +227,10 @@ public sealed class JournalEntryRowVm
         _ => CreateBrush("#EFF6FF")
     };
 
+    public Visibility DetailsLoadingVisibility => IsDetailsLoading ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility DetailsVisibility => Details.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility DetailsEmptyVisibility => !IsDetailsLoading && HasLoadedDetails && Details.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
     public bool MatchesSearch(string? query)
     {
         if (string.IsNullOrWhiteSpace(query))
@@ -217,4 +257,29 @@ public sealed class JournalEntryRowVm
             Convert.ToByte(raw.Substring(4, 2), 16),
             Convert.ToByte(raw.Substring(6, 2), 16)));
     }
+
+    public void BeginDetailsLoading()
+    {
+        if (HasLoadedDetails || IsDetailsLoading)
+            return;
+
+        IsDetailsLoading = true;
+    }
+
+    public void SetDetails(IEnumerable<JournalEntryLineDetailVm> details)
+    {
+        Details.Clear();
+        foreach (var detail in details)
+            Details.Add(detail);
+
+        HasLoadedDetails = true;
+        IsDetailsLoading = false;
+        OnPropertyChanged(nameof(DetailsVisibility));
+        OnPropertyChanged(nameof(DetailsEmptyVisibility));
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

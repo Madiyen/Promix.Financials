@@ -25,8 +25,6 @@ public sealed partial class JournalEntriesPage : Page
     private readonly IUserContext _userContext;
     private readonly IJournalEntriesQuery _query;
     private readonly IPartyQuery _partyQuery;
-    private bool _isUiReady;
-    private bool _isApplyingQuickView;
 
     public JournalEntriesPage()
     {
@@ -57,8 +55,6 @@ public sealed partial class JournalEntriesPage : Page
         };
 
         Loaded += OnLoaded;
-        _isUiReady = true;
-        SyncQuickViewButtons();
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -67,11 +63,13 @@ public sealed partial class JournalEntriesPage : Page
             return;
 
         await _vm.InitializeAsync(_userContext.CompanyId.Value);
+        await _vm.EnsureEntryDetailsLoadedAsync(_vm.SelectedEntry);
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e)
     {
         await _vm.RefreshAsync();
+        await _vm.EnsureEntryDetailsLoadedAsync(_vm.SelectedEntry);
     }
 
     private async void CreateReceipt_Click(object sender, RoutedEventArgs e)
@@ -274,6 +272,11 @@ public sealed partial class JournalEntriesPage : Page
         await OpenSelectedVoucherAsync();
     }
 
+    private async void EntriesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        await _vm.EnsureEntryDetailsLoadedAsync(_vm.SelectedEntry);
+    }
+
     private async Task OpenSelectedVoucherAsync()
     {
         if (_userContext.CompanyId is not Guid companyId || _vm.SelectedEntry is not { } entry)
@@ -346,69 +349,21 @@ public sealed partial class JournalEntriesPage : Page
     private void SearchFilterBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         _vm.SearchText = (sender as TextBox)?.Text ?? string.Empty;
-        SyncQuickViewButtons();
     }
 
     private void TypeFilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         _vm.SetTypeFilter(GetSelectedTag(sender));
-        SyncQuickViewButtons();
     }
 
     private void StatusFilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         _vm.SetStatusFilter(GetSelectedTag(sender));
-        SyncQuickViewButtons();
     }
 
     private void PeriodFilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         _vm.SetPeriodFilter(GetSelectedTag(sender));
-        SyncQuickViewButtons();
-    }
-
-    private void QuickViewButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (!_isUiReady || _isApplyingQuickView)
-            return;
-
-        _isApplyingQuickView = true;
-        try
-        {
-            switch ((sender as Button)?.Tag?.ToString())
-            {
-                case "today":
-                    TypeFilterCombo.SelectedIndex = 0;
-                    StatusFilterCombo.SelectedIndex = 0;
-                    PeriodFilterCombo.SelectedIndex = 1;
-                    break;
-                case "drafts":
-                    TypeFilterCombo.SelectedIndex = 0;
-                    StatusFilterCombo.SelectedIndex = 2;
-                    PeriodFilterCombo.SelectedIndex = 0;
-                    break;
-                case "posted":
-                    TypeFilterCombo.SelectedIndex = 0;
-                    StatusFilterCombo.SelectedIndex = 1;
-                    PeriodFilterCombo.SelectedIndex = 0;
-                    break;
-                case "month":
-                    TypeFilterCombo.SelectedIndex = 0;
-                    StatusFilterCombo.SelectedIndex = 0;
-                    PeriodFilterCombo.SelectedIndex = 3;
-                    break;
-                default:
-                    TypeFilterCombo.SelectedIndex = 0;
-                    StatusFilterCombo.SelectedIndex = 0;
-                    PeriodFilterCombo.SelectedIndex = 0;
-                    break;
-            }
-        }
-        finally
-        {
-            _isApplyingQuickView = false;
-            SyncQuickViewButtons();
-        }
     }
 
     private void ClearFilters_Click(object sender, RoutedEventArgs e)
@@ -418,7 +373,6 @@ public sealed partial class JournalEntriesPage : Page
         StatusFilterCombo.SelectedIndex = 0;
         PeriodFilterCombo.SelectedIndex = 0;
         _vm.ClearFilters();
-        SyncQuickViewButtons();
     }
 
     private static string? GetSelectedTag(object sender)
@@ -427,48 +381,5 @@ public sealed partial class JournalEntriesPage : Page
             return comboItem.Tag?.ToString();
 
         return null;
-    }
-
-    private void SyncQuickViewButtons()
-    {
-        if (!_isUiReady || _isApplyingQuickView)
-            return;
-
-        if (!string.IsNullOrWhiteSpace(SearchFilterBox?.Text))
-        {
-            SetQuickViewState(null);
-            return;
-        }
-
-        var type = GetSelectedTag(TypeFilterCombo) ?? "all";
-        var status = GetSelectedTag(StatusFilterCombo) ?? "all";
-        var period = GetSelectedTag(PeriodFilterCombo) ?? "all";
-
-        var quickViewKey =
-            type == "all" && status == "all" && period == "all" ? "all" :
-            type == "all" && status == "all" && period == "today" ? "today" :
-            type == "all" && status == "draft" && period == "all" ? "drafts" :
-            type == "all" && status == "posted" && period == "all" ? "posted" :
-            type == "all" && status == "all" && period == "month" ? "month" :
-            null;
-
-        SetQuickViewState(quickViewKey);
-    }
-
-    private void SetQuickViewState(string? quickViewKey)
-    {
-        SetQuickViewButtonStyle(QuickViewAllButton, quickViewKey == "all");
-        SetQuickViewButtonStyle(QuickViewTodayButton, quickViewKey == "today");
-        SetQuickViewButtonStyle(QuickViewDraftsButton, quickViewKey == "drafts");
-        SetQuickViewButtonStyle(QuickViewPostedButton, quickViewKey == "posted");
-        SetQuickViewButtonStyle(QuickViewMonthButton, quickViewKey == "month");
-    }
-
-    private void SetQuickViewButtonStyle(Button? button, bool isActive)
-    {
-        if (button is null)
-            return;
-
-        button.Style = (Style)Resources[isActive ? "QuickViewButtonActiveStyle" : "QuickViewButtonStyle"];
     }
 }

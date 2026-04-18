@@ -30,7 +30,7 @@
     </Style>
 
     <Style x:Key="AppMetricCardCompactStyle" TargetType="Border" BasedOn="{StaticResource AppMetricCardStyle}">
-        <Setter Property="Padding" Value="14,12"/>
+        <Setter Property="Padding" Value="12,10"/>
         <Setter Property="CornerRadius" Value="12"/>
     </Style>
 
@@ -94,7 +94,8 @@
     </Style>
 
     <Style x:Key="AppMetricValueCompactTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppMetricValueTextStyle}">
-        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
     </Style>
 
     <Style x:Key="AppBadgeBorderStyle" TargetType="Border">
@@ -142,10 +143,10 @@
     </Style>
 
     <Style x:Key="AppEnterpriseDataRowStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="#E2E8F0"/>
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
-        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Padding" Value="10,7"/>
     </Style>
 
     <Style x:Key="AppEnterpriseInfoChipStyle" TargetType="Border">
@@ -203,17 +204,17 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0,0,0,2"/>
-        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Padding" Value="8,6"/>
         <Setter Property="Margin" Value="0,0,8,0"/>
-        <Setter Property="MinHeight" Value="34"/>
+        <Setter Property="MinHeight" Value="32"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
     <Style x:Key="AppTabViewItemCompactStyle" TargetType="controls:TabViewItem" BasedOn="{StaticResource AppTabViewItemStyle}">
-        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Padding" Value="10,6"/>
         <Setter Property="Margin" Value="0,0,6,0"/>
-        <Setter Property="MinHeight" Value="38"/>
+        <Setter Property="MinHeight" Value="34"/>
     </Style>
 
     <Style x:Key="AppTabHeaderTextStyle" TargetType="TextBlock">

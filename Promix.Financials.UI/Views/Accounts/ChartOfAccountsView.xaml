@@ -21,42 +21,16 @@
     <Grid Padding="20,16,20,20" RowSpacing="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" ColumnSpacing="12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0"
-                        Orientation="Horizontal"
-                        Spacing="8"
-                        HorizontalAlignment="Left">
-                <Button Click="NewAccount_Click" Style="{StaticResource PrimaryActionCompactButtonStyle}">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <FontIcon Glyph="&#xE710;" Foreground="White"/>
-                        <TextBlock Text="حساب جديد" Foreground="White"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding RefreshCommand}" Style="{StaticResource SecondaryActionCompactButtonStyle}">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <FontIcon Glyph="&#xE72C;"/>
-                        <TextBlock Text="تحديث"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-        </Grid>
-
-        <InfoBar Grid.Row="1"
+        <InfoBar Grid.Row="0"
                  IsOpen="{Binding HasErrorMessage, Mode=OneWay}"
                  Severity="Error"
                  Title="تعذّر تحميل الحسابات"
                  Message="{Binding ErrorMessage}"/>
 
-        <TabView Grid.Row="2"
+        <TabView Grid.Row="1"
                  Style="{StaticResource AppTabViewStyle}"
                  SelectedIndex="{Binding SelectedWorkspaceTabIndex, Mode=TwoWay}"
                  TabWidthMode="SizeToContent"
@@ -93,51 +67,74 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <Grid Grid.Row="0" ColumnSpacing="10">
+                            <Grid Grid.Row="0" ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="128"/>
-                                    <ColumnDefinition Width="118"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBox Grid.Column="0"
-                                         Style="{StaticResource SearchBoxStyle}"
-                                         PlaceholderText="ابحث بالكود أو الاسم أو الحساب الأب..."
-                                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <StackPanel Grid.Column="0"
+                                            Orientation="Horizontal"
+                                            Spacing="8"
+                                            HorizontalAlignment="Left">
+                                    <Button Style="{StaticResource IconCompactButtonStyle}"
+                                            Command="{Binding RefreshCommand}"
+                                            ToolTipService.ToolTip="تحديث الحسابات">
+                                        <FontIcon Glyph="&#xE72C;"/>
+                                    </Button>
+                                    <Button Click="NewAccount_Click" Style="{StaticResource PrimaryActionCompactButtonStyle}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xE710;" Foreground="White"/>
+                                            <TextBlock Text="حساب جديد" Foreground="White"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
 
-                                <ComboBox Grid.Column="1"
-                                          Style="{StaticResource InputComboBoxStyle}"
-                                          ItemsSource="{Binding PostingFilters}"
-                                          SelectedItem="{Binding SelectedPostingFilter, Mode=TwoWay}"/>
+                                <Grid Grid.Column="1" ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="128"/>
+                                        <ColumnDefinition Width="118"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
 
-                                <ComboBox Grid.Column="2"
-                                          Style="{StaticResource InputComboBoxStyle}"
-                                          ItemsSource="{Binding OriginFilters}"
-                                          SelectedItem="{Binding SelectedOriginFilter, Mode=TwoWay}"/>
+                                    <TextBox Grid.Column="0"
+                                             Style="{StaticResource SearchBoxStyle}"
+                                             PlaceholderText="ابحث بالكود أو الاسم أو الحساب الأب..."
+                                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                                <Button x:Name="SystemFilterChipButton"
-                                        Grid.Column="3"
-                                        Click="SystemFilterChipButton_Click"
-                                        Content="{Binding SystemFilterLabel}"
-                                        Style="{StaticResource FilterChipButtonStyle}"/>
+                                    <ComboBox Grid.Column="1"
+                                              Style="{StaticResource InputComboBoxStyle}"
+                                              ItemsSource="{Binding PostingFilters}"
+                                              SelectedItem="{Binding SelectedPostingFilter, Mode=TwoWay}"/>
 
-                                <Button x:Name="InactiveFilterChipButton"
-                                        Grid.Column="4"
-                                        Click="InactiveFilterChipButton_Click"
-                                        Content="{Binding InactiveFilterLabel}"
-                                        Style="{StaticResource FilterChipButtonStyle}"/>
+                                    <ComboBox Grid.Column="2"
+                                              Style="{StaticResource InputComboBoxStyle}"
+                                              ItemsSource="{Binding OriginFilters}"
+                                              SelectedItem="{Binding SelectedOriginFilter, Mode=TwoWay}"/>
 
-                                <Button x:Name="PartyFilterChipButton"
-                                        Grid.Column="5"
-                                        Click="PartyFilterChipButton_Click"
-                                        Content="{Binding PartyFilterLabel}"
-                                        Style="{StaticResource FilterChipButtonStyle}"/>
+                                    <Button x:Name="SystemFilterChipButton"
+                                            Grid.Column="3"
+                                            Click="SystemFilterChipButton_Click"
+                                            Content="{Binding SystemFilterLabel}"
+                                            Style="{StaticResource FilterChipButtonStyle}"/>
+
+                                    <Button x:Name="InactiveFilterChipButton"
+                                            Grid.Column="4"
+                                            Click="InactiveFilterChipButton_Click"
+                                            Content="{Binding InactiveFilterLabel}"
+                                            Style="{StaticResource FilterChipButtonStyle}"/>
+
+                                    <Button x:Name="PartyFilterChipButton"
+                                            Grid.Column="5"
+                                            Click="PartyFilterChipButton_Click"
+                                            Content="{Binding PartyFilterLabel}"
+                                            Style="{StaticResource FilterChipButtonStyle}"/>
+                                </Grid>
                             </Grid>
 
                             <Border Grid.Row="1"
@@ -298,9 +295,15 @@
                                                                                 </StackPanel>
 
                                                                                 <StackPanel Grid.Column="2" Spacing="3" VerticalAlignment="Center">
-                                                                                    <TextBlock Text="{Binding ClassificationText}"
-                                                                                               Foreground="{StaticResource SlateTextBrush}"
-                                                                                               FontSize="11.5"/>
+                                                                                    <Border Background="{Binding ClassificationSurfaceBrush}"
+                                                                                            CornerRadius="999"
+                                                                                            Padding="8,3"
+                                                                                            HorizontalAlignment="Left">
+                                                                                        <TextBlock Text="{Binding ClassificationText}"
+                                                                                                   Foreground="{Binding ClassificationForegroundBrush}"
+                                                                                                   FontSize="10.5"
+                                                                                                   FontWeight="SemiBold"/>
+                                                                                    </Border>
                                                                                     <TextBlock Text="{Binding TypeText}"
                                                                                                Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
                                                                                 </StackPanel>
@@ -393,20 +396,6 @@
                                 </ScrollViewer>
                             </Border>
 
-                            <Grid Grid.Row="3" ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="يمكنك التنقل داخل المجموعات والتمرير داخل هذه المساحة دون ضغط التفاصيل أو التبويبات."
-                                           Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
-                                <TextBlock Grid.Column="1"
-                                           Text="{Binding Summary.TotalAccountsText}"
-                                           FontSize="11.5"
-                                           FontWeight="Bold"
-                                           Foreground="{StaticResource SlateTextBrush}"
-                                           Language="en-US"/>
-                            </Grid>
                         </Grid>
                     </Border>
 
@@ -603,26 +592,45 @@
 
                             <Grid Grid.Row="0" ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Spacing="3">
-                                    <TextBlock Text="العرض الشجري" Style="{StaticResource AppSectionTitleTextStyle}"/>
-                                    <TextBlock Text="شجرة فعلية بأسهم واضحة مع صفوف مضغوطة، لتصفح الهيكل الكامل عند الحاجة."
-                                               Style="{StaticResource AppSectionCaptionTextStyle}"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Left">
                                     <Button Click="ExpandAll_Click" Style="{StaticResource GhostActionButtonStyle}" Content="توسيع"/>
                                     <Button Click="CollapseAll_Click" Style="{StaticResource GhostActionButtonStyle}" Content="طي"/>
+                                    <Button Style="{StaticResource IconCompactButtonStyle}"
+                                            Command="{Binding RefreshCommand}"
+                                            ToolTipService.ToolTip="تحديث الحسابات">
+                                        <FontIcon Glyph="&#xE72C;"/>
+                                    </Button>
                                 </StackPanel>
+                                <Grid Grid.Column="1" ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="128"/>
+                                        <ColumnDefinition Width="118"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0"
+                                             Style="{StaticResource SearchBoxStyle}"
+                                             PlaceholderText="ابحث داخل الشجرة..."
+                                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <ComboBox Grid.Column="1"
+                                              Style="{StaticResource InputComboBoxStyle}"
+                                              ItemsSource="{Binding PostingFilters}"
+                                              SelectedItem="{Binding SelectedPostingFilter, Mode=TwoWay}"/>
+                                    <ComboBox Grid.Column="2"
+                                              Style="{StaticResource InputComboBoxStyle}"
+                                              ItemsSource="{Binding OriginFilters}"
+                                              SelectedItem="{Binding SelectedOriginFilter, Mode=TwoWay}"/>
+                                </Grid>
                             </Grid>
 
                             <Border Grid.Row="1"
-                                    Background="#FBFDFF"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="1"
-                                    CornerRadius="18"
-                                    Padding="8">
+                                    Background="{StaticResource CardBackgroundBrush}"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="0"
+                                    CornerRadius="12"
+                                    Padding="6">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                                               HorizontalScrollBarVisibility="Disabled">
                                     <TreeView x:Name="AccountsTreeView"
@@ -651,9 +659,9 @@
                                                     </Button.ContextFlyout>
 
                                                     <Border Background="{Binding RowBackgroundBrush}"
-                                                            BorderBrush="{Binding RowBorderBrush}"
-                                                            BorderThickness="1"
-                                                            CornerRadius="12"
+                                                            BorderBrush="#E2E8F0"
+                                                            BorderThickness="0,0,0,1"
+                                                            CornerRadius="0"
                                                             Padding="10,8">
                                                         <Grid ColumnSpacing="10">
                                                             <Grid.ColumnDefinitions>
@@ -670,6 +678,9 @@
                                                             <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
                                                                 <TextBlock Text="{Binding ArabicName}" Foreground="{Binding RowForegroundBrush}" FontWeight="{Binding NameFontWeight}" FontSize="13.5" TextTrimming="CharacterEllipsis"/>
                                                                 <StackPanel Orientation="Horizontal" Spacing="6">
+                                                                    <Border Background="{Binding ClassificationSurfaceBrush}" CornerRadius="999" Padding="8,3">
+                                                                        <TextBlock Text="{Binding ClassificationText}" Foreground="{Binding ClassificationForegroundBrush}" FontSize="10.5" FontWeight="SemiBold"/>
+                                                                    </Border>
                                                                     <Border Background="{Binding OriginSurfaceBrush}" CornerRadius="999" Padding="8,3">
                                                                         <TextBlock Text="{Binding OriginText}" Foreground="{Binding OriginForegroundBrush}" FontSize="10.5" FontWeight="SemiBold"/>
                                                                     </Border>
@@ -679,7 +690,7 @@
                                                                 </StackPanel>
                                                             </StackPanel>
 
-                                                            <TextBlock Grid.Column="2" Text="{Binding ClassificationText}" FontSize="11.5" VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding NatureText}" FontSize="11.5" VerticalAlignment="Center" Foreground="{StaticResource SecondaryTextBrush}"/>
                                                         </Grid>
                                                     </Border>
                                                 </Button>

@@ -126,7 +126,7 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
     public string Title => string.IsNullOrWhiteSpace(_entryNumber) ? _baseTitle : $"{_baseTitle} · {_entryNumber}";
     public string Subtitle => _mode switch
     {
-        VoucherEditorMode.View when _status == JournalEntryStatus.Posted => "عرض السند المرحل كما تم حفظه، ويمكن للمدير فقط فتح وضع التعديل.",
+        VoucherEditorMode.View when _status == JournalEntryStatus.Posted => "عرض السند المرحل كما تم حفظه. السندات المرحلة للعرض فقط ولا يمكن تعديلها أو حذفها.",
         VoucherEditorMode.View => "عرض السند المحفوظ مع تفاصيله والقيد الناتج.",
         VoucherEditorMode.EditPosted => "عدّل بيانات السند المرحل بحذر، وسيبقى مرحلًا بعد حفظ التغييرات.",
         VoucherEditorMode.EditDraft => "حدّث المسودة الحالية ثم احفظها أو رحّلها مباشرة من نفس الشاشة.",
@@ -159,7 +159,8 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
     public string TotalLinesText => $"عدد السطور الصالحة: {GetActiveLines().Count}";
     public string FooterHintText => _mode switch
     {
-        VoucherEditorMode.View when _canManage => "افتح وضع التعديل أو الحذف من هذا الشريط. غير المدير يعرض السند فقط.",
+        VoucherEditorMode.View when _status == JournalEntryStatus.Posted => "السند المرحل للعرض فقط حفاظًا على سلامة الأرصدة. يمكن تعديل المسودات أو حذفها فقط.",
+        VoucherEditorMode.View when _canManage => "يمكنك تعديل هذه المسودة أو حذفها من هذا الشريط.",
         VoucherEditorMode.View => "وضع عرض فقط. لا يمكن تعديل هذا السند من هذه الجلسة.",
         VoucherEditorMode.EditPosted => "Ctrl+S لحفظ التعديلات على السند المرحل.",
         _ => "Ctrl+S للحفظ كمسودة  •  Ctrl+Enter للحفظ والترحيل  •  Ctrl+Shift+N لإضافة سطر",
@@ -173,13 +174,15 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
     public bool IsEditing => _mode != VoucherEditorMode.View;
     public bool IsExistingEntry => _entryId is Guid;
     public bool CanManage => _canManage && IsExistingEntry;
+    public bool CanEditEntry => CanManage && _status != JournalEntryStatus.Posted;
+    public bool CanDeleteEntry => CanManage && _status != JournalEntryStatus.Posted;
     public bool CanEditExchangeRate => SelectedCurrency is not { IsBaseCurrency: true } && IsEditing;
     public Visibility EditControlsVisibility => IsEditing ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility ViewManageButtonsVisibility => CanManage && _mode == VoucherEditorMode.View ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility DeleteButtonVisibility => CanManage ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility ViewManageButtonsVisibility => CanEditEntry && _mode == VoucherEditorMode.View ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility DeleteButtonVisibility => CanDeleteEntry ? Visibility.Visible : Visibility.Collapsed;
     public Visibility SaveDraftButtonVisibility => _mode is VoucherEditorMode.Create or VoucherEditorMode.EditDraft ? Visibility.Visible : Visibility.Collapsed;
     public Visibility SaveAndPostButtonVisibility => _mode is VoucherEditorMode.Create or VoucherEditorMode.EditDraft ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility SaveChangesButtonVisibility => _mode == VoucherEditorMode.EditPosted ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility SaveChangesButtonVisibility => Visibility.Collapsed;
     public Visibility AddLineButtonVisibility => IsEditing ? Visibility.Visible : Visibility.Collapsed;
     public Visibility PreviewErrorVisibility => string.IsNullOrWhiteSpace(PreviewErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
     public Visibility PostingPreviewVisibility => PostingPreviewLines.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -353,10 +356,10 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
 
     public void BeginEdit()
     {
-        if (!CanManage)
+        if (!CanEditEntry)
             return;
 
-        SetMode(_status == JournalEntryStatus.Posted ? VoucherEditorMode.EditPosted : VoucherEditorMode.EditDraft);
+        SetMode(VoucherEditorMode.EditDraft);
     }
 
     public bool TryBuildCommand(Guid companyId, bool postNow, out CreateJournalEntryCommand? command, out string error)
@@ -400,6 +403,12 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
             return false;
         }
 
+        if (_status == JournalEntryStatus.Posted)
+        {
+            error = "السندات المرحلة للعرض فقط ولا يمكن تعديلها.";
+            return false;
+        }
+
         if (!TryValidateVoucher(out var cashAccount, out var currency, out var lines, out error))
             return false;
 
@@ -427,6 +436,12 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
         if (!CanManage || _entryId is not Guid entryId)
         {
             error = "حذف السند غير متاح في هذا الوضع.";
+            return false;
+        }
+
+        if (_status == JournalEntryStatus.Posted)
+        {
+            error = "السندات المرحلة للعرض فقط ولا يمكن حذفها.";
             return false;
         }
 
@@ -849,6 +864,8 @@ public sealed class SimpleVoucherEditorViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(CanEditExchangeRate));
         OnPropertyChanged(nameof(IsEditing));
         OnPropertyChanged(nameof(CanManage));
+        OnPropertyChanged(nameof(CanEditEntry));
+        OnPropertyChanged(nameof(CanDeleteEntry));
         OnPropertyChanged(nameof(EditControlsVisibility));
         OnPropertyChanged(nameof(ViewManageButtonsVisibility));
         OnPropertyChanged(nameof(DeleteButtonVisibility));

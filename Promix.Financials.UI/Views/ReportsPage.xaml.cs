@@ -28,6 +28,7 @@ public sealed partial class ReportsPage : Page
     private readonly CreateJournalEntryService _createService;
     private Guid? _requestedAccountId;
     private bool _isInitializing;
+    private bool _isLoadingStatement;
 
     public ReportsPage()
     {
@@ -76,34 +77,34 @@ public sealed partial class ReportsPage : Page
 
     private async void LoadStatement_Click(object sender, RoutedEventArgs e)
     {
-        await _vm.LoadStatementPageAsync();
+        await LoadStatementSafelyAsync();
     }
 
     private async void TodayRange_Click(object sender, RoutedEventArgs e)
     {
         _vm.SetTodayRange();
-        await _vm.LoadStatementPageAsync();
+        await LoadStatementSafelyAsync();
     }
 
     private async void MonthRange_Click(object sender, RoutedEventArgs e)
     {
         _vm.SetThisMonthRange();
-        await _vm.LoadStatementPageAsync();
+        await LoadStatementSafelyAsync();
     }
 
     private async void YearRange_Click(object sender, RoutedEventArgs e)
     {
         _vm.SetThisYearRange();
-        await _vm.LoadStatementPageAsync();
+        await LoadStatementSafelyAsync();
     }
 
     private async void AccountStatementYearCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_isInitializing)
+        if (_isInitializing || _isLoadingStatement || _vm.IsBusy)
             return;
 
         if ((sender as ComboBox)?.SelectedItem is FinancialYearOptionVm)
-            await _vm.LoadStatementPageAsync();
+            await LoadStatementSafelyAsync();
     }
 
     private async void CreateReceiptVoucher_Click(object sender, RoutedEventArgs e)
@@ -182,5 +183,21 @@ public sealed partial class ReportsPage : Page
         return parties
             .Select(x => new PartyOptionVm(x.Id, x.Code, x.NameAr, x.TypeFlags, x.LedgerMode, x.ReceivableAccountId, x.PayableAccountId, x.IsActive))
             .ToList();
+    }
+
+    private async Task LoadStatementSafelyAsync()
+    {
+        if (_isLoadingStatement)
+            return;
+
+        _isLoadingStatement = true;
+        try
+        {
+            await _vm.LoadStatementPageAsync();
+        }
+        finally
+        {
+            _isLoadingStatement = false;
+        }
     }
 }

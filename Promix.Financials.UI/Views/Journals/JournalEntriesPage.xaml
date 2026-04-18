@@ -2,37 +2,13 @@
     x:Class="Promix.Financials.UI.Views.Journals.JournalEntriesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctcontrols="using:CommunityToolkit.WinUI.UI.Controls"
     Background="{StaticResource AppBackgroundBrush}"
     FlowDirection="RightToLeft">
-
-    <Page.Resources>
-        <Style x:Key="QuickViewButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
-            <Setter Property="Background" Value="#F8FAFC"/>
-            <Setter Property="Foreground" Value="#334155"/>
-            <Setter Property="BorderBrush" Value="#CBD5E1"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="14,7"/>
-            <Setter Property="MinHeight" Value="38"/>
-        </Style>
-
-        <Style x:Key="QuickViewButtonActiveStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionButtonStyle}">
-            <Setter Property="Background" Value="#0F172A"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#0F172A"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="14,7"/>
-            <Setter Property="MinHeight" Value="38"/>
-        </Style>
-    </Page.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid Margin="24,20,24,20" RowSpacing="14">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -42,43 +18,125 @@
             <Border Grid.Row="0"
                     Style="{StaticResource AppSurfaceCardCompactStyle}"
                     Padding="14,12">
-                <Grid ColumnSpacing="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                <Grid RowSpacing="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Column="0"
-                                Orientation="Horizontal"
-                                Spacing="8"
+                    <Grid Grid.Row="0" ColumnSpacing="14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0"
+                                    Orientation="Horizontal"
+                                    Spacing="8"
+                                    VerticalAlignment="Center">
+                            <Button Style="{StaticResource IconCompactButtonStyle}"
+                                    Click="Refresh_Click"
+                                    ToolTipService.ToolTip="{Binding LastRefreshedText}">
+                                <FontIcon Glyph="&#xE72C;"/>
+                            </Button>
+                            <Button Content="ترحيل المحدد"
+                                    Click="PostSelected_Click"
+                                    IsEnabled="{Binding CanPostSelected}"
+                                    Style="{StaticResource SecondaryActionCompactButtonStyle}"/>
+                            <DropDownButton Content="+ إنشاء سند"
+                                            Style="{StaticResource PrimaryActionCompactButtonStyle}">
+                                <DropDownButton.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Text="سند قبض" Click="CreateReceipt_Click"/>
+                                        <MenuFlyoutItem Text="سند صرف" Click="CreatePayment_Click"/>
+                                        <MenuFlyoutItem Text="تحويل بين الحسابات" Click="CreateTransfer_Click"/>
+                                        <MenuFlyoutItem Text="قيد يومية" Click="CreateDailyJournal_Click"/>
+                                        <MenuFlyoutItem Text="قيد افتتاحي" Click="CreateOpeningEntry_Click"/>
+                                        <MenuFlyoutItem Text="إقفال صندوق" Click="CreateDailyCashClosing_Click"/>
+                                    </MenuFlyout>
+                                </DropDownButton.Flyout>
+                            </DropDownButton>
+                        </StackPanel>
+
+                        <Grid Grid.Column="1" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2.4*"/>
+                                <ColumnDefinition Width="132"/>
+                                <ColumnDefinition Width="132"/>
+                                <ColumnDefinition Width="132"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="SearchFilterBox"
+                                     Grid.Column="0"
+                                     Style="{StaticResource InputTextBoxStyle}"
+                                     PlaceholderText="ابحث برقم السند أو المرجع أو الوصف"
+                                     TextChanged="SearchFilterBox_TextChanged"/>
+
+                            <ComboBox x:Name="TypeFilterCombo"
+                                      Grid.Column="1"
+                                      Style="{StaticResource InputComboBoxStyle}"
+                                      SelectionChanged="TypeFilterCombo_SelectionChanged"
+                                      SelectedIndex="0">
+                                <ComboBoxItem Content="كل الأنواع" Tag="all"/>
+                                <ComboBoxItem Content="سند قبض" Tag="receipt"/>
+                                <ComboBoxItem Content="سند صرف" Tag="payment"/>
+                                <ComboBoxItem Content="تحويل" Tag="transfer"/>
+                                <ComboBoxItem Content="قيد يومية" Tag="daily"/>
+                                <ComboBoxItem Content="قيد افتتاحي" Tag="opening"/>
+                                <ComboBoxItem Content="إقفال صندوق" Tag="closing"/>
+                                <ComboBoxItem Content="قيد تسوية" Tag="adjustment"/>
+                            </ComboBox>
+
+                            <ComboBox x:Name="StatusFilterCombo"
+                                      Grid.Column="2"
+                                      Style="{StaticResource InputComboBoxStyle}"
+                                      SelectionChanged="StatusFilterCombo_SelectionChanged"
+                                      SelectedIndex="0">
+                                <ComboBoxItem Content="كل الحالات" Tag="all"/>
+                                <ComboBoxItem Content="مرحل" Tag="posted"/>
+                                <ComboBoxItem Content="مسودة" Tag="draft"/>
+                            </ComboBox>
+
+                            <ComboBox x:Name="PeriodFilterCombo"
+                                      Grid.Column="3"
+                                      Style="{StaticResource InputComboBoxStyle}"
+                                      SelectionChanged="PeriodFilterCombo_SelectionChanged"
+                                      SelectedIndex="0">
+                                <ComboBoxItem Content="كل الفترات" Tag="all"/>
+                                <ComboBoxItem Content="اليوم" Tag="today"/>
+                                <ComboBoxItem Content="آخر 7 أيام" Tag="week"/>
+                                <ComboBoxItem Content="هذا الشهر" Tag="month"/>
+                            </ComboBox>
+
+                            <Button Grid.Column="4"
+                                    Style="{StaticResource IconCompactButtonStyle}"
+                                    Click="ClearFilters_Click"
+                                    ToolTipService.ToolTip="مسح الفلاتر">
+                                <FontIcon Glyph="&#xE894;"/>
+                            </Button>
+                        </Grid>
+                    </Grid>
+
+                    <Grid Grid.Row="1" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding ActiveFiltersText}"
+                                   Style="{StaticResource AppSectionCaptionCompactTextStyle}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis"/>
+
+                        <Border Grid.Column="1"
+                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
                                 VerticalAlignment="Center">
-                        <Button
-                                Content="تحديث"
-                                Style="{StaticResource SecondaryActionCompactButtonStyle}"
-                                Click="Refresh_Click"/>
-                        <DropDownButton Content="+ إنشاء سند"
-                                        Style="{StaticResource PrimaryActionCompactButtonStyle}">
-                            <DropDownButton.Flyout>
-                                <MenuFlyout>
-                                    <MenuFlyoutItem Text="سند قبض" Click="CreateReceipt_Click"/>
-                                    <MenuFlyoutItem Text="سند صرف" Click="CreatePayment_Click"/>
-                                    <MenuFlyoutItem Text="تحويل بين الحسابات" Click="CreateTransfer_Click"/>
-                                    <MenuFlyoutItem Text="قيد يومية" Click="CreateDailyJournal_Click"/>
-                                    <MenuFlyoutItem Text="قيد افتتاحي" Click="CreateOpeningEntry_Click"/>
-                                    <MenuFlyoutItem Text="إقفال صندوق" Click="CreateDailyCashClosing_Click"/>
-                                </MenuFlyout>
-                            </DropDownButton.Flyout>
-                        </DropDownButton>
-                    </StackPanel>
-
-                    <Border Grid.Column="1"
-                            Style="{StaticResource AppEnterpriseInfoChipStyle}"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center">
-                        <TextBlock Text="{Binding FilterSummaryText}"
-                                   Style="{StaticResource AppEnterpriseInfoChipTextStyle}"
-                                   ToolTipService.ToolTip="{Binding LastRefreshedText}"/>
-                    </Border>
+                            <TextBlock Text="{Binding FilterSummaryText}"
+                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
+                        </Border>
+                    </Grid>
                 </Grid>
             </Border>
 
@@ -90,130 +148,36 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardCompactStyle}">
+                <Border Grid.Column="0" Style="{StaticResource AppMetricCardCompactStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="إجمالي السندات" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding TotalEntriesText}" FontSize="24" FontWeight="Bold"/>
+                        <TextBlock Text="إجمالي السندات" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                        <TextBlock Text="{Binding TotalEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="1" Style="{StaticResource AppSurfaceCardCompactStyle}">
+                <Border Grid.Column="1" Style="{StaticResource AppMetricCardCompactStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="المرحل" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding PostedEntriesText}" FontSize="24" FontWeight="Bold" Foreground="#0369A1"/>
+                        <TextBlock Text="المرحل" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                        <TextBlock Text="{Binding PostedEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}" Foreground="#0369A1"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="2" Style="{StaticResource AppSurfaceCardCompactStyle}">
+                <Border Grid.Column="2" Style="{StaticResource AppMetricCardCompactStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="المسودات" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding DraftEntriesText}" FontSize="24" FontWeight="Bold" Foreground="#B45309"/>
+                        <TextBlock Text="المسودات" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                        <TextBlock Text="{Binding DraftEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}" Foreground="#B45309"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="3" Style="{StaticResource AppSurfaceCardCompactStyle}">
+                <Border Grid.Column="3" Style="{StaticResource AppMetricCardCompactStyle}">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="صافي اليوم" Foreground="{StaticResource MutedTextBrush}"/>
-                        <TextBlock Text="{Binding TodayNetMovementText}" FontSize="24" FontWeight="Bold" Foreground="#2563EB"/>
+                        <TextBlock Text="صافي اليوم" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                        <TextBlock Text="{Binding TodayNetMovementText}" Style="{StaticResource AppMetricValueCompactTextStyle}" Foreground="#2563EB"/>
                     </StackPanel>
                 </Border>
             </Grid>
 
-            <Border Grid.Row="2" Style="{StaticResource AppSurfaceCardCompactStyle}">
-                <Grid RowSpacing="14">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{Binding PeriodLockSummaryText}" FontSize="15" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding PeriodLockHintText}"
-                                       Foreground="{StaticResource SlateTextBrush}"
-                                       FontSize="11.5"
-                                       TextTrimming="CharacterEllipsis"
-                                       ToolTipService.ToolTip="{Binding QuickEntryShortcutsText}"/>
-                        </StackPanel>
-                    </Grid>
-                </Grid>
-            </Border>
-
-            <Border Grid.Row="3" Style="{StaticResource AppSurfaceCardCompactStyle}" Padding="14,12,14,8">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="مشاهد سريعة" FontSize="14" FontWeight="SemiBold"/>
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                  VerticalScrollBarVisibility="Disabled"
-                                  HorizontalScrollMode="Enabled"
-                                  ZoomMode="Disabled">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Button x:Name="QuickViewAllButton" Content="كل السندات" Tag="all" Style="{StaticResource QuickViewButtonActiveStyle}" Click="QuickViewButton_Click"/>
-                            <Button x:Name="QuickViewTodayButton" Content="اليوم" Tag="today" Style="{StaticResource QuickViewButtonStyle}" Click="QuickViewButton_Click"/>
-                            <Button x:Name="QuickViewDraftsButton" Content="المسودات" Tag="drafts" Style="{StaticResource QuickViewButtonStyle}" Click="QuickViewButton_Click"/>
-                            <Button x:Name="QuickViewPostedButton" Content="المرحلة" Tag="posted" Style="{StaticResource QuickViewButtonStyle}" Click="QuickViewButton_Click"/>
-                            <Button x:Name="QuickViewMonthButton" Content="هذا الشهر" Tag="month" Style="{StaticResource QuickViewButtonStyle}" Click="QuickViewButton_Click"/>
-                        </StackPanel>
-                    </ScrollViewer>
-                </StackPanel>
-            </Border>
-
-            <Border Grid.Row="4" Style="{StaticResource AppSurfaceCardCompactStyle}">
-                <Grid RowSpacing="12">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid ColumnSpacing="12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBox x:Name="SearchFilterBox"
-                                 Grid.Column="0"
-                                 Style="{StaticResource InputTextBoxStyle}"
-                                 PlaceholderText="ابحث برقم السند أو المرجع أو الوصف"
-                                 TextChanged="SearchFilterBox_TextChanged"/>
-
-                        <ComboBox x:Name="TypeFilterCombo" Grid.Column="1" Style="{StaticResource InputComboBoxStyle}" SelectionChanged="TypeFilterCombo_SelectionChanged" SelectedIndex="0">
-                            <ComboBoxItem Content="كل الأنواع" Tag="all"/>
-                            <ComboBoxItem Content="سند قبض" Tag="receipt"/>
-                            <ComboBoxItem Content="سند صرف" Tag="payment"/>
-                            <ComboBoxItem Content="تحويل" Tag="transfer"/>
-                            <ComboBoxItem Content="قيد يومية" Tag="daily"/>
-                            <ComboBoxItem Content="قيد افتتاحي" Tag="opening"/>
-                            <ComboBoxItem Content="إقفال صندوق" Tag="closing"/>
-                            <ComboBoxItem Content="قيد تسوية" Tag="adjustment"/>
-                        </ComboBox>
-
-                        <ComboBox x:Name="StatusFilterCombo" Grid.Column="2" Style="{StaticResource InputComboBoxStyle}" SelectionChanged="StatusFilterCombo_SelectionChanged" SelectedIndex="0">
-                            <ComboBoxItem Content="كل الحالات" Tag="all"/>
-                            <ComboBoxItem Content="مرحل" Tag="posted"/>
-                            <ComboBoxItem Content="مسودة" Tag="draft"/>
-                        </ComboBox>
-
-                        <ComboBox x:Name="PeriodFilterCombo" Grid.Column="3" Style="{StaticResource InputComboBoxStyle}" SelectionChanged="PeriodFilterCombo_SelectionChanged" SelectedIndex="0">
-                            <ComboBoxItem Content="كل الفترات" Tag="all"/>
-                            <ComboBoxItem Content="اليوم" Tag="today"/>
-                            <ComboBoxItem Content="آخر 7 أيام" Tag="week"/>
-                            <ComboBoxItem Content="هذا الشهر" Tag="month"/>
-                        </ComboBox>
-
-                        <Button Grid.Column="4" Content="مسح الفلاتر" Style="{StaticResource SecondaryActionButtonStyle}" Click="ClearFilters_Click"/>
-                    </Grid>
-
-                    <TextBlock Grid.Row="1" Text="{Binding ActiveFiltersText}" Foreground="{StaticResource SlateTextBrush}" FontSize="12"/>
-                </Grid>
-            </Border>
-
-            <StackPanel Grid.Row="5" Spacing="8">
+            <StackPanel Grid.Row="2" Spacing="8">
                 <Border x:Name="ErrorBanner" Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="12" Padding="14,10" Visibility="Collapsed">
                     <TextBlock x:Name="ErrorBannerText" Foreground="#DC2626"/>
                 </Border>
@@ -222,200 +186,139 @@
                 </Border>
             </StackPanel>
 
-            <Grid Grid.Row="6" ColumnSpacing="18">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.55*"/>
-                    <ColumnDefinition Width="0.95*"/>
-                </Grid.ColumnDefinitions>
-
-                <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardCompactStyle}" Padding="0">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <Border Grid.Row="0" Background="#F8FAFC" CornerRadius="20,20,0,0" Padding="18,14" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120"/>
-                                    <ColumnDefinition Width="110"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="115"/>
-                                    <ColumnDefinition Width="110"/>
-                                    <ColumnDefinition Width="100"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="الرقم" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SlateTextBrush}"/>
-                                <TextBlock Grid.Column="1" Text="التاريخ" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SlateTextBrush}"/>
-                                <TextBlock Grid.Column="2" Text="البيان" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SlateTextBrush}"/>
-                                <TextBlock Grid.Column="3" Text="النوع" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SlateTextBrush}"/>
-                                <TextBlock Grid.Column="4" Text="المبلغ" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SlateTextBrush}"/>
-                                <TextBlock Grid.Column="5" Text="الحالة" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SlateTextBrush}"/>
-                            </Grid>
-                        </Border>
-
-                        <Grid Grid.Row="1">
-                            <ListView x:Name="EntriesListView"
-                                      ItemsSource="{Binding Entries}"
-                                      SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
-                                      SelectionMode="Single"
-                                      Background="Transparent"
-                                      BorderThickness="0"
-                                      DoubleTapped="EntriesListView_DoubleTapped"
-                                      KeyDown="EntriesListView_KeyDown"
-                                      Visibility="{Binding EntriesVisibility}">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.ItemTemplate>
+            <Border Grid.Row="3"
+                    Style="{StaticResource AppSurfaceCardCompactStyle}"
+                    Padding="0">
+                <Grid>
+                    <ctcontrols:DataGrid x:Name="EntriesDataGrid"
+                                         ItemsSource="{Binding Entries}"
+                                         SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                                         SelectionChanged="EntriesDataGrid_SelectionChanged"
+                                         DoubleTapped="EntriesListView_DoubleTapped"
+                                         KeyDown="EntriesListView_KeyDown"
+                                         AutoGenerateColumns="False"
+                                         IsReadOnly="True"
+                                         CanUserSortColumns="False"
+                                         HeadersVisibility="Column"
+                                         GridLinesVisibility="Horizontal"
+                                         RowDetailsVisibilityMode="VisibleWhenSelected"
+                                         RowBackground="Transparent"
+                                         AlternatingRowBackground="#FBFCFE"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         RowHeight="58"
+                                         Visibility="{Binding EntriesVisibility}">
+                        <ctcontrols:DataGrid.Columns>
+                            <ctcontrols:DataGridTemplateColumn Header="الرقم" Width="160">
+                                <ctcontrols:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border BorderBrush="#EEF2F7" BorderThickness="0,0,0,1" Padding="18,14">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="120"/>
-                                                    <ColumnDefinition Width="110"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="115"/>
-                                                    <ColumnDefinition Width="110"/>
-                                                    <ColumnDefinition Width="100"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <StackPanel Grid.Column="0" Spacing="4">
-                                                    <TextBlock Text="{Binding EntryNumber}" FontWeight="Bold"/>
-                                                    <TextBlock Text="{Binding ReferenceDisplay}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                                </StackPanel>
-
-                                                <StackPanel Grid.Column="1" Spacing="4">
-                                                    <TextBlock Text="{Binding EntryDateText}" FontSize="13"/>
-                                                    <TextBlock Text="{Binding CreatedAtText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}"/>
-                                                </StackPanel>
-
-                                                <StackPanel Grid.Column="2" Spacing="4">
-                                                    <TextBlock Text="{Binding Description}" TextWrapping="WrapWholeWords" FontSize="13"/>
-                                                    <TextBlock Text="{Binding MovementText}" Foreground="{Binding MovementBrush}" FontSize="11"/>
-                                                    <TextBlock Text="{Binding LifecycleText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
-                                                </StackPanel>
-
-                                                <Border Grid.Column="3" Background="{Binding TypeBackgroundBrush}" CornerRadius="14" Padding="10,6" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding TypeText}" Foreground="{Binding TypeForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
-                                                </Border>
-
-                                                <StackPanel Grid.Column="4" Spacing="4">
-                                                    <TextBlock Text="{Binding TotalDebitText}" Foreground="#1D4ED8" FontWeight="SemiBold"/>
-                                                    <TextBlock Text="{Binding CurrencySummaryText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Language="en-US"/>
-                                                </StackPanel>
-
-                                                <Border Grid.Column="5" Background="{Binding StatusBackgroundBrush}" CornerRadius="14" Padding="10,6" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
-                                                </Border>
-                                            </Grid>
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Text="{Binding EntryNumber}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding ReferenceDisplay}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ctcontrols:DataGridTemplateColumn.CellTemplate>
+                            </ctcontrols:DataGridTemplateColumn>
+                            <ctcontrols:DataGridTextColumn Header="التاريخ" Width="130" Binding="{Binding EntryDateText}"/>
+                            <ctcontrols:DataGridTemplateColumn Header="البيان" Width="*">
+                                <ctcontrols:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Text="{Binding Description}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding LifecycleText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ctcontrols:DataGridTemplateColumn.CellTemplate>
+                            </ctcontrols:DataGridTemplateColumn>
+                            <ctcontrols:DataGridTemplateColumn Header="النوع" Width="120">
+                                <ctcontrols:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding TypeBackgroundBrush}" CornerRadius="14" Padding="10,5" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding TypeText}" Foreground="{Binding TypeForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
                                         </Border>
                                     </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-
-                            <Border x:Name="EmptyState" Background="Transparent" Visibility="{Binding EmptyStateVisibility}">
-                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-                                    <TextBlock Text="لا توجد سندات مطابقة" FontSize="20" FontWeight="Bold"/>
-                                    <TextBlock Text="عدّل الفلاتر أو أنشئ سنداً جديداً من شريط الأوامر." Foreground="{StaticResource MutedTextBrush}"/>
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </Grid>
-                </Border>
-
-                <Border Grid.Column="1" Style="{StaticResource AppSurfaceCardCompactStyle}">
-                    <Grid>
-                        <StackPanel Spacing="12" Visibility="{Binding PreviewPlaceholderVisibility}">
-                            <TextBlock Text="لوحة معاينة السند" FontSize="22" FontWeight="Bold" HorizontalAlignment="Center"/>
-                            <TextBlock Text="اختر سنداً من القائمة لعرض تفاصيله، حالته، وأثره المحاسبي هنا."
-                                       TextAlignment="Center"
-                                       TextWrapping="WrapWholeWords"
-                                       Foreground="{StaticResource SlateTextBrush}"/>
-                        </StackPanel>
-
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding SelectedEntryVisibility}">
-                            <StackPanel Spacing="14">
-                                <TextBlock Text="{Binding SelectedEntryTitle}" FontSize="20" FontWeight="Bold"/>
-
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Border Background="{Binding SelectedEntry.TypeBackgroundBrush}" CornerRadius="14" Padding="10,6">
-                                        <TextBlock Text="{Binding SelectedEntry.TypeText}" Foreground="{Binding SelectedEntry.TypeForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
-                                    </Border>
-                                    <Border Background="{Binding SelectedEntry.StatusBackgroundBrush}" CornerRadius="14" Padding="10,6">
-                                        <TextBlock Text="{Binding SelectedEntry.StatusText}" Foreground="{Binding SelectedEntry.StatusForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
-                                    </Border>
-                                </StackPanel>
-
-                                <Grid ColumnSpacing="12" RowSpacing="12">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <Border Grid.Row="0" Grid.Column="0" Background="#F8FAFC" CornerRadius="16" Padding="14">
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Text="تاريخ السند" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
-                                            <TextBlock Text="{Binding SelectedEntry.EntryDateText}" FontWeight="Bold"/>
+                                </ctcontrols:DataGridTemplateColumn.CellTemplate>
+                            </ctcontrols:DataGridTemplateColumn>
+                            <ctcontrols:DataGridTemplateColumn Header="المبلغ" Width="140">
+                                <ctcontrols:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Spacing="3">
+                                            <TextBlock Text="{Binding TotalDebitText}" Foreground="#1D4ED8" FontSize="14" FontWeight="SemiBold" Language="en-US"/>
+                                            <TextBlock Text="{Binding CurrencySummaryText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" Language="en-US"/>
                                         </StackPanel>
-                                    </Border>
-                                    <Border Grid.Row="0" Grid.Column="1" Background="#F8FAFC" CornerRadius="16" Padding="14">
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Text="التسلسل الزمني" Foreground="{StaticResource MutedTextBrush}" FontSize="12"/>
-                                            <TextBlock Text="{Binding SelectedEntryCreatedAtText}" FontWeight="Bold"/>
-                                            <TextBlock Text="{Binding SelectedEntryPostedAtText}" FontSize="12" Foreground="{StaticResource SlateTextBrush}" TextWrapping="WrapWholeWords"/>
-                                            <TextBlock Text="{Binding SelectedEntryModifiedAtText}" FontSize="12" Foreground="{StaticResource SlateTextBrush}" TextWrapping="WrapWholeWords"/>
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Grid.Row="1" Grid.Column="0" Background="#EFF6FF" CornerRadius="16" Padding="14">
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Text="العملة والقيمة" Foreground="#1D4ED8" FontSize="12"/>
-                                            <TextBlock Text="{Binding SelectedEntryCurrencyText}" FontWeight="Bold" TextWrapping="WrapWholeWords" Language="en-US"/>
-                                            <TextBlock Text="{Binding SelectedEntryExchangeRateText}" Foreground="{StaticResource SlateTextBrush}" FontSize="12" TextWrapping="WrapWholeWords" Language="en-US"/>
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Grid.Row="1" Grid.Column="1" Background="{Binding SelectedEntry.BalanceBackgroundBrush}" CornerRadius="16" Padding="14">
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Text="حالة التوازن" Foreground="{Binding SelectedEntry.BalanceBrush}" FontSize="12"/>
-                                            <TextBlock Text="{Binding SelectedEntryBalanceText}" Foreground="{Binding SelectedEntry.BalanceBrush}" FontWeight="Bold"/>
-                                        </StackPanel>
-                                    </Border>
-                                </Grid>
-
-                                <Border Background="{Binding SelectedEntry.MovementBackgroundBrush}" CornerRadius="18" Padding="16">
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Text="أثر الحركة" Foreground="{Binding SelectedEntry.MovementBrush}" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding SelectedEntryMovementText}" Foreground="{Binding SelectedEntry.MovementBrush}" FontSize="16" FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding SelectedEntryStatusHintText}" Foreground="{StaticResource SlateTextBrush}" TextWrapping="WrapWholeWords"/>
-                                    </StackPanel>
-                                </Border>
-
-                                <Border Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="18" Padding="16">
+                                    </DataTemplate>
+                                </ctcontrols:DataGridTemplateColumn.CellTemplate>
+                            </ctcontrols:DataGridTemplateColumn>
+                            <ctcontrols:DataGridTemplateColumn Header="الحالة" Width="110">
+                                <ctcontrols:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{Binding StatusBackgroundBrush}" CornerRadius="14" Padding="10,5" HorizontalAlignment="Left">
+                                            <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ctcontrols:DataGridTemplateColumn.CellTemplate>
+                            </ctcontrols:DataGridTemplateColumn>
+                        </ctcontrols:DataGrid.Columns>
+                        <ctcontrols:DataGrid.RowDetailsTemplate>
+                            <DataTemplate>
+                                <Border Background="#F8FAFC" CornerRadius="0,0,12,12" Padding="16,12" Margin="12,0,12,12">
                                     <StackPanel Spacing="10">
-                                        <TextBlock Text="تفاصيل سريعة" FontSize="16" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding SelectedEntryDebitCreditText}" FontWeight="SemiBold" TextWrapping="WrapWholeWords"/>
-                                        <TextBlock Text="{Binding SelectedEntryReferenceText}" TextWrapping="WrapWholeWords"/>
-                                        <TextBlock Text="{Binding SelectedEntryLineSummaryText}" Foreground="{StaticResource SlateTextBrush}"/>
-                                        <TextBlock Text="{Binding SelectedEntryAuditText}" TextWrapping="WrapWholeWords" Foreground="{StaticResource SlateTextBrush}"/>
-                                        <TextBlock Text="{Binding SelectedEntryActionText}" TextWrapping="WrapWholeWords" Foreground="{StaticResource SlateTextBrush}"/>
+                                        <TextBlock Text="الأثر المحاسبي للسند" Style="{StaticResource AppSectionTitleCompactTextStyle}"/>
+                                        <Grid ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.1*"/>
+                                                <ColumnDefinition Width="120"/>
+                                                <ColumnDefinition Width="120"/>
+                                                <ColumnDefinition Width="2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="الحساب" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                                            <TextBlock Grid.Column="1" Text="مدين" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                                            <TextBlock Grid.Column="2" Text="دائن" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                                            <TextBlock Grid.Column="3" Text="البيان" Style="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{Binding DetailsLoadingVisibility}">
+                                            <ProgressRing Width="18" Height="18" IsActive="True"/>
+                                            <TextBlock Text="جاري تحميل أسطر القيد..." Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+                                        </StackPanel>
+                                        <TextBlock Text="لا توجد تفاصيل أسطر متاحة لهذا السند." Visibility="{Binding DetailsEmptyVisibility}" Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+                                        <ItemsControl ItemsSource="{Binding Details}" Visibility="{Binding DetailsVisibility}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Spacing="6"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="White" CornerRadius="10" Padding="12,10">
+                                                        <Grid ColumnSpacing="10">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="2.1*"/>
+                                                                <ColumnDefinition Width="120"/>
+                                                                <ColumnDefinition Width="120"/>
+                                                                <ColumnDefinition Width="2*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0" Text="{Binding AccountName}" FontWeight="SemiBold" TextWrapping="WrapWholeWords"/>
+                                                            <TextBlock Grid.Column="1" Text="{Binding DebitText}" FontSize="13.5" FontWeight="SemiBold" Foreground="#1D4ED8" Language="en-US"/>
+                                                            <TextBlock Grid.Column="2" Text="{Binding CreditText}" FontSize="13.5" FontWeight="SemiBold" Foreground="#0F172A" Language="en-US"/>
+                                                            <TextBlock Grid.Column="3" Text="{Binding DescriptionText}" Foreground="{StaticResource SlateTextBrush}" TextWrapping="WrapWholeWords"/>
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </StackPanel>
                                 </Border>
-
-                                <Button Content="ترحيل السند المحدد"
-                                        IsEnabled="{Binding CanPostSelected}"
-                                        Style="{StaticResource PrimaryActionButtonStyle}"
-                                        Click="PostSelected_Click"/>
-                            </StackPanel>
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
-            </Grid>
+                            </DataTemplate>
+                        </ctcontrols:DataGrid.RowDetailsTemplate>
+                    </ctcontrols:DataGrid>
+                    <Border x:Name="EmptyState" Background="Transparent" Visibility="{Binding EmptyStateVisibility}">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                            <TextBlock Text="لا توجد سندات مطابقة" FontSize="20" FontWeight="Bold"/>
+                            <TextBlock Text="ابدأ بإنشاء سند جديد أو عدّل الفلاتر لإظهار النتائج." Foreground="{StaticResource MutedTextBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
         </Grid>
     </ScrollViewer>
 </Page>

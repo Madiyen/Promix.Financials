@@ -301,7 +301,7 @@ public sealed class AccountStatementViewModel : INotifyPropertyChanged
 
     private async Task LoadInternalAsync(bool loadStatement, bool loadTrialBalance)
     {
-        if (_companyId == Guid.Empty)
+        if (_companyId == Guid.Empty || IsBusy)
             return;
 
         IsBusy = true;

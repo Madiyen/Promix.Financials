@@ -97,7 +97,7 @@ public sealed partial class TransferVoucherEditorViewModel : INotifyPropertyChan
     public string Title => string.IsNullOrWhiteSpace(_entryNumber) ? "تحويل بين الحسابات" : $"تحويل بين الحسابات · {_entryNumber}";
     public string Subtitle => _mode switch
     {
-        VoucherEditorMode.View when _status == JournalEntryStatus.Posted => "عرض السند المرحل كما تم حفظه، مع إمكانية تعديل المدير فقط.",
+        VoucherEditorMode.View when _status == JournalEntryStatus.Posted => "عرض السند المرحل كما تم حفظه. السندات المرحلة للعرض فقط ولا يمكن تعديلها أو حذفها.",
         VoucherEditorMode.View => "عرض السند المحفوظ مع القيد الناتج وأثره على الجهتين.",
         VoucherEditorMode.EditPosted => "عدّل بيانات السند المرحل بحذر، وسيبقى مرحلًا بعد حفظ التغييرات.",
         VoucherEditorMode.EditDraft => "حدّث مسودة التحويل الحالية ثم احفظها أو رحّلها.",
@@ -120,7 +120,8 @@ public sealed partial class TransferVoucherEditorViewModel : INotifyPropertyChan
     public string SettlementModeHintText => BuildSettlementHintText();
     public string FooterHintText => _mode switch
     {
-        VoucherEditorMode.View when _canManage => "افتح وضع التعديل أو الحذف من هذا الشريط. غير المدير يعرض السند فقط.",
+        VoucherEditorMode.View when _status == JournalEntryStatus.Posted => "السند المرحل للعرض فقط حفاظًا على سلامة الأرصدة. يمكن تعديل المسودات أو حذفها فقط.",
+        VoucherEditorMode.View when _canManage => "يمكنك تعديل هذه المسودة أو حذفها من هذا الشريط.",
         VoucherEditorMode.View => "وضع عرض فقط. لا يمكن تعديل هذا السند من هذه الجلسة.",
         VoucherEditorMode.EditPosted => "Ctrl+S لحفظ التعديلات على السند المرحل.",
         _ => "Ctrl+S للحفظ كمسودة  •  Ctrl+Enter للحفظ والترحيل",
@@ -133,14 +134,16 @@ public sealed partial class TransferVoucherEditorViewModel : INotifyPropertyChan
     public string DeleteButtonText => "حذف السند";
     public bool IsEditing => _mode != VoucherEditorMode.View;
     public bool CanManage => _canManage && _entryId is Guid;
+    public bool CanEditEntry => CanManage && _status != JournalEntryStatus.Posted;
+    public bool CanDeleteEntry => CanManage && _status != JournalEntryStatus.Posted;
     public bool CanEditExchangeRate => SelectedCurrency is not { IsBaseCurrency: true } && IsEditing;
     public double EquivalentAmount => Math.Round(Amount * ExchangeRate, 2);
     public Visibility EditControlsVisibility => IsEditing ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility ViewManageButtonsVisibility => CanManage && _mode == VoucherEditorMode.View ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility DeleteButtonVisibility => CanManage ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility ViewManageButtonsVisibility => CanEditEntry && _mode == VoucherEditorMode.View ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility DeleteButtonVisibility => CanDeleteEntry ? Visibility.Visible : Visibility.Collapsed;
     public Visibility SaveDraftButtonVisibility => _mode is VoucherEditorMode.Create or VoucherEditorMode.EditDraft ? Visibility.Visible : Visibility.Collapsed;
     public Visibility SaveAndPostButtonVisibility => _mode is VoucherEditorMode.Create or VoucherEditorMode.EditDraft ? Visibility.Visible : Visibility.Collapsed;
-    public Visibility SaveChangesButtonVisibility => _mode == VoucherEditorMode.EditPosted ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility SaveChangesButtonVisibility => Visibility.Collapsed;
     public Visibility PreviewErrorVisibility => string.IsNullOrWhiteSpace(PreviewErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
     public Visibility PostingPreviewVisibility => PostingPreviewLines.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility PostingPreviewPlaceholderVisibility => PostingPreviewLines.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -336,6 +339,12 @@ public sealed partial class TransferVoucherEditorViewModel : INotifyPropertyChan
             return false;
         }
 
+        if (_status == JournalEntryStatus.Posted)
+        {
+            error = "السندات المرحلة للعرض فقط ولا يمكن تعديلها.";
+            return false;
+        }
+
         if (!TryValidateTransfer(out var source, out var target, out var currency, out var amount, out error))
             return false;
 
@@ -383,16 +392,22 @@ public sealed partial class TransferVoucherEditorViewModel : INotifyPropertyChan
             return false;
         }
 
+        if (_status == JournalEntryStatus.Posted)
+        {
+            error = "السندات المرحلة للعرض فقط ولا يمكن حذفها.";
+            return false;
+        }
+
         command = new DeleteJournalEntryCommand(companyId, entryId);
         return true;
     }
 
     public void BeginEdit()
     {
-        if (!CanManage)
+        if (!CanEditEntry)
             return;
 
-        SetMode(_status == JournalEntryStatus.Posted ? VoucherEditorMode.EditPosted : VoucherEditorMode.EditDraft);
+        SetMode(VoucherEditorMode.EditDraft);
     }
 
     private bool TryValidateTransfer(
@@ -869,6 +884,8 @@ public sealed partial class TransferVoucherEditorViewModel : INotifyPropertyChan
         OnPropertyChanged(nameof(CloseButtonText));
         OnPropertyChanged(nameof(IsEditing));
         OnPropertyChanged(nameof(CanManage));
+        OnPropertyChanged(nameof(CanEditEntry));
+        OnPropertyChanged(nameof(CanDeleteEntry));
         OnPropertyChanged(nameof(CanEditExchangeRate));
         OnPropertyChanged(nameof(EditControlsVisibility));
         OnPropertyChanged(nameof(ViewManageButtonsVisibility));
