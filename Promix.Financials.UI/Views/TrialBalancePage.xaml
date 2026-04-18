@@ -228,9 +228,6 @@
             </Grid>
 
             <Border Grid.Row="4" Style="{StaticResource AppSurfaceCardCompactStyle}" Padding="0">
-                <Border.Visibility>
-                    <Binding Path="IsBusy" Converter="{StaticResource InverseBoolToVisibilityConverter}"/>
-                </Border.Visibility>
                 <StackPanel>
                     <Grid Padding="16,14,16,8">
                         <Grid.ColumnDefinitions>
@@ -257,10 +254,6 @@
                             Style="{StaticResource AppEmptyStateCardStyle}"
                             Visibility="{Binding TrialBalanceEmptyVisibility}">
                         <StackPanel Spacing="6" HorizontalAlignment="Center">
-                            <FontIcon Glyph="&#xE9D2;"
-                                      FontSize="34"
-                                      Foreground="{StaticResource MutedTextBrush}"
-                                      HorizontalAlignment="Center"/>
                             <TextBlock Text="لا توجد حسابات لعرضها"
                                        FontSize="17"
                                        FontWeight="SemiBold"
@@ -270,10 +263,6 @@
                                        TextAlignment="Center"
                                        TextWrapping="WrapWholeWords"
                                        MaxWidth="420"/>
-                            <Button Content="هذه السنة"
-                                    Style="{StaticResource SecondaryActionCompactButtonStyle}"
-                                    Click="YearRange_Click"
-                                    HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
@@ -376,19 +365,6 @@
                             </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
-                </StackPanel>
-            </Border>
-
-            <Border Grid.Row="4"
-                    Style="{StaticResource AppSurfaceCardCompactStyle}"
-                    Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}">
-                <StackPanel Spacing="14">
-                    <Rectangle Height="18" RadiusX="9" RadiusY="9" Fill="#E2E8F0" Width="220" HorizontalAlignment="Right"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E5E7EB"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E2E8F0"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E5E7EB"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E2E8F0"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E5E7EB"/>
                 </StackPanel>
             </Border>
         </Grid>

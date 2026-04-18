@@ -130,19 +130,19 @@ public sealed class AccountNodeVm : INotifyPropertyChanged
     public Brush StatusForegroundBrush => CreateBrush(IsActive ? "#166534" : "#B91C1C");
     public Brush ClassificationSurfaceBrush => CreateBrush(Classification switch
     {
-        AccountClass.Assets => "#DCFCE7",
+        AccountClass.Assets => "#DBEAFE",
         AccountClass.Liabilities => "#FEE2E2",
         AccountClass.Equity => "#EDE9FE",
-        AccountClass.Revenue => "#DBEAFE",
-        _ => "#FFEDD5"
+        AccountClass.Revenue => "#DCFCE7",
+        _ => "#FEF3C7"
     });
     public Brush ClassificationForegroundBrush => CreateBrush(Classification switch
     {
-        AccountClass.Assets => "#166534",
+        AccountClass.Assets => "#1D4ED8",
         AccountClass.Liabilities => "#B91C1C",
         AccountClass.Equity => "#6D28D9",
-        AccountClass.Revenue => "#1D4ED8",
-        _ => "#C2410C"
+        AccountClass.Revenue => "#166534",
+        _ => "#B45309"
     });
 
     public ObservableCollection<AccountNodeVm> Children { get; } = new();

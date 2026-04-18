@@ -11,7 +11,6 @@ using Promix.Financials.Application.Features.Journals.Queries;
 using Promix.Financials.Application.Features.Journals.Services;
 using Promix.Financials.Application.Features.Parties.Queries;
 using Promix.Financials.UI.Dialogs.Journals;
-using Promix.Financials.UI.Services;
 using Promix.Financials.UI.ViewModels.Journals.Models;
 using Promix.Financials.UI.ViewModels.Parties.Models;
 using Promix.Financials.UI.ViewModels.Reports;
@@ -27,7 +26,6 @@ public sealed partial class ReportsPage : Page
     private readonly IJournalEntriesQuery _query;
     private readonly IPartyQuery _partyQuery;
     private readonly CreateJournalEntryService _createService;
-    private readonly TransientMessageService _messageService;
     private Guid? _requestedAccountId;
     private bool _isInitializing;
 
@@ -40,7 +38,6 @@ public sealed partial class ReportsPage : Page
         _query = _scope.ServiceProvider.GetRequiredService<IJournalEntriesQuery>();
         _partyQuery = _scope.ServiceProvider.GetRequiredService<IPartyQuery>();
         _createService = _scope.ServiceProvider.GetRequiredService<CreateJournalEntryService>();
-        _messageService = _scope.ServiceProvider.GetRequiredService<TransientMessageService>();
 
         InitializeComponent();
         DataContext = _vm;
@@ -162,12 +159,20 @@ public sealed partial class ReportsPage : Page
                 return;
 
             await _createService.CreateAsync(command);
-            _messageService.ShowSuccess(command.PostNow ? "تم حفظ السند وترحيله بنجاح." : "تم حفظ السند كمسودة.");
             await _vm.LoadAllAsync();
         }
         catch (Exception ex)
         {
-            _messageService.ShowError(ex.Message, "تعذر حفظ السند");
+            var errorDialog = new ContentDialog
+            {
+                XamlRoot = XamlRoot,
+                Title = "تعذر حفظ السند",
+                Content = ex.Message,
+                CloseButtonText = "إغلاق",
+                DefaultButton = ContentDialogButton.Close
+            };
+
+            await errorDialog.ShowAsync();
         }
     }
 
@@ -177,14 +182,5 @@ public sealed partial class ReportsPage : Page
         return parties
             .Select(x => new PartyOptionVm(x.Id, x.Code, x.NameAr, x.TypeFlags, x.LedgerMode, x.ReceivableAccountId, x.PayableAccountId, x.IsActive))
             .ToList();
-    }
-
-    private void EntryNumberLink_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not FrameworkElement { Tag: AccountStatementRowVm row } || !row.CanOpenSourceEntry)
-            return;
-
-        (((App)Microsoft.UI.Xaml.Application.Current).CurrentWindow as MainWindow)
-            ?.NavigateTo(Controls.SidebarDestination.Journals, row.EntryId);
     }
 }

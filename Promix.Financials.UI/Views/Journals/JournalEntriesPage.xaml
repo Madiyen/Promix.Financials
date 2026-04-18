@@ -223,9 +223,6 @@
             </StackPanel>
 
             <Grid Grid.Row="6" ColumnSpacing="18">
-                <Grid.Visibility>
-                    <Binding Path="IsBusy" Converter="{StaticResource InverseBoolToVisibilityConverter}"/>
-                </Grid.Visibility>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.55*"/>
                     <ColumnDefinition Width="0.95*"/>
@@ -321,18 +318,8 @@
 
                             <Border x:Name="EmptyState" Background="Transparent" Visibility="{Binding EmptyStateVisibility}">
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-                                    <FontIcon Glyph="&#xE70F;"
-                                              FontSize="38"
-                                              Foreground="{StaticResource MutedTextBrush}"
-                                              HorizontalAlignment="Center"/>
-                                    <TextBlock Text="لا توجد سندات لعرضها" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="ابدأ بأول قيد يومية أو غيّر الفلاتر الحالية."
-                                               Foreground="{StaticResource MutedTextBrush}"
-                                               HorizontalAlignment="Center"/>
-                                    <Button Content="+ إنشاء أول قيد"
-                                            Click="CreateFirstJournal_Click"
-                                            Style="{StaticResource PrimaryActionCompactButtonStyle}"
-                                            HorizontalAlignment="Center"/>
+                                    <TextBlock Text="لا توجد سندات مطابقة" FontSize="20" FontWeight="Bold"/>
+                                    <TextBlock Text="عدّل الفلاتر أو أنشئ سنداً جديداً من شريط الأوامر." Foreground="{StaticResource MutedTextBrush}"/>
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -429,19 +416,6 @@
                     </Grid>
                 </Border>
             </Grid>
-
-            <Border Grid.Row="6"
-                    Style="{StaticResource AppSurfaceCardCompactStyle}"
-                    Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}">
-                <StackPanel Spacing="14">
-                    <Rectangle Height="18" RadiusX="9" RadiusY="9" Fill="#E2E8F0" Width="220" HorizontalAlignment="Right"/>
-                    <Rectangle Height="42" RadiusX="12" RadiusY="12" Fill="#E5E7EB"/>
-                    <Rectangle Height="42" RadiusX="12" RadiusY="12" Fill="#E2E8F0"/>
-                    <Rectangle Height="42" RadiusX="12" RadiusY="12" Fill="#E5E7EB"/>
-                    <Rectangle Height="42" RadiusX="12" RadiusY="12" Fill="#E2E8F0"/>
-                    <Rectangle Height="42" RadiusX="12" RadiusY="12" Fill="#E5E7EB"/>
-                </StackPanel>
-            </Border>
         </Grid>
     </ScrollViewer>
 </Page>

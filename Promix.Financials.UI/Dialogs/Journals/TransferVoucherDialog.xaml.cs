@@ -138,33 +138,9 @@ public sealed partial class TransferVoucherDialog : ContentDialog
         Hide();
     }
 
-    private void QuickDateInputBox_LostFocus(object sender, RoutedEventArgs e)
-        => ApplyQuickDateInput();
-
-    private void QuickDateInputBox_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key is not (VirtualKey.Enter or VirtualKey.Tab))
-            return;
-
-        e.Handled = true;
-        ApplyQuickDateInput();
-    }
-
-    private void SmartAmountBox_LostFocus(object sender, RoutedEventArgs e)
-        => DialogSmartInputHelper.TryApplyAmount(sender as NumberBox, ShowValidationError);
-
-    private void SmartAmountBox_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key is not (VirtualKey.Enter or VirtualKey.Tab))
-            return;
-
-        e.Handled = true;
-        DialogSmartInputHelper.TryApplyAmount(sender as NumberBox, ShowValidationError);
-    }
-
     private void RegisterKeyboardAccelerators()
     {
-        KeyboardAccelerators.Add(DialogSmartInputHelper.CreateAccelerator(VirtualKey.S, (_, args) =>
+        KeyboardAccelerators.Add(CreateAccelerator(VirtualKey.S, (_, args) =>
         {
             args.Handled = true;
             var success = ViewModel.SaveChangesButtonVisibility == Visibility.Visible
@@ -176,7 +152,7 @@ public sealed partial class TransferVoucherDialog : ContentDialog
                 Hide();
         }));
 
-        KeyboardAccelerators.Add(DialogSmartInputHelper.CreateAccelerator(VirtualKey.Enter, (_, args) =>
+        KeyboardAccelerators.Add(CreateAccelerator(VirtualKey.Enter, (_, args) =>
         {
             if (ViewModel.SaveAndPostButtonVisibility != Visibility.Visible)
                 return;
@@ -188,20 +164,19 @@ public sealed partial class TransferVoucherDialog : ContentDialog
             if (success)
                 Hide();
         }));
-
-        KeyboardAccelerators.Add(DialogSmartInputHelper.CreateAccelerator(VirtualKey.Escape, (_, args) =>
-        {
-            args.Handled = true;
-            CancelButton_Click(this, new RoutedEventArgs());
-        }, VirtualKeyModifiers.None));
     }
 
-    private void ApplyQuickDateInput()
-        => DialogSmartInputHelper.TryApplyDate(QuickDateInputBox, value => ViewModel.EntryDate = value, ShowValidationError);
-
-    private void ShowValidationError(string message)
+    private static KeyboardAccelerator CreateAccelerator(
+        VirtualKey key,
+        TypedEventHandler<KeyboardAccelerator, KeyboardAcceleratorInvokedEventArgs> handler,
+        VirtualKeyModifiers modifiers = VirtualKeyModifiers.Control)
     {
-        ErrorText.Text = message;
-        ErrorBanner.Visibility = Visibility.Visible;
+        var accelerator = new KeyboardAccelerator
+        {
+            Key = key,
+            Modifiers = modifiers
+        };
+        accelerator.Invoked += handler;
+        return accelerator;
     }
 }

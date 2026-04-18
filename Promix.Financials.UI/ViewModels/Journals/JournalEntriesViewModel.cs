@@ -350,23 +350,6 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         ApplyFilters();
     }
 
-    public void FocusEntry(Guid entryId, bool clearFilters = true)
-    {
-        if (entryId == Guid.Empty)
-            return;
-
-        if (clearFilters)
-        {
-            _searchText = string.Empty;
-            _typeFilterKey = "all";
-            _statusFilterKey = "all";
-            _periodFilterKey = "all";
-            OnPropertyChanged(nameof(SearchText));
-        }
-
-        ApplyFilters(entryId);
-    }
-
     private async Task LoadAsync(Guid? preferredSelectionId = null)
     {
         IsBusy = true;

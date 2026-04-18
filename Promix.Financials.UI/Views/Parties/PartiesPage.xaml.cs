@@ -9,11 +9,8 @@ using Microsoft.UI.Xaml.Navigation;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Domain.Enums;
 using Promix.Financials.UI.Dialogs.Parties;
-using Promix.Financials.UI.Services;
 using Promix.Financials.UI.ViewModels.Parties;
 using Promix.Financials.UI.ViewModels.Parties.Models;
-using Windows.Foundation;
-using Windows.System;
 
 namespace Promix.Financials.UI.Views.Parties;
 
@@ -22,7 +19,6 @@ public sealed partial class PartiesPage : Page
     private readonly IServiceScope _scope;
     private readonly PartiesPageViewModel _vm;
     private readonly IUserContext _userContext;
-    private readonly TransientMessageService _messageService;
     private bool _isViewReady;
 
     public PartiesPage()
@@ -31,7 +27,6 @@ public sealed partial class PartiesPage : Page
         _scope = app.Services.CreateScope();
         _vm = _scope.ServiceProvider.GetRequiredService<PartiesPageViewModel>();
         _userContext = _scope.ServiceProvider.GetRequiredService<IUserContext>();
-        _messageService = _scope.ServiceProvider.GetRequiredService<TransientMessageService>();
 
         InitializeComponent();
         DataContext = _vm;
@@ -42,7 +37,6 @@ public sealed partial class PartiesPage : Page
 
         UpdateMessageBanners();
         UpdateVisualState();
-        RegisterKeyboardAccelerators();
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
@@ -68,9 +62,6 @@ public sealed partial class PartiesPage : Page
 
         await OpenPartyDialogFlowAsync(companyId, null);
     }
-
-    private void AddFirstParty_Click(object sender, RoutedEventArgs e)
-        => AddParty_Click(sender, e);
 
     private async void EditParty_Click(object sender, RoutedEventArgs e)
     {
@@ -188,21 +179,24 @@ public sealed partial class PartiesPage : Page
         }
         catch (Exception ex)
         {
-            if (_isViewReady)
-                _messageService.ShowError(ex.Message);
+            if (_isViewReady && ErrorBannerText is not null && ErrorBanner is not null)
+            {
+                ErrorBannerText.Text = ex.Message;
+                ErrorBanner.Visibility = Visibility.Visible;
+            }
         }
     }
 
     private void UpdateMessageBanners()
     {
-        if (!_isViewReady)
+        if (!_isViewReady || ErrorBannerText is null || ErrorBanner is null || SuccessBannerText is null || SuccessBanner is null)
             return;
 
-        if (!string.IsNullOrWhiteSpace(_vm.ErrorMessage))
-            _messageService.ShowError(_vm.ErrorMessage);
+        ErrorBannerText.Text = _vm.ErrorMessage ?? string.Empty;
+        ErrorBanner.Visibility = string.IsNullOrWhiteSpace(_vm.ErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
 
-        if (!string.IsNullOrWhiteSpace(_vm.SuccessMessage))
-            _messageService.ShowSuccess(_vm.SuccessMessage);
+        SuccessBannerText.Text = _vm.SuccessMessage ?? string.Empty;
+        SuccessBanner.Visibility = string.IsNullOrWhiteSpace(_vm.SuccessMessage) ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void UpdateVisualState()
@@ -233,29 +227,6 @@ public sealed partial class PartiesPage : Page
         ActivatePartyButton.Visibility = _vm.SelectedParty is { IsActive: false }
             ? Visibility.Visible
             : Visibility.Collapsed;
-    }
-
-    private void RegisterKeyboardAccelerators()
-    {
-        KeyboardAccelerators.Add(CreateAccelerator(VirtualKey.N, (_, args) =>
-        {
-            args.Handled = true;
-            AddParty_Click(this, new RoutedEventArgs());
-        }));
-    }
-
-    private static KeyboardAccelerator CreateAccelerator(
-        VirtualKey key,
-        TypedEventHandler<KeyboardAccelerator, KeyboardAcceleratorInvokedEventArgs> handler,
-        VirtualKeyModifiers modifiers = VirtualKeyModifiers.Control)
-    {
-        var accelerator = new KeyboardAccelerator
-        {
-            Key = key,
-            Modifiers = modifiers
-        };
-        accelerator.Invoked += handler;
-        return accelerator;
     }
 
 }

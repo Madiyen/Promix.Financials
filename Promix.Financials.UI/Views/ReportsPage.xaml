@@ -220,9 +220,6 @@
             </Grid>
 
             <Border Grid.Row="4" Style="{StaticResource AppSurfaceCardCompactStyle}" Padding="0">
-                <Border.Visibility>
-                    <Binding Path="IsBusy" Converter="{StaticResource InverseBoolToVisibilityConverter}"/>
-                </Border.Visibility>
                 <StackPanel>
                     <Grid Padding="16,14,16,8">
                         <Grid.ColumnDefinitions>
@@ -272,10 +269,6 @@
                             Style="{StaticResource AppEmptyStateCardStyle}"
                             Visibility="{Binding EmptyStateVisibility}">
                         <StackPanel Spacing="6" HorizontalAlignment="Center">
-                            <FontIcon Glyph="&#xE9D2;"
-                                      FontSize="34"
-                                      Foreground="{StaticResource MutedTextBrush}"
-                                      HorizontalAlignment="Center"/>
                             <TextBlock Text="لا توجد حركات لعرضها"
                                        FontSize="17"
                                        FontWeight="SemiBold"
@@ -285,10 +278,6 @@
                                        TextAlignment="Center"
                                        TextWrapping="WrapWholeWords"
                                        MaxWidth="420"/>
-                            <Button Content="استخدم هذا الشهر"
-                                    Style="{StaticResource SecondaryActionCompactButtonStyle}"
-                                    Click="MonthRange_Click"
-                                    HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
@@ -341,17 +330,7 @@
                                                 </Grid.ColumnDefinitions>
 
                                                 <TextBlock Grid.Column="0" Text="{Binding EntryDateText}" Style="{StaticResource TableCellTextStyle}" Language="en-US"/>
-                                                <HyperlinkButton Grid.Column="1"
-                                                                 Content="{Binding EntryNumberDisplay}"
-                                                                 Tag="{Binding}"
-                                                                 Click="EntryNumberLink_Click"
-                                                                 IsEnabled="{Binding CanOpenSourceEntry}"
-                                                                 Padding="0"
-                                                                 HorizontalAlignment="Left"
-                                                                 FontSize="12"
-                                                                 FontWeight="SemiBold"
-                                                                 Foreground="{StaticResource PrimaryButtonBrush}"
-                                                                 Language="en-US"/>
+                                                <TextBlock Grid.Column="1" Text="{Binding EntryNumberDisplay}" Style="{StaticResource TableCellTextStyle}" Language="en-US"/>
                                                 <Border Grid.Column="2"
                                                         Background="{Binding TypeBackgroundBrush}"
                                                         CornerRadius="999"
@@ -364,14 +343,13 @@
                                                 </Border>
                                                 <TextBlock Grid.Column="3" Text="{Binding ReferenceDisplay}" Style="{StaticResource TableCellTextStyle}" Language="en-US"/>
                                                 <TextBlock Grid.Column="4" Text="{Binding DescriptionDisplay}" Style="{StaticResource TableCellTextStyle}" TextWrapping="WrapWholeWords"/>
-                                                <TextBlock Grid.Column="5" Text="{Binding DebitText}" Style="{StaticResource TableCellTextStyle}" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="14" Language="en-US"/>
-                                                <TextBlock Grid.Column="6" Text="{Binding CreditText}" Style="{StaticResource TableCellTextStyle}" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="14" Language="en-US"/>
+                                                <TextBlock Grid.Column="5" Text="{Binding DebitText}" Style="{StaticResource TableCellTextStyle}" HorizontalAlignment="Right" FontWeight="SemiBold" Language="en-US"/>
+                                                <TextBlock Grid.Column="6" Text="{Binding CreditText}" Style="{StaticResource TableCellTextStyle}" HorizontalAlignment="Right" FontWeight="SemiBold" Language="en-US"/>
                                                 <TextBlock Grid.Column="7"
                                                            Text="{Binding RunningBalanceText}"
                                                            Style="{StaticResource TableCellTextStyle}"
                                                            Foreground="{Binding RunningBalanceBrush}"
                                                            FontWeight="SemiBold"
-                                                           FontSize="14"
                                                            HorizontalAlignment="Right"
                                                            Language="en-US"/>
                                             </Grid>
@@ -381,19 +359,6 @@
                             </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
-                </StackPanel>
-            </Border>
-
-            <Border Grid.Row="4"
-                    Style="{StaticResource AppSurfaceCardCompactStyle}"
-                    Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}">
-                <StackPanel Spacing="14">
-                    <Rectangle Height="18" RadiusX="9" RadiusY="9" Fill="#E2E8F0" Width="200" HorizontalAlignment="Right"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E5E7EB"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E2E8F0"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E5E7EB"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E2E8F0"/>
-                    <Rectangle Height="28" RadiusX="10" RadiusY="10" Fill="#E5E7EB"/>
                 </StackPanel>
             </Border>
         </Grid>

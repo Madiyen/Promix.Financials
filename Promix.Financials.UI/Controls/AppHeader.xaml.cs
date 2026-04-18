@@ -9,7 +9,6 @@ public sealed partial class AppHeader : UserControl
 {
     public string SettingsTooltip => "الإعدادات";
     public event EventHandler? SettingsRequested;
-    public event EventHandler? CommandPaletteRequested;
 
     public AppHeader()
     {
@@ -64,24 +63,5 @@ public sealed partial class AppHeader : UserControl
     private void Settings_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         SettingsRequested?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void SearchBox_GotFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        CommandPaletteRequested?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void SearchBox_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
-    {
-        CommandPaletteRequested?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void SearchBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
-    {
-        if (e.Key != Windows.System.VirtualKey.Enter)
-            return;
-
-        e.Handled = true;
-        CommandPaletteRequested?.Invoke(this, EventArgs.Empty);
     }
 }

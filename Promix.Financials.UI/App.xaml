@@ -2,13 +2,10 @@
 <Application
     x:Class="Promix.Financials.UI.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="using:Promix.Financials.UI.Converters">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Application.Resources>
         <ResourceDictionary>
-            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-            <converters:BoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" Invert="True"/>
 
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
@@ -21,7 +18,7 @@
             <FontFamily x:Key="AppFontFamily">Inter</FontFamily>
 
             <!-- Brushes -->
-            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F8FAFC"/>
+            <SolidColorBrush x:Key="AppBackgroundBrush" Color="#F1F5F9"/>
             <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
             <SolidColorBrush x:Key="CardSubtleBackgroundBrush" Color="#F8FAFC"/>
             <SolidColorBrush x:Key="BorderBrushSoft" Color="#F1F5F9"/>

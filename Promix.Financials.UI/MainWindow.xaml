@@ -14,22 +14,14 @@
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <controls:AppHeader x:Name="Header"
                                 Grid.Row="0"/>
 
-            <InfoBar x:Name="GlobalInfoBar"
-                     Grid.Row="1"
-                     Margin="24,10,24,0"
-                     IsOpen="False"
-                     IsClosable="True"
-                     Closed="GlobalInfoBar_Closed"/>
-
             <Frame x:Name="RootFrame"
-                   Grid.Row="2"
+                   Grid.Row="1"
                    Margin="0"/>
         </Grid>
 

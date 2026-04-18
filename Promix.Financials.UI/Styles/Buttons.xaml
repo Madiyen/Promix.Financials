@@ -466,6 +466,10 @@
         <Setter Property="MinWidth" Value="108"/>
     </Style>
 
+    <Style x:Key="AccentButtonStyle"
+           TargetType="Button"
+           BasedOn="{StaticResource PrimaryActionButtonStyle}"/>
+
     <Style x:Key="PrimaryActionCompactButtonStyle"
            TargetType="Button"
            BasedOn="{StaticResource PrimaryButtonStyle}">

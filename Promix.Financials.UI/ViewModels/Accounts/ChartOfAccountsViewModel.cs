@@ -32,7 +32,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
     private string _searchText = string.Empty;
     private string _selectedOriginFilter = AllFilter;
     private string _selectedPostingFilter = AllFilter;
-    private string _selectedClassificationFilter = AllFilter;
     private bool _showSystemAccountsOnly;
     private bool _showInactiveAccountsOnly;
     private bool _showPartyAccountsOnly;
@@ -53,15 +52,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
         AllFilter,
         "حركي",
         "تجميعي"
-    ];
-    public ObservableCollection<string> ClassificationFilters { get; } =
-    [
-        AllFilter,
-        "أصول",
-        "خصوم",
-        "حقوق ملكية",
-        "إيرادات",
-        "مصروفات"
     ];
 
     public AccountsSummaryVm Summary { get; } = new();
@@ -92,7 +82,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
     }
 
     public bool HasErrorMessage => !string.IsNullOrWhiteSpace(ErrorMessage);
-    public bool HasAnyAccounts => AccountGroups.Count > 0 || AccountTree.Count > 0;
 
     public string SearchText
     {
@@ -125,18 +114,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
         {
             if (_selectedPostingFilter == value) return;
             _selectedPostingFilter = value;
-            OnPropertyChanged();
-            ApplyFilters();
-        }
-    }
-
-    public string SelectedClassificationFilter
-    {
-        get => _selectedClassificationFilter;
-        set
-        {
-            if (_selectedClassificationFilter == value) return;
-            _selectedClassificationFilter = value;
             OnPropertyChanged();
             ApplyFilters();
         }
@@ -328,7 +305,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
         {
             AccountGroups.Clear();
             AccountTree.Clear();
-            OnPropertyChanged(nameof(HasAnyAccounts));
             _flatAccounts = [];
             _workspaceRows = [];
             _fullTree = [];
@@ -355,7 +331,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
         if (_fullTree.Count == 0)
         {
             AccountTree.Clear();
-            OnPropertyChanged(nameof(HasAnyAccounts));
         }
         else
         {
@@ -398,21 +373,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
 
         if (SelectedPostingFilter == "تجميعي" && row.IsPosting)
             return false;
-
-        if (SelectedClassificationFilter != AllFilter)
-        {
-            var requiredClass = SelectedClassificationFilter switch
-            {
-                "أصول" => AccountClass.Assets,
-                "خصوم" => AccountClass.Liabilities,
-                "حقوق ملكية" => AccountClass.Equity,
-                "إيرادات" => AccountClass.Revenue,
-                _ => AccountClass.Expenses
-            };
-
-            if (row.Classification != requiredClass)
-                return false;
-        }
 
         if (ShowSystemAccountsOnly && !row.IsSystem)
             return false;
@@ -484,7 +444,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
             AccountGroups.Add(group);
 
         ApplySelectionState(AccountGroups, _selectedAccountId);
-        OnPropertyChanged(nameof(HasAnyAccounts));
     }
 
     private void CaptureGroupExpansionState()
@@ -619,7 +578,6 @@ public sealed class ChartOfAccountsViewModel : INotifyPropertyChanged
             AccountTree.Add(node);
 
         ApplySelectionState(AccountTree, _selectedAccountId);
-        OnPropertyChanged(nameof(HasAnyAccounts));
     }
 
     private void UpdateSummary(IReadOnlyList<AccountWorkspaceRowDto> rows)
