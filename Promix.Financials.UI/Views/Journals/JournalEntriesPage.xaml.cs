@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.Application.Features.Journals.Commands;
 using Promix.Financials.Application.Features.Journals.Queries;
@@ -15,16 +17,19 @@ using Promix.Financials.UI.Dialogs.Journals;
 using Promix.Financials.UI.ViewModels.Journals;
 using Promix.Financials.UI.ViewModels.Parties.Models;
 using Windows.System;
+using Windows.UI;
 
 namespace Promix.Financials.UI.Views.Journals;
 
 public sealed partial class JournalEntriesPage : Page
 {
+    private static readonly SolidColorBrush SelectedRowBackgroundBrush = new(Color.FromArgb(0xFF, 0xF0, 0xF9, 0xFF));
     private readonly IServiceScope _scope;
     private readonly JournalEntriesViewModel _vm;
     private readonly IUserContext _userContext;
     private readonly IJournalEntriesQuery _query;
     private readonly IPartyQuery _partyQuery;
+    private readonly List<DataGridRow> _realizedRows = [];
 
     public JournalEntriesPage()
     {
@@ -64,12 +69,14 @@ public sealed partial class JournalEntriesPage : Page
 
         await _vm.InitializeAsync(_userContext.CompanyId.Value);
         await _vm.EnsureEntryDetailsLoadedAsync(_vm.SelectedEntry);
+        ApplySelectionVisuals();
     }
 
     private async void Refresh_Click(object sender, RoutedEventArgs e)
     {
         await _vm.RefreshAsync();
         await _vm.EnsureEntryDetailsLoadedAsync(_vm.SelectedEntry);
+        ApplySelectionVisuals();
     }
 
     private async void CreateReceipt_Click(object sender, RoutedEventArgs e)
@@ -275,6 +282,26 @@ public sealed partial class JournalEntriesPage : Page
     private async void EntriesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         await _vm.EnsureEntryDetailsLoadedAsync(_vm.SelectedEntry);
+        ApplySelectionVisuals();
+    }
+
+    private void EntriesDataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
+    {
+        if (!_realizedRows.Contains(e.Row))
+            _realizedRows.Add(e.Row);
+
+        ApplyRowSelectionVisual(e.Row);
+    }
+
+    private void EntriesDataGrid_UnloadingRow(object sender, DataGridRowEventArgs e)
+    {
+        _realizedRows.Remove(e.Row);
+    }
+
+    private void CloseRowDetails_Click(object sender, RoutedEventArgs e)
+    {
+        EntriesDataGrid.SelectedItem = null;
+        ApplySelectionVisuals();
     }
 
     private async Task OpenSelectedVoucherAsync()
@@ -381,5 +408,25 @@ public sealed partial class JournalEntriesPage : Page
             return comboItem.Tag?.ToString();
 
         return null;
+    }
+
+    private void ApplySelectionVisuals()
+    {
+        foreach (var row in _realizedRows.ToList())
+            ApplyRowSelectionVisual(row);
+    }
+
+    private void ApplyRowSelectionVisual(DataGridRow row)
+    {
+        if (Equals(row.DataContext, _vm.SelectedEntry))
+        {
+            row.Background = SelectedRowBackgroundBrush;
+        }
+        else
+        {
+            row.ClearValue(Control.BackgroundProperty);
+        }
+
+        row.BorderThickness = new Thickness(0);
     }
 }

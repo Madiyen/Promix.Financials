@@ -2,71 +2,49 @@
     x:Class="Promix.Financials.UI.Views.Ledger.LedgerWorkspacePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     Background="{StaticResource AppBackgroundBrush}"
     FlowDirection="RightToLeft">
 
-    <Grid Padding="24,20,24,20" RowSpacing="6">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid Padding="24,10,24,20">
+        <Pivot x:Name="LedgerPivot"
+               Background="Transparent"
+               SelectionChanged="LedgerPivot_SelectionChanged">
+            <Pivot.Resources>
+                <SolidColorBrush x:Key="PivotForeground" Color="#64748B"/>
+                <SolidColorBrush x:Key="PivotForegroundPointerOver" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotForegroundSelected" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundSelected" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundPointerOver" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelected" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPointerOver" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPressed" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualPrimaryBrush" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualSecondaryBrush" Color="#00FFFFFF"/>
+            </Pivot.Resources>
 
-        <controls:TabView x:Name="LedgerTabView"
-                          Grid.Row="0"
-                          Style="{StaticResource AppTabViewStyle}"
-                          SelectionChanged="LedgerTabView_SelectionChanged"
-                          TabWidthMode="SizeToContent"
-                          Padding="0">
-            <controls:TabView.Resources>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPressed" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForeground" Color="#64748B"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundPointerOver" Color="#0F172A"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundSelected" Color="#0F172A"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundDisabled" Color="#94A3B8"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrush" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushPointerOver" Color="#BFDBFE"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushSelected" Color="#3B82F6"/>
-                <Style TargetType="controls:TabViewItem" BasedOn="{StaticResource AppTabViewItemCompactStyle}"/>
-            </controls:TabView.Resources>
-            <controls:TabViewItem x:Name="AccountsTab">
-                <controls:TabViewItem.Header>
-                    <TextBlock Text="الحسابات" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </controls:TabViewItem.Header>
+            <PivotItem x:Name="AccountsPivotItem" Header="الحسابات">
                 <Frame x:Name="AccountsFrame"/>
-            </controls:TabViewItem>
-            <controls:TabViewItem x:Name="JournalsTab">
-                <controls:TabViewItem.Header>
-                    <TextBlock Text="القيود والسندات" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </controls:TabViewItem.Header>
+            </PivotItem>
+
+            <PivotItem x:Name="JournalsPivotItem" Header="القيود والسندات">
                 <Frame x:Name="JournalsFrame"/>
-            </controls:TabViewItem>
-            <controls:TabViewItem x:Name="StatementTab">
-                <controls:TabViewItem.Header>
-                    <TextBlock Text="كشف الحساب" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </controls:TabViewItem.Header>
+            </PivotItem>
+
+            <PivotItem x:Name="StatementPivotItem" Header="كشف الحساب">
                 <Frame x:Name="StatementFrame"/>
-            </controls:TabViewItem>
-            <controls:TabViewItem x:Name="TrialBalanceTab">
-                <controls:TabViewItem.Header>
-                    <TextBlock Text="ميزان المراجعة" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </controls:TabViewItem.Header>
+            </PivotItem>
+
+            <PivotItem x:Name="TrialBalancePivotItem" Header="ميزان المراجعة">
                 <Frame x:Name="TrialBalanceFrame"/>
-            </controls:TabViewItem>
-            <controls:TabViewItem x:Name="ReceivablesTab">
-                <controls:TabViewItem.Header>
-                    <TextBlock Text="الذمم" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </controls:TabViewItem.Header>
+            </PivotItem>
+
+            <PivotItem x:Name="ReceivablesPivotItem" Header="الذمم">
                 <Frame x:Name="ReceivablesFrame"/>
-            </controls:TabViewItem>
-            <controls:TabViewItem x:Name="FinancialYearsTab">
-                <controls:TabViewItem.Header>
-                    <TextBlock Text="السنة المالية" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </controls:TabViewItem.Header>
+            </PivotItem>
+
+            <PivotItem x:Name="FinancialYearsPivotItem" Header="السنة المالية">
                 <Frame x:Name="FinancialYearsFrame"/>
-            </controls:TabViewItem>
-        </controls:TabView>
+            </PivotItem>
+        </Pivot>
     </Grid>
 </Page>

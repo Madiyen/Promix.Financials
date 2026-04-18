@@ -35,15 +35,7 @@ public sealed partial class LedgerWorkspacePage : Page
 
         Loaded += (_, _) =>
         {
-            if (LedgerTabView.SelectedItem is not TabViewItem)
-            {
-                SelectTab(LedgerWorkspaceTab.Accounts);
-            }
-            else
-            {
-                EnsureTabInitialized(GetSelectedTab());
-                UpdateHeaderSummary(GetSelectedTab());
-            }
+            SelectTab(GetSelectedOrDefaultTab());
         };
     }
 
@@ -77,7 +69,7 @@ public sealed partial class LedgerWorkspacePage : Page
         UpdateHeaderSummary(request.InitialTab);
     }
 
-    private void LedgerTabView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void LedgerPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isTabSelectionSyncing)
             return;
@@ -90,8 +82,10 @@ public sealed partial class LedgerWorkspacePage : Page
     private void SelectTab(LedgerWorkspaceTab tab)
     {
         _isTabSelectionSyncing = true;
-        LedgerTabView.SelectedIndex = (int)tab;
+        LedgerPivot.SelectedIndex = (int)tab;
         _isTabSelectionSyncing = false;
+        EnsureTabInitialized(tab);
+        UpdateHeaderSummary(tab);
     }
 
     private void EnsureTabInitialized(LedgerWorkspaceTab tab)
@@ -117,7 +111,7 @@ public sealed partial class LedgerWorkspacePage : Page
         };
 
     private LedgerWorkspaceTab GetSelectedTab()
-        => LedgerTabView.SelectedIndex switch
+        => LedgerPivot.SelectedIndex switch
         {
             1 => LedgerWorkspaceTab.Journals,
             2 => LedgerWorkspaceTab.AccountStatement,
@@ -128,7 +122,7 @@ public sealed partial class LedgerWorkspacePage : Page
         };
 
     private LedgerWorkspaceTab GetSelectedOrDefaultTab()
-        => LedgerTabView.SelectedItem is TabViewItem ? GetSelectedTab() : LedgerWorkspaceTab.Accounts;
+        => LedgerPivot.SelectedItem is PivotItem ? GetSelectedTab() : LedgerWorkspaceTab.Accounts;
 
     private void UpdateHeaderSummary(LedgerWorkspaceTab tab)
     {

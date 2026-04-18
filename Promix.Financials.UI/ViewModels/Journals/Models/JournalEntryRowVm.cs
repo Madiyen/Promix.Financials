@@ -159,29 +159,29 @@ public sealed class JournalEntryRowVm : INotifyPropertyChanged
 
     public Brush TypeBackgroundBrush => Type switch
     {
-        JournalEntryType.ReceiptVoucher => CreateBrush("#ECFDF5"),
-        JournalEntryType.PaymentVoucher => CreateBrush("#FEF2F2"),
-        JournalEntryType.TransferVoucher => CreateBrush("#EEF2FF"),
+        JournalEntryType.ReceiptVoucher => CreateBrush("#DCFCE7"),
+        JournalEntryType.PaymentVoucher => CreateBrush("#FEE2E2"),
+        JournalEntryType.TransferVoucher => CreateBrush("#E0E7FF"),
         JournalEntryType.OpeningEntry => CreateBrush("#FEF3C7"),
         JournalEntryType.DailyCashClosing => CreateBrush("#E0F2FE"),
-        JournalEntryType.Adjustment => CreateBrush("#FFF7ED"),
-        _ => CreateBrush("#EFF6FF")
+        JournalEntryType.Adjustment => CreateBrush("#FFEDD5"),
+        _ => CreateBrush("#DBEAFE")
     };
 
     public Brush TypeForegroundBrush => Type switch
     {
-        JournalEntryType.ReceiptVoucher => CreateBrush("#059669"),
-        JournalEntryType.PaymentVoucher => CreateBrush("#DC2626"),
-        JournalEntryType.TransferVoucher => CreateBrush("#4F46E5"),
-        JournalEntryType.OpeningEntry => CreateBrush("#B45309"),
-        JournalEntryType.DailyCashClosing => CreateBrush("#0369A1"),
-        JournalEntryType.Adjustment => CreateBrush("#EA580C"),
-        _ => CreateBrush("#2563EB")
+        JournalEntryType.ReceiptVoucher => CreateBrush("#166534"),
+        JournalEntryType.PaymentVoucher => CreateBrush("#991B1B"),
+        JournalEntryType.TransferVoucher => CreateBrush("#3730A3"),
+        JournalEntryType.OpeningEntry => CreateBrush("#92400E"),
+        JournalEntryType.DailyCashClosing => CreateBrush("#0C4A6E"),
+        JournalEntryType.Adjustment => CreateBrush("#9A3412"),
+        _ => CreateBrush("#1D4ED8")
     };
 
     public string StatusText => Status == JournalEntryStatus.Posted ? "مرحل" : "مسودة";
-    public Brush StatusBackgroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#E0F2FE") : CreateBrush("#FEF3C7");
-    public Brush StatusForegroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#0369A1") : CreateBrush("#B45309");
+    public Brush StatusBackgroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#DCFCE7") : CreateBrush("#FEF3C7");
+    public Brush StatusForegroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#166534") : CreateBrush("#92400E");
 
     public string StatusNoteText => Status == JournalEntryStatus.Posted
         ? "تم ترحيل هذا السند وهو مؤثر على الأرصدة والتقارير. السندات المرحلة للعرض فقط ولا يمكن تعديلها أو حذفها."
