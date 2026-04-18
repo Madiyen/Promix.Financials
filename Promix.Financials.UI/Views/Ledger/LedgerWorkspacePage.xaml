@@ -8,13 +8,15 @@
     <Grid Padding="24,10,24,20">
         <Pivot x:Name="LedgerPivot"
                Background="Transparent"
+               FontSize="14"
+               FontWeight="SemiBold"
                SelectionChanged="LedgerPivot_SelectionChanged">
             <Pivot.Resources>
                 <SolidColorBrush x:Key="PivotForeground" Color="#64748B"/>
-                <SolidColorBrush x:Key="PivotForegroundPointerOver" Color="#0F172A"/>
-                <SolidColorBrush x:Key="PivotForegroundSelected" Color="#0F172A"/>
-                <SolidColorBrush x:Key="PivotHeaderForegroundSelected" Color="#0F172A"/>
-                <SolidColorBrush x:Key="PivotHeaderForegroundPointerOver" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotForegroundPointerOver" Color="#1E293B"/>
+                <SolidColorBrush x:Key="PivotForegroundSelected" Color="#1E293B"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundSelected" Color="#1E293B"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundPointerOver" Color="#1E293B"/>
                 <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelected" Color="#00FFFFFF"/>
                 <SolidColorBrush x:Key="PivotHeaderItemBackgroundPointerOver" Color="#00FFFFFF"/>
                 <SolidColorBrush x:Key="PivotHeaderItemBackgroundPressed" Color="#00FFFFFF"/>
@@ -22,27 +24,27 @@
                 <SolidColorBrush x:Key="PivotHeaderItemFocusVisualSecondaryBrush" Color="#00FFFFFF"/>
             </Pivot.Resources>
 
-            <PivotItem x:Name="AccountsPivotItem" Header="الحسابات">
+            <PivotItem x:Name="AccountsPivotItem" Header="الحسابات" FontWeight="SemiBold">
                 <Frame x:Name="AccountsFrame"/>
             </PivotItem>
 
-            <PivotItem x:Name="JournalsPivotItem" Header="القيود والسندات">
+            <PivotItem x:Name="JournalsPivotItem" Header="القيود والسندات" FontWeight="SemiBold">
                 <Frame x:Name="JournalsFrame"/>
             </PivotItem>
 
-            <PivotItem x:Name="StatementPivotItem" Header="كشف الحساب">
+            <PivotItem x:Name="StatementPivotItem" Header="كشف الحساب" FontWeight="SemiBold">
                 <Frame x:Name="StatementFrame"/>
             </PivotItem>
 
-            <PivotItem x:Name="TrialBalancePivotItem" Header="ميزان المراجعة">
+            <PivotItem x:Name="TrialBalancePivotItem" Header="ميزان المراجعة" FontWeight="SemiBold">
                 <Frame x:Name="TrialBalanceFrame"/>
             </PivotItem>
 
-            <PivotItem x:Name="ReceivablesPivotItem" Header="الذمم">
+            <PivotItem x:Name="ReceivablesPivotItem" Header="الذمم" FontWeight="SemiBold">
                 <Frame x:Name="ReceivablesFrame"/>
             </PivotItem>
 
-            <PivotItem x:Name="FinancialYearsPivotItem" Header="السنة المالية">
+            <PivotItem x:Name="FinancialYearsPivotItem" Header="السنة المالية" FontWeight="SemiBold">
                 <Frame x:Name="FinancialYearsFrame"/>
             </PivotItem>
         </Pivot>

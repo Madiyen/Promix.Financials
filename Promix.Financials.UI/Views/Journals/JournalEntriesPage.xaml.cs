@@ -24,6 +24,7 @@ namespace Promix.Financials.UI.Views.Journals;
 public sealed partial class JournalEntriesPage : Page
 {
     private static readonly SolidColorBrush SelectedRowBackgroundBrush = new(Color.FromArgb(0xFF, 0xF0, 0xF9, 0xFF));
+    private static readonly SolidColorBrush RowDividerBrush = new(Color.FromArgb(0xFF, 0xE2, 0xE8, 0xF0));
     private readonly IServiceScope _scope;
     private readonly JournalEntriesViewModel _vm;
     private readonly IUserContext _userContext;
@@ -290,6 +291,8 @@ public sealed partial class JournalEntriesPage : Page
         if (!_realizedRows.Contains(e.Row))
             _realizedRows.Add(e.Row);
 
+        e.Row.BorderBrush = RowDividerBrush;
+        e.Row.BorderThickness = new Thickness(0, 0, 0, 1);
         ApplyRowSelectionVisual(e.Row);
     }
 
@@ -426,7 +429,5 @@ public sealed partial class JournalEntriesPage : Page
         {
             row.ClearValue(Control.BackgroundProperty);
         }
-
-        row.BorderThickness = new Thickness(0);
     }
 }

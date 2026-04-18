@@ -100,6 +100,15 @@
                 <Setter Property="Language" Value="en-US"/>
             </Style>
 
+            <Style x:Key="SoftBadgeStyle" TargetType="Border">
+                <Setter Property="CornerRadius" Value="999"/>
+                <Setter Property="Padding" Value="10,4"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="MinHeight" Value="24"/>
+            </Style>
+
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
                 <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
