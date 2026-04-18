@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.UI;
 using Promix.Financials.UI.Controls;
@@ -17,6 +18,7 @@ public sealed partial class DashboardView : Page
     private readonly DashboardViewModel _vm;
     private readonly IUserContext _userContext;
     private readonly JournalDialogLauncher _dialogLauncher;
+    private QuickActions? _quickActionsPanel;
 
     public DashboardView()
     {
@@ -30,9 +32,13 @@ public sealed partial class DashboardView : Page
         DataContext = _vm;
 
         Loaded += OnLoaded;
-        Unloaded += (_, __) => _scope.Dispose();
+        Unloaded += OnUnloaded;
 
-        QuickActionsPanel.QuickActionRequested += QuickActionsPanel_QuickActionRequested;
+        _quickActionsPanel = FindDescendant<QuickActions>(this);
+        if (_quickActionsPanel is not null)
+        {
+            _quickActionsPanel.QuickActionRequested += QuickActionsPanel_QuickActionRequested;
+        }
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -43,6 +49,16 @@ public sealed partial class DashboardView : Page
         }
 
         await _vm.InitializeAsync(_userContext.CompanyId.Value);
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (_quickActionsPanel is not null)
+        {
+            _quickActionsPanel.QuickActionRequested -= QuickActionsPanel_QuickActionRequested;
+        }
+
+        _scope.Dispose();
     }
 
     private async void QuickActionsPanel_QuickActionRequested(object? sender, QuickActionRequestedEventArgs e)
@@ -95,5 +111,26 @@ public sealed partial class DashboardView : Page
         };
 
         await dialog.ShowAsync();
+    }
+
+    private static T? FindDescendant<T>(DependencyObject root) where T : DependencyObject
+    {
+        var childrenCount = VisualTreeHelper.GetChildrenCount(root);
+        for (var index = 0; index < childrenCount; index++)
+        {
+            var child = VisualTreeHelper.GetChild(root, index);
+            if (child is T match)
+            {
+                return match;
+            }
+
+            var nested = FindDescendant<T>(child);
+            if (nested is not null)
+            {
+                return nested;
+            }
+        }
+
+        return null;
     }
 }

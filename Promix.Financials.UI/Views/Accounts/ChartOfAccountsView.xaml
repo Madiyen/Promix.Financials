@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     FlowDirection="RightToLeft"
-    Background="{StaticResource AppBackgroundBrush}">
+    Background="#F1F5F9">
 
     <Page.Resources>
         <Style x:Key="TreeItemStyle" TargetType="TreeViewItem">
@@ -30,29 +30,23 @@
                  Title="تعذّر تحميل الحسابات"
                  Message="{Binding ErrorMessage}"/>
 
-        <TabView Grid.Row="1"
-                 Style="{StaticResource AppTabViewStyle}"
-                 SelectedIndex="{Binding SelectedWorkspaceTabIndex, Mode=TwoWay}"
-                 TabWidthMode="SizeToContent"
-                 Padding="0">
-            <TabView.Resources>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPressed" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForeground" Color="#64748B"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundPointerOver" Color="#0F172A"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundSelected" Color="#0F172A"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderForegroundDisabled" Color="#94A3B8"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrush" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushPointerOver" Color="#BFDBFE"/>
-                <SolidColorBrush x:Key="TabViewItemHeaderBorderBrushSelected" Color="#3B82F6"/>
-                <Style TargetType="TabViewItem" BasedOn="{StaticResource AppTabViewItemCompactStyle}"/>
-            </TabView.Resources>
-            <TabViewItem>
-                <TabViewItem.Header>
-                    <TextBlock Text="الحسابات" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </TabViewItem.Header>
+        <Pivot Grid.Row="1"
+               SelectedIndex="{Binding SelectedWorkspaceTabIndex, Mode=TwoWay}"
+               Padding="0"
+               Background="Transparent"
+               FontSize="14"
+               FontWeight="SemiBold">
+            <Pivot.Resources>
+                <SolidColorBrush x:Key="PivotHeaderForegroundUnselected" Color="#475569"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundSelected" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundPointerOver" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelected" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPointerOver" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPressed" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualPrimaryBrush" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualSecondaryBrush" Color="Transparent"/>
+            </Pivot.Resources>
+            <PivotItem Header="الحسابات" FontWeight="SemiBold">
                 <Grid ColumnSpacing="12" Padding="0,8,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -60,7 +54,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0"
-                            Style="{StaticResource AppSurfaceCardCompactStyle}"
+                            Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0"
                             Padding="14">
                         <Grid RowSpacing="10">
                             <Grid.RowDefinitions>
@@ -104,6 +98,7 @@
 
                                     <TextBox Grid.Column="0"
                                              Style="{StaticResource SearchBoxStyle}"
+                                             Width="300" HorizontalAlignment="Left"
                                              PlaceholderText="ابحث بالكود أو الاسم أو الحساب الأب..."
                                              Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
@@ -162,7 +157,7 @@
                             </Border>
 
                             <Border Grid.Row="2"
-                                    Style="{StaticResource AppSurfaceCardCompactStyle}"
+                                    Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0"
                                     Padding="6">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                                               HorizontalScrollBarVisibility="Disabled"
@@ -443,7 +438,7 @@
                                 </Border>
                             </Grid>
 
-                            <Border Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                            <Border Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16">
                                 <StackPanel Spacing="12">
                                     <TextBlock Text="توزيع الحسابات" Style="{StaticResource AppSectionTitleTextStyle}"/>
                                     <ItemsControl ItemsSource="{Binding Summary.ClassBreakdown}">
@@ -475,7 +470,7 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                            <Border Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16">
                                 <StackPanel Spacing="12">
                                     <TextBlock Text="ملخص الميزانية" Style="{StaticResource AppSectionTitleTextStyle}"/>
                                     <Grid ColumnSpacing="10" RowSpacing="10">
@@ -498,7 +493,7 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                            <Border Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16">
                                 <Grid RowSpacing="12">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -572,18 +567,15 @@
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
-            </TabViewItem>
-            <TabViewItem>
-                <TabViewItem.Header>
-                    <TextBlock Text="العرض الشجري" Style="{StaticResource AppTabHeaderCompactTextStyle}"/>
-                </TabViewItem.Header>
+            </PivotItem>
+            <PivotItem Header="العرض الشجري" FontWeight="SemiBold">
                 <Grid ColumnSpacing="12" Padding="0,8,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="360"/>
                     </Grid.ColumnDefinitions>
 
-                    <Border Grid.Column="0" Style="{StaticResource AppSurfaceCardStyle}" Padding="16">
+                    <Border Grid.Column="0" Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16">
                         <Grid RowSpacing="12">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -612,6 +604,7 @@
                                     </Grid.ColumnDefinitions>
                                     <TextBox Grid.Column="0"
                                              Style="{StaticResource SearchBoxStyle}"
+                                             Width="300" HorizontalAlignment="Left"
                                              PlaceholderText="ابحث داخل الشجرة..."
                                              Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                     <ComboBox Grid.Column="1"
@@ -777,7 +770,9 @@
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
-            </TabViewItem>
-        </TabView>
+            </PivotItem>
+        </Pivot>
     </Grid>
 </Page>
+
+

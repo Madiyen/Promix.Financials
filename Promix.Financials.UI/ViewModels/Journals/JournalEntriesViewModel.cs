@@ -167,13 +167,13 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         ? $"أي سند بتاريخ {lockedThroughDate:yyyy-MM-dd} أو قبله سيُمنع من الإنشاء أو الترحيل. استخدم إقفال الصندوق اليومي فقط بعد اكتمال مراجعة اليوم."
         : "يمكنك العمل على التواريخ الحالية بحرية، وعند نهاية اليوم يمكنك قفل الفترة من خلال إقفال الصندوق اليومي.";
     public string FilterSummaryText => _allEntries.Count == 0
-        ? "لا توجد سندات بعد."
+        ? "0"
         : Entries.Count == _allEntries.Count && !HasActiveFilters
-            ? $"عرض كل السندات: {_allEntries.Count}"
-            : $"عرض {Entries.Count} من أصل {_allEntries.Count} سند";
+            ? $"{_allEntries.Count}"
+            : $"{Entries.Count} / {_allEntries.Count}";
     public string ActiveFiltersText => HasActiveFilters
-        ? $"البحث: {(string.IsNullOrWhiteSpace(SearchText) ? "—" : SearchText)} · النوع: {GetTypeFilterLabel()} · الحالة: {GetStatusFilterLabel()} · الفترة: {GetPeriodFilterLabel()}"
-        : "بدون فلاتر مفعلة";
+        ? $"{GetTypeFilterLabel()} · {GetStatusFilterLabel()}"
+        : "الكل";
     public string SelectedSummaryText => SelectedEntry is null
         ? "اختر سنداً من القائمة لعرض تفاصيله وحالته."
         : $"{SelectedEntry.TypeText} · {SelectedEntry.EntryNumber} · {SelectedEntry.TotalDebitText}";
@@ -591,3 +591,4 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
+

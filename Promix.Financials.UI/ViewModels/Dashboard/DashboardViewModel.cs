@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -46,6 +47,7 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
     public string TotalEntriesText => _allEntries.Count.ToString("N0");
     public string PostedEntriesText => _allEntries.Count(x => x.Status == JournalEntryStatus.Posted).ToString("N0");
     public string DraftEntriesText => _allEntries.Count(x => x.Status == JournalEntryStatus.Draft).ToString("N0");
+    public string CurrentDateText => DateTime.Now.ToString("dddd d MMMM yyyy", new CultureInfo("ar-SA"));
     public string TodayNetMovementText => GetTodayPostedNetMovement().ToString("N0");
     public string TodayMovementHintText => GetTodayPostedCount() == 0
         ? "لا توجد حركة مرحلة اليوم"
@@ -136,6 +138,7 @@ public sealed class DashboardViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(TotalEntriesText));
         OnPropertyChanged(nameof(PostedEntriesText));
         OnPropertyChanged(nameof(DraftEntriesText));
+        OnPropertyChanged(nameof(CurrentDateText));
         OnPropertyChanged(nameof(TodayNetMovementText));
         OnPropertyChanged(nameof(TodayMovementHintText));
         OnPropertyChanged(nameof(WeeklyCashInflowText));

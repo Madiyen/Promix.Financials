@@ -1,3 +1,5 @@
+#pragma warning disable IDE0060
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -83,7 +85,7 @@ public sealed partial class ChartOfAccountsView : Page
         await DeleteNodeAsync(node);
     }
 
-    private async void AccountListRowButton_Click(object sender, RoutedEventArgs e)
+    private void AccountListRowButton_Click(object sender, RoutedEventArgs e)
     {
         if (!TryResolveAccountId(sender, out var accountId))
             return;
@@ -280,7 +282,7 @@ public sealed partial class ChartOfAccountsView : Page
         return node is not null;
     }
 
-    private bool TryResolveAccountId(object sender, out Guid accountId)
+    private static bool TryResolveAccountId(object sender, out Guid accountId)
     {
         accountId = Guid.Empty;
 
@@ -368,7 +370,7 @@ public sealed partial class ChartOfAccountsView : Page
         ApplyFilterChipStyle(PartyFilterChipButton, _vm.ShowPartyAccountsOnly);
     }
 
-    private void ApplyFilterChipStyle(Button button, bool isSelected)
+    private static void ApplyFilterChipStyle(Button button, bool isSelected)
     {
         if (Microsoft.UI.Xaml.Application.Current.Resources[isSelected
                 ? "FilterChipButtonSelectedStyle"

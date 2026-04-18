@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid ColumnSpacing="16">
+    <Grid ColumnSpacing="24">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -11,185 +11,105 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
-            <Grid>
-                <Border Height="3"
-                        VerticalAlignment="Top"
-                        Background="{StaticResource SidebarActiveBrush}"
-                        CornerRadius="12,12,0,0"/>
-                <StackPanel Spacing="12" Padding="16,14,16,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="42"
-                                Height="42"
-                                Background="{StaticResource InfoSurfaceBrush}"
-                                CornerRadius="12"
-                                HorizontalAlignment="Left">
-                            <FontIcon Glyph="&#xE80F;"
-                                      Foreground="{StaticResource SidebarActiveBrush}"
-                                      FontSize="16"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
+        <!-- KPI: Total Cash / Entries -->
+        <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="24" Translation="0,2,0">
+            <Border.Shadow>
+                <ThemeShadow />
+            </Border.Shadow>
+            <StackPanel Spacing="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="إجمالي السندات" FontSize="14" FontWeight="Medium" Foreground="#64748B"/>
+                    <Border Grid.Column="1" Background="#F1F5F9" CornerRadius="6" Padding="8,4">
+                        <FontIcon Glyph="&#xE80F;" FontSize="14" Foreground="#0F172A"/>
+                    </Border>
+                </Grid>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding TotalEntriesText}" FontSize="28" FontWeight="SemiBold" Foreground="#0F172A" Language="en-US"/>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Border Background="#DCFCE7" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="+2.5%" FontSize="11" FontWeight="Bold" Foreground="#166534"/>
                         </Border>
-                        <Border Grid.Column="1"
-                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="إجمالي"
-                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                        </Border>
-                    </Grid>
-
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="إجمالي السندات" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                        <TextBlock Text="{Binding TotalEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
+                        <TextBlock Text="منذ الشهر الماضي" FontSize="12" Foreground="#64748B" VerticalAlignment="Center"/>
                     </StackPanel>
-
-                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
-
-                    <TextBlock Text="كل القيود والسندات المسجلة حتى الآن"
-                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
                 </StackPanel>
-            </Grid>
+            </StackPanel>
         </Border>
 
-        <Border Grid.Column="1" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
-            <Grid>
-                <Border Height="3"
-                        VerticalAlignment="Top"
-                        Background="{StaticResource SuccessBrush}"
-                        CornerRadius="12,12,0,0"/>
-                <StackPanel Spacing="12" Padding="16,14,16,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="42"
-                                Height="42"
-                                Background="{StaticResource SuccessSurfaceBrush}"
-                                CornerRadius="12"
-                                HorizontalAlignment="Left">
-                            <FontIcon Glyph="&#xE8FB;"
-                                      Foreground="{StaticResource SuccessBrush}"
-                                      FontSize="16"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
-                        </Border>
-                        <Border Grid.Column="1"
-                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="معتمد"
-                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                        </Border>
-                    </Grid>
-
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="المرحل" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                        <TextBlock Text="{Binding PostedEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
-                    </StackPanel>
-
-                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
-
-                    <TextBlock Text="سندات مؤثرة على الأرصدة والتقارير"
-                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+        <!-- KPI: Posted Entries -->
+        <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="24" Translation="0,2,0">
+            <Border.Shadow>
+                <ThemeShadow />
+            </Border.Shadow>
+            <StackPanel Spacing="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="المرحل معتمداً" FontSize="14" FontWeight="Medium" Foreground="#64748B"/>
+                    <Border Grid.Column="1" Background="#DCFCE7" CornerRadius="6" Padding="8,4">
+                        <FontIcon Glyph="&#xE8FB;" FontSize="14" Foreground="#166534"/>
+                    </Border>
+                </Grid>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding PostedEntriesText}" FontSize="28" FontWeight="SemiBold" Foreground="#0F172A" Language="en-US"/>
+                    <TextBlock Text="سندات مؤثرة مالياً" FontSize="12" Foreground="#64748B"/>
                 </StackPanel>
-            </Grid>
+            </StackPanel>
         </Border>
 
-        <Border Grid.Column="2" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
-            <Grid>
-                <Border Height="3"
-                        VerticalAlignment="Top"
-                        Background="{StaticResource WarningBrush}"
-                        CornerRadius="12,12,0,0"/>
-                <StackPanel Spacing="12" Padding="16,14,16,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="42"
-                                Height="42"
-                                Background="{StaticResource WarningSurfaceBrush}"
-                                CornerRadius="12"
-                                HorizontalAlignment="Left">
-                            <FontIcon Glyph="&#xE70F;"
-                                      Foreground="{StaticResource WarningBrush}"
-                                      FontSize="16"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
-                        </Border>
-                        <Border Grid.Column="1"
-                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="مراجعة"
-                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                        </Border>
-                    </Grid>
-
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="المسودات" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                        <TextBlock Text="{Binding DraftEntriesText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
-                    </StackPanel>
-
-                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
-
-                    <TextBlock Text="سندات بانتظار المراجعة أو الترحيل"
-                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+        <!-- KPI: Drafts -->
+        <Border Grid.Column="2" Background="White" CornerRadius="12" Padding="24" Translation="0,2,0">
+            <Border.Shadow>
+                <ThemeShadow />
+            </Border.Shadow>
+            <StackPanel Spacing="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="المسودات قيد المراجعة" FontSize="14" FontWeight="Medium" Foreground="#64748B"/>
+                    <Border Grid.Column="1" Background="#FEF3C7" CornerRadius="6" Padding="8,4">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14" Foreground="#92400E"/>
+                    </Border>
+                </Grid>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding DraftEntriesText}" FontSize="28" FontWeight="SemiBold" Foreground="#0F172A" Language="en-US"/>
+                    <TextBlock Text="بانتظار الاعتماد النهائي" FontSize="12" Foreground="#64748B"/>
                 </StackPanel>
-            </Grid>
+            </StackPanel>
         </Border>
 
-        <Border Grid.Column="3" Style="{StaticResource AppMetricCardCompactStyle}" Padding="0">
-            <Grid>
-                <Border Height="3"
-                        VerticalAlignment="Top"
-                        Background="{StaticResource DangerBrush}"
-                        CornerRadius="12,12,0,0"/>
-                <StackPanel Spacing="12" Padding="16,14,16,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border Width="42"
-                                Height="42"
-                                Background="{StaticResource DangerSurfaceBrush}"
-                                CornerRadius="12"
-                                HorizontalAlignment="Left">
-                            <FontIcon Glyph="&#xE81C;"
-                                      Foreground="{StaticResource DangerBrush}"
-                                      FontSize="16"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
-                        </Border>
-                        <Border Grid.Column="1"
-                                Style="{StaticResource AppEnterpriseInfoChipStyle}"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="اليوم"
-                                       Style="{StaticResource AppEnterpriseInfoChipTextStyle}"/>
-                        </Border>
-                    </Grid>
-
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="صافي اليوم" Style="{StaticResource AppMetricLabelTextStyle}"/>
-                        <TextBlock Text="{Binding TodayNetMovementText}" Style="{StaticResource AppMetricValueCompactTextStyle}"/>
-                    </StackPanel>
-
-                    <Rectangle Height="1" Fill="{StaticResource BorderBrushSoft}"/>
-
-                    <TextBlock Text="{Binding TodayMovementHintText}"
-                               Style="{StaticResource AppSectionCaptionCompactTextStyle}"
-                               MaxWidth="220"/>
+        <!-- KPI: Daily Net -->
+        <Border Grid.Column="3" Background="White" CornerRadius="12" Padding="24" Translation="0,2,0">
+            <Border.Shadow>
+                <ThemeShadow />
+            </Border.Shadow>
+            <StackPanel Spacing="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="صافي حركة اليوم" FontSize="14" FontWeight="Medium" Foreground="#64748B"/>
+                    <Border Grid.Column="1" Background="#E0E7FF" CornerRadius="6" Padding="8,4">
+                        <FontIcon Glyph="&#xE81C;" FontSize="14" Foreground="#3730A3"/>
+                    </Border>
+                </Grid>
+                
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{Binding TodayNetMovementText}" FontSize="28" FontWeight="SemiBold" Foreground="#0F172A" Language="en-US"/>
+                    <TextBlock Text="تحديث لحظي للبيانات" FontSize="12" Foreground="#64748B"/>
                 </StackPanel>
-            </Grid>
+            </StackPanel>
         </Border>
     </Grid>
 </UserControl>

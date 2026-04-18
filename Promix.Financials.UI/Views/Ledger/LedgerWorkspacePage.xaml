@@ -12,16 +12,14 @@
                FontWeight="SemiBold"
                SelectionChanged="LedgerPivot_SelectionChanged">
             <Pivot.Resources>
-                <SolidColorBrush x:Key="PivotForeground" Color="#64748B"/>
-                <SolidColorBrush x:Key="PivotForegroundPointerOver" Color="#1E293B"/>
-                <SolidColorBrush x:Key="PivotForegroundSelected" Color="#1E293B"/>
-                <SolidColorBrush x:Key="PivotHeaderForegroundSelected" Color="#1E293B"/>
-                <SolidColorBrush x:Key="PivotHeaderForegroundPointerOver" Color="#1E293B"/>
-                <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelected" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPointerOver" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPressed" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualPrimaryBrush" Color="#00FFFFFF"/>
-                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualSecondaryBrush" Color="#00FFFFFF"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundUnselected" Color="#475569"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundSelected" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotHeaderForegroundPointerOver" Color="#0F172A"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelected" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPointerOver" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPressed" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualPrimaryBrush" Color="Transparent"/>
+                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualSecondaryBrush" Color="Transparent"/>
             </Pivot.Resources>
 
             <PivotItem x:Name="AccountsPivotItem" Header="الحسابات" FontWeight="SemiBold">

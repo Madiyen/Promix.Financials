@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -159,13 +159,13 @@ public sealed class JournalEntryRowVm : INotifyPropertyChanged
 
     public Brush TypeBackgroundBrush => Type switch
     {
-        JournalEntryType.ReceiptVoucher => CreateBrush("#DCFCE7"),
-        JournalEntryType.PaymentVoucher => CreateBrush("#FEE2E2"),
-        JournalEntryType.TransferVoucher => CreateBrush("#E0E7FF"),
-        JournalEntryType.OpeningEntry => CreateBrush("#FEF3C7"),
-        JournalEntryType.DailyCashClosing => CreateBrush("#E0F2FE"),
-        JournalEntryType.Adjustment => CreateBrush("#FFEDD5"),
-        _ => CreateBrush("#DBEAFE")
+        JournalEntryType.ReceiptVoucher => CreateBrush("#F0FDF4"),
+        JournalEntryType.PaymentVoucher => CreateBrush("#FEF2F2"),
+        JournalEntryType.TransferVoucher => CreateBrush("#EEF2FF"),
+        JournalEntryType.OpeningEntry => CreateBrush("#FFFBEB"),
+        JournalEntryType.DailyCashClosing => CreateBrush("#F0F9FF"),
+        JournalEntryType.Adjustment => CreateBrush("#FFF7ED"),
+        _ => CreateBrush("#EFF6FF")
     };
 
     public Brush TypeForegroundBrush => Type switch
@@ -180,7 +180,7 @@ public sealed class JournalEntryRowVm : INotifyPropertyChanged
     };
 
     public string StatusText => Status == JournalEntryStatus.Posted ? "مرحل" : "مسودة";
-    public Brush StatusBackgroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#DCFCE7") : CreateBrush("#FEF3C7");
+    public Brush StatusBackgroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#F0FDF4") : CreateBrush("#FFFBEB");
     public Brush StatusForegroundBrush => Status == JournalEntryStatus.Posted ? CreateBrush("#166534") : CreateBrush("#92400E");
 
     public string StatusNoteText => Status == JournalEntryStatus.Posted
@@ -189,7 +189,7 @@ public sealed class JournalEntryRowVm : INotifyPropertyChanged
 
     public string BalanceText => IsBalanced ? "متوازن" : $"فرق {DifferenceText}";
     public Brush BalanceBrush => IsBalanced ? CreateBrush("#16A34A") : CreateBrush("#DC2626");
-    public Brush BalanceBackgroundBrush => IsBalanced ? CreateBrush("#DCFCE7") : CreateBrush("#FEF2F2");
+    public Brush BalanceBackgroundBrush => IsBalanced ? CreateBrush("#F0FDF4") : CreateBrush("#FEF2F2");
 
     public string MovementText => Type switch
     {
@@ -221,8 +221,8 @@ public sealed class JournalEntryRowVm : INotifyPropertyChanged
         JournalEntryType.ReceiptVoucher => CreateBrush("#ECFDF5"),
         JournalEntryType.PaymentVoucher => CreateBrush("#FEF2F2"),
         JournalEntryType.TransferVoucher => CreateBrush("#EEF2FF"),
-        JournalEntryType.DailyCashClosing => CreateBrush("#E0F2FE"),
-        JournalEntryType.OpeningEntry => CreateBrush("#FEF3C7"),
+        JournalEntryType.DailyCashClosing => CreateBrush("#F0F9FF"),
+        JournalEntryType.OpeningEntry => CreateBrush("#FFFBEB"),
         JournalEntryType.Adjustment => CreateBrush("#FFF7ED"),
         _ => CreateBrush("#EFF6FF")
     };
@@ -283,3 +283,4 @@ public sealed class JournalEntryRowVm : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
+
