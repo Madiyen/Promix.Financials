@@ -3,7 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="{StaticResource AppBackgroundBrush}"
-    FlowDirection="RightToLeft">
+    FlowDirection="RightToLeft"
+    >
 
     <Page.Resources>
         <Style x:Key="TableHeaderTextStyle" TargetType="TextBlock" BasedOn="{StaticResource AppEnterpriseTableHeaderTextStyle}"/>

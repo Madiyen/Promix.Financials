@@ -6,7 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     FlowDirection="RightToLeft"
-    Background="#F1F5F9">
+    Background="#F1F5F9"
+    >
 
     <Page.Resources>
         <Style x:Key="TreeItemStyle" TargetType="TreeViewItem">
@@ -80,8 +81,8 @@
                                     </Button>
                                     <Button Click="NewAccount_Click" Style="{StaticResource PrimaryActionCompactButtonStyle}">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <FontIcon Glyph="&#xE710;" Foreground="White"/>
-                                            <TextBlock Text="حساب جديد" Foreground="White"/>
+                                            <FontIcon Glyph="&#xE710;"/>
+                                            <TextBlock Text="حساب جديد"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>

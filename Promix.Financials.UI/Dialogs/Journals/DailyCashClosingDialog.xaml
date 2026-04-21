@@ -9,7 +9,6 @@
     CloseButtonText="إلغاء"
     DefaultButton="Primary"
     FlowDirection="RightToLeft"
-    RequestedTheme="Light"
     FullSizeDesired="True"
     HorizontalContentAlignment="Stretch"
     VerticalContentAlignment="Stretch">

@@ -369,6 +369,11 @@ public sealed class JournalEntriesViewModel : INotifyPropertyChanged
         ApplyFilters();
     }
 
+    public void ApplyCurrentFilters()
+    {
+        ApplyFilters(SelectedEntry?.Id);
+    }
+
     private async Task LoadAsync(Guid? preferredSelectionId = null)
     {
         IsBusy = true;

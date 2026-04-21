@@ -5,18 +5,62 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid Background="{StaticResource AppBackgroundBrush}" Padding="24">
-        <StackPanel Spacing="12" MaxWidth="520">
+        <StackPanel Spacing="16" MaxWidth="560">
             <TextBlock x:Uid="Settings_Title"
                        FontSize="22"
-                       FontWeight="Bold"/>
+                       FontWeight="SemiBold"/>
 
-            <TextBlock x:Uid="Settings_Language"
-                       FontSize="14"
-                       Foreground="{StaticResource MutedTextBrush}"/>
+            <Border Style="{StaticResource AppSurfaceCardStyle}">
+                <StackPanel Spacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Settings_Appearance"
+                                   Style="{StaticResource AppSectionTitleCompactTextStyle}"/>
+                        <TextBlock x:Uid="Settings_AppearanceDescription"
+                                   Style="{StaticResource AppSectionCaptionTextStyle}"/>
+                    </StackPanel>
 
-            <ComboBox x:Name="LanguageCombo"
-                      Width="260"
-                      SelectionChanged="LanguageCombo_SelectionChanged"/>
+                    <Border Background="{StaticResource CardSubtleBackgroundBrush}"
+                            BorderBrush="{StaticResource BorderBrushStrong}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="14,12">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Uid="Settings_DarkMode"
+                                           FontSize="13.5"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock x:Uid="Settings_DarkModeDescription"
+                                           Style="{StaticResource AppSectionCaptionCompactTextStyle}"/>
+                            </StackPanel>
+
+                            <ToggleSwitch x:Name="ThemeToggle"
+                                          Grid.Column="1"
+                                          VerticalAlignment="Center"
+                                          Toggled="ThemeToggle_Toggled"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource AppSurfaceCardStyle}">
+                <StackPanel Spacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Uid="Settings_Language"
+                                   Style="{StaticResource AppSectionTitleCompactTextStyle}"/>
+                        <TextBlock x:Uid="Settings_LanguageDescription"
+                                   Style="{StaticResource AppSectionCaptionTextStyle}"/>
+                    </StackPanel>
+
+                    <ComboBox x:Name="LanguageCombo"
+                              Width="260"
+                              SelectionChanged="LanguageCombo_SelectionChanged"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </Grid>
 </Page>

@@ -1,6 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Xaml.Media;
 using Promix.Financials.UI.Navigation;
 using Promix.Financials.UI.Views;
 using Promix.Financials.UI.Views.Accounts;
@@ -8,14 +10,19 @@ using Promix.Financials.UI.Views.Journals;
 using Promix.Financials.UI.Views.Parties;
 using System;
 using System.Collections.Generic;
+using Microsoft.UI;
 
 namespace Promix.Financials.UI.Views.Ledger;
 
 public sealed partial class LedgerWorkspacePage : Page
 {
+    private static readonly SolidColorBrush ActiveTabForegroundBrush = new(ColorHelper.FromArgb(255, 15, 23, 42));
+    private static readonly SolidColorBrush InactiveTabForegroundBrush = new(ColorHelper.FromArgb(255, 100, 116, 139));
     private readonly Dictionary<LedgerWorkspaceTab, Frame> _tabFrames;
+    private readonly Dictionary<LedgerWorkspaceTab, ToggleButton> _tabButtons;
     private readonly HashSet<LedgerWorkspaceTab> _initializedTabs = new();
     private bool _isTabSelectionSyncing;
+    private LedgerWorkspaceTab _selectedTab = LedgerWorkspaceTab.Accounts;
     public event EventHandler<LedgerWorkspaceHeaderContextChangedEventArgs>? HeaderContextChanged;
 
     public LedgerWorkspacePage()
@@ -31,6 +38,16 @@ public sealed partial class LedgerWorkspacePage : Page
             [LedgerWorkspaceTab.TrialBalance] = TrialBalanceFrame,
             [LedgerWorkspaceTab.ReceivablesPayables] = ReceivablesFrame,
             [LedgerWorkspaceTab.FinancialYears] = FinancialYearsFrame
+        };
+
+        _tabButtons = new()
+        {
+            [LedgerWorkspaceTab.Accounts] = AccountsTabButton,
+            [LedgerWorkspaceTab.Journals] = JournalsTabButton,
+            [LedgerWorkspaceTab.AccountStatement] = StatementTabButton,
+            [LedgerWorkspaceTab.TrialBalance] = TrialBalanceTabButton,
+            [LedgerWorkspaceTab.ReceivablesPayables] = ReceivablesTabButton,
+            [LedgerWorkspaceTab.FinancialYears] = FinancialYearsTabButton
         };
 
         Loaded += (_, _) =>
@@ -69,23 +86,62 @@ public sealed partial class LedgerWorkspacePage : Page
         UpdateHeaderSummary(request.InitialTab);
     }
 
-    private void LedgerPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void LedgerTabButton_Click(object sender, RoutedEventArgs e)
     {
         if (_isTabSelectionSyncing)
             return;
 
-        var selectedTab = GetSelectedTab();
-        EnsureTabInitialized(selectedTab);
-        UpdateHeaderSummary(selectedTab);
+        if ((sender as ToggleButton)?.Tag is not string tag)
+            return;
+
+        SelectTab(ParseTabTag(tag));
     }
 
     private void SelectTab(LedgerWorkspaceTab tab)
     {
+        _selectedTab = tab;
         _isTabSelectionSyncing = true;
-        LedgerPivot.SelectedIndex = (int)tab;
+
+        SyncTabVisuals(tab);
+
+        foreach (var frame in _tabFrames)
+            frame.Value.Visibility = frame.Key == tab ? Visibility.Visible : Visibility.Collapsed;
+
         _isTabSelectionSyncing = false;
+
         EnsureTabInitialized(tab);
         UpdateHeaderSummary(tab);
+    }
+
+    private void SyncTabVisuals(LedgerWorkspaceTab selectedTab)
+    {
+        foreach (var buttonEntry in _tabButtons)
+        {
+            var isSelected = buttonEntry.Key == selectedTab;
+            var button = buttonEntry.Value;
+            button.IsChecked = isSelected;
+            button.Foreground = isSelected ? ActiveTabForegroundBrush : InactiveTabForegroundBrush;
+            button.ApplyTemplate();
+
+            if (FindNamedChild<Border>(button, "Underline") is Border underline)
+                underline.Opacity = isSelected ? 1 : 0;
+        }
+    }
+
+    private static T? FindNamedChild<T>(DependencyObject root, string childName) where T : FrameworkElement
+    {
+        var childCount = VisualTreeHelper.GetChildrenCount(root);
+        for (var index = 0; index < childCount; index++)
+        {
+            var child = VisualTreeHelper.GetChild(root, index);
+            if (child is T typedChild && typedChild.Name == childName)
+                return typedChild;
+
+            if (FindNamedChild<T>(child, childName) is T descendant)
+                return descendant;
+        }
+
+        return null;
     }
 
     private void EnsureTabInitialized(LedgerWorkspaceTab tab)
@@ -110,19 +166,20 @@ public sealed partial class LedgerWorkspacePage : Page
             _ => typeof(ChartOfAccountsView)
         };
 
-    private LedgerWorkspaceTab GetSelectedTab()
-        => LedgerPivot.SelectedIndex switch
+    private LedgerWorkspaceTab GetSelectedTab() => _selectedTab;
+
+    private LedgerWorkspaceTab GetSelectedOrDefaultTab() => _selectedTab;
+
+    private static LedgerWorkspaceTab ParseTabTag(string tag)
+        => tag switch
         {
-            1 => LedgerWorkspaceTab.Journals,
-            2 => LedgerWorkspaceTab.AccountStatement,
-            3 => LedgerWorkspaceTab.TrialBalance,
-            4 => LedgerWorkspaceTab.ReceivablesPayables,
-            5 => LedgerWorkspaceTab.FinancialYears,
+            "Journals" => LedgerWorkspaceTab.Journals,
+            "AccountStatement" => LedgerWorkspaceTab.AccountStatement,
+            "TrialBalance" => LedgerWorkspaceTab.TrialBalance,
+            "ReceivablesPayables" => LedgerWorkspaceTab.ReceivablesPayables,
+            "FinancialYears" => LedgerWorkspaceTab.FinancialYears,
             _ => LedgerWorkspaceTab.Accounts
         };
-
-    private LedgerWorkspaceTab GetSelectedOrDefaultTab()
-        => LedgerPivot.SelectedItem is PivotItem ? GetSelectedTab() : LedgerWorkspaceTab.Accounts;
 
     private void UpdateHeaderSummary(LedgerWorkspaceTab tab)
     {
@@ -132,7 +189,7 @@ public sealed partial class LedgerWorkspacePage : Page
 
     public LedgerWorkspaceHeaderContextChangedEventArgs GetHeaderContext()
     {
-        var context = ResolveHeaderContext(GetSelectedOrDefaultTab());
+        var context = ResolveHeaderContext(GetSelectedTab());
         return new LedgerWorkspaceHeaderContextChangedEventArgs(context.Title, context.Subtitle);
     }
 

@@ -3,23 +3,23 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ctcontrols="using:CommunityToolkit.WinUI.UI.Controls"
-    Background="#F1F5F9"
+    Background="{StaticResource AppBackgroundBrush}"
     FlowDirection="RightToLeft">
 
     <Page.Resources>
         <Style x:Key="JournalToolbarTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextBoxStyle}">
             <Setter Property="MinHeight" Value="34"/>
-            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Padding" Value="10,5"/>
         </Style>
 
         <Style x:Key="JournalToolbarComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource InputComboBoxStyle}">
             <Setter Property="MinHeight" Value="34"/>
-            <Setter Property="MinWidth" Value="100"/>
+            <Setter Property="MinWidth" Value="98"/>
         </Style>
 
         <Style x:Key="JournalToolbarSecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource SecondaryActionCompactButtonStyle}">
             <Setter Property="MinHeight" Value="34"/>
-            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="Padding" Value="10,0"/>
         </Style>
 
         <Style x:Key="JournalToolbarIconButtonStyle" TargetType="Button" BasedOn="{StaticResource IconCompactButtonStyle}">
@@ -28,14 +28,26 @@
         </Style>
 
         <Style x:Key="JournalDetailsHeaderTextStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="Foreground" Value="{StaticResource SecondaryTextBrush}"/>
             <Setter Property="FontSize" Value="11.5"/>
             <Setter Property="FontWeight" Value="Normal"/>
+        </Style>
+
+        <Style x:Key="JournalEntryBadgeStyle" TargetType="Border" BasedOn="{StaticResource SoftBadgeStyle}">
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="MinHeight" Value="30"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+
+        <Style x:Key="JournalEntryBadgeTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
         </Style>
     </Page.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Margin="24,20,24,20" RowSpacing="12">
+        <Grid Margin="20,16,20,20" RowSpacing="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -44,8 +56,11 @@
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0"
-                    Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0"
-                    Padding="12,8">
+                    Background="{StaticResource CardBackgroundBrush}"
+                    CornerRadius="16"
+                    BorderThickness="1"
+                    BorderBrush="{StaticResource BorderBrushStrong}"
+                    Padding="14,10">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -58,13 +73,13 @@
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center">
                         <TextBox x:Name="SearchFilterBox"
-                                 Width="300"
+                                 Width="216"
                                  Style="{StaticResource JournalToolbarTextBoxStyle}"
                                  PlaceholderText="ابحث برقم السند أو المرجع أو الوصف"
                                  TextChanged="SearchFilterBox_TextChanged"/>
 
                         <ComboBox x:Name="TypeFilterCombo"
-                                  Width="112"
+                                  Width="108"
                                   Style="{StaticResource JournalToolbarComboBoxStyle}"
                                   SelectionChanged="TypeFilterCombo_SelectionChanged"
                                   SelectedIndex="0">
@@ -79,7 +94,7 @@
                         </ComboBox>
 
                         <ComboBox x:Name="StatusFilterCombo"
-                                  Width="102"
+                                  Width="98"
                                   Style="{StaticResource JournalToolbarComboBoxStyle}"
                                   SelectionChanged="StatusFilterCombo_SelectionChanged"
                                   SelectedIndex="0">
@@ -89,7 +104,7 @@
                         </ComboBox>
 
                         <ComboBox x:Name="PeriodFilterCombo"
-                                  Width="102"
+                                  Width="108"
                                   Style="{StaticResource JournalToolbarComboBoxStyle}"
                                   SelectionChanged="PeriodFilterCombo_SelectionChanged"
                                   SelectedIndex="0">
@@ -98,6 +113,10 @@
                             <ComboBoxItem Content="آخر 7 أيام" Tag="week"/>
                             <ComboBoxItem Content="هذا الشهر" Tag="month"/>
                         </ComboBox>
+
+                        <Button Content="تطبيق"
+                                Style="{StaticResource JournalToolbarSecondaryButtonStyle}"
+                                Click="ApplyFilters_Click"/>
 
                         <Button Style="{StaticResource JournalToolbarIconButtonStyle}"
                                 Click="ClearFilters_Click"
@@ -116,13 +135,13 @@
                                 ToolTipService.ToolTip="تحديث البيانات">
                             <FontIcon Glyph="&#xE72C;"/>
                         </Button>
-                        <Button Content="ترحيل المحدد"
+                        <Button Content="ترحيل"
                                 Click="PostSelected_Click"
                                 IsEnabled="{Binding CanPostSelected}"
                                 Style="{StaticResource JournalToolbarSecondaryButtonStyle}"/>
                         <DropDownButton Content="+ إنشاء سند"
                                         MinHeight="34"
-                                        Padding="12,0"
+                                        Padding="10,0"
                                         Style="{StaticResource PrimaryActionCompactButtonStyle}">
                             <DropDownButton.Flyout>
                                 <MenuFlyout>
@@ -139,57 +158,73 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.Row="1" ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <Border Grid.Row="1"
+                    Background="{StaticResource CardBackgroundBrush}"
+                    CornerRadius="16"
+                    BorderThickness="1"
+                    BorderBrush="{StaticResource BorderBrushStrong}"
+                    Padding="0">
+                <Grid ColumnSpacing="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <Border Grid.Column="0" Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16,12">
-                    <StackPanel Spacing="3">
-                        <TextBlock Text="إجمالي السندات" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
-                        <TextBlock Text="{Binding TotalEntriesText}"
-                                   Style="{StaticResource AppMetricValueCompactTextStyle}"
-                                   FontSize="27"
-                                   FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Border>
+                    <Border Grid.Column="0" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="إجمالي السندات" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                            <TextBlock Text="{Binding TotalEntriesText}"
+                                       Style="{StaticResource AppMetricValueCompactTextStyle}"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
 
-                <Border Grid.Column="1" Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16,12">
-                    <StackPanel Spacing="3">
-                        <TextBlock Text="المرحل" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
-                        <TextBlock Text="{Binding PostedEntriesText}"
-                                   Style="{StaticResource AppMetricValueCompactTextStyle}"
-                                   FontSize="27"
-                                   FontWeight="SemiBold"
-                                   Foreground="#166534"/>
-                    </StackPanel>
-                </Border>
+                    <Rectangle Grid.Column="1" Fill="{StaticResource BorderBrushStrong}"/>
 
-                <Border Grid.Column="2" Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16,12">
-                    <StackPanel Spacing="3">
-                        <TextBlock Text="المسودات" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
-                        <TextBlock Text="{Binding DraftEntriesText}"
-                                   Style="{StaticResource AppMetricValueCompactTextStyle}"
-                                   FontSize="27"
-                                   FontWeight="SemiBold"
-                                   Foreground="#92400E"/>
-                    </StackPanel>
-                </Border>
+                    <Border Grid.Column="2" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="المرحل" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                            <TextBlock Text="{Binding PostedEntriesText}"
+                                       Style="{StaticResource AppMetricValueCompactTextStyle}"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Foreground="#166534"/>
+                        </StackPanel>
+                    </Border>
 
-                <Border Grid.Column="3" Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0" Padding="16,12">
-                    <StackPanel Spacing="3">
-                        <TextBlock Text="صافي اليوم" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
-                        <TextBlock Text="{Binding TodayNetMovementText}"
-                                   Style="{StaticResource AppMetricValueCompactTextStyle}"
-                                   FontSize="27"
-                                   FontWeight="SemiBold"
-                                   Foreground="#1D4ED8"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
+                    <Rectangle Grid.Column="3" Fill="{StaticResource BorderBrushStrong}"/>
+
+                    <Border Grid.Column="4" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="المسودات" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                            <TextBlock Text="{Binding DraftEntriesText}"
+                                       Style="{StaticResource AppMetricValueCompactTextStyle}"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Foreground="#B45309"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Rectangle Grid.Column="5" Fill="{StaticResource BorderBrushStrong}"/>
+
+                    <Border Grid.Column="6" Padding="14,10">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="صافي اليوم" Style="{StaticResource AppMetricLabelCompactTextStyle}"/>
+                            <TextBlock Text="{Binding TodayNetMovementText}"
+                                       Style="{StaticResource AppMetricValueCompactTextStyle}"
+                                       FontSize="20"
+                                       FontWeight="SemiBold"
+                                       Foreground="#1D4ED8"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
 
             <StackPanel Grid.Row="2" Spacing="8">
                 <Border x:Name="ErrorBanner" Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="12" Padding="14,10" Visibility="Collapsed">
@@ -201,7 +236,7 @@
             </StackPanel>
 
             <Border Grid.Row="3"
-                    Background="White" CornerRadius="12" BorderThickness="1" BorderBrush="#E2E8F0"
+                    Background="{StaticResource CardBackgroundBrush}" CornerRadius="16" BorderThickness="1" BorderBrush="{StaticResource BorderBrushStrong}"
                     Padding="0">
                 <Grid>
                     <ctcontrols:DataGrid x:Name="EntriesDataGrid"
@@ -218,35 +253,46 @@
                                          CanUserReorderColumns="False"
                                          CanUserResizeColumns="True"
                                          HeadersVisibility="Column"
-                                         GridLinesVisibility="Horizontal"
-                                         HorizontalGridLinesBrush="#E2E8F0"
-                                         VerticalGridLinesBrush="Transparent"
+                                         GridLinesVisibility="All"
+                                         HorizontalGridLinesBrush="{StaticResource BorderBrushStrong}"
+                                         VerticalGridLinesBrush="{StaticResource BorderBrushStrong}"
                                          RowDetailsVisibilityMode="VisibleWhenSelected"
-                                         RowBackground="Transparent"
-                                         AlternatingRowBackground="#FBFCFE"
+                                         RowBackground="{StaticResource CardBackgroundBrush}"
+                                         AlternatingRowBackground="{StaticResource CardSubtleBackgroundBrush}"
                                          BorderThickness="0"
                                          Background="Transparent"
-                                         RowHeight="54"
+                                         Foreground="{StaticResource PrimaryTextBrush}"
+                                         RowHeight="52"
+                                         ColumnHeaderHeight="40"
                                          Visibility="{Binding EntriesVisibility}">
                         <ctcontrols:DataGrid.Columns>
                             <ctcontrols:DataGridTemplateColumn Header="الرقم" Width="150">
                                 <ctcontrols:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Spacing="2">
-                                            <TextBlock Text="{Binding EntryNumber}" FontWeight="SemiBold" Foreground="#0F172A"/>
+                                            <TextBlock Text="{Binding EntryNumber}" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
                                             <TextBlock Text="{Binding ReferenceDisplay}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </ctcontrols:DataGridTemplateColumn.CellTemplate>
                             </ctcontrols:DataGridTemplateColumn>
 
-                            <ctcontrols:DataGridTextColumn Header="التاريخ" Width="124" Binding="{Binding EntryDateText}"/>
+                            <ctcontrols:DataGridTemplateColumn Header="التاريخ" Width="124">
+                                <ctcontrols:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding EntryDateText}"
+                                                   Foreground="{StaticResource SecondaryTextBrush}"
+                                                   FontSize="12.5"
+                                                   Language="en-US"/>
+                                    </DataTemplate>
+                                </ctcontrols:DataGridTemplateColumn.CellTemplate>
+                            </ctcontrols:DataGridTemplateColumn>
 
                             <ctcontrols:DataGridTemplateColumn Header="البيان" Width="*">
                                 <ctcontrols:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Spacing="2">
-                                            <TextBlock Text="{Binding Description}" Foreground="#0F172A" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Description}" Foreground="{StaticResource PrimaryTextBrush}" TextTrimming="CharacterEllipsis"/>
                                             <TextBlock Text="{Binding LifecycleText}" FontSize="11" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
                                     </DataTemplate>
@@ -256,9 +302,11 @@
                             <ctcontrols:DataGridTemplateColumn Header="النوع" Width="118">
                                 <ctcontrols:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource SoftBadgeStyle}"
+                                        <Border Style="{StaticResource JournalEntryBadgeStyle}"
                                                 Background="{Binding TypeBackgroundBrush}">
-                                            <TextBlock Text="{Binding TypeText}" Foreground="{Binding TypeForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding TypeText}"
+                                                       Style="{StaticResource JournalEntryBadgeTextStyle}"
+                                                       Foreground="{Binding TypeForegroundBrush}"/>
                                         </Border>
                                     </DataTemplate>
                                 </ctcontrols:DataGridTemplateColumn.CellTemplate>
@@ -278,9 +326,11 @@
                             <ctcontrols:DataGridTemplateColumn Header="الحالة" Width="104">
                                 <ctcontrols:DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource SoftBadgeStyle}"
+                                        <Border Style="{StaticResource JournalEntryBadgeStyle}"
                                                 Background="{Binding StatusBackgroundBrush}">
-                                            <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding StatusText}"
+                                                       Style="{StaticResource JournalEntryBadgeTextStyle}"
+                                                       Foreground="{Binding StatusForegroundBrush}"/>
                                         </Border>
                                     </DataTemplate>
                                 </ctcontrols:DataGridTemplateColumn.CellTemplate>
@@ -289,8 +339,8 @@
 
                         <ctcontrols:DataGrid.RowDetailsTemplate>
                             <DataTemplate>
-                                <Border Background="#F8FAFC"
-                                        CornerRadius="0,0,12,12"
+                                <Border Background="{StaticResource CardSubtleBackgroundBrush}"
+                                        CornerRadius="0,0,16,16"
                                         Padding="16,12"
                                         Margin="12,0,12,12">
                                     <Grid RowSpacing="10">
@@ -304,14 +354,14 @@
                                         <Grid Grid.Row="0">
                                             <TextBlock Text="الأثر المحاسبي للسند"
                                                        HorizontalAlignment="Right"
-                                                       Foreground="#0F172A"
+                                                       Foreground="{StaticResource PrimaryTextBrush}"
                                                        FontSize="13"
                                                        FontWeight="SemiBold"/>
                                             <Button HorizontalAlignment="Left"
                                                     Style="{StaticResource IconCompactButtonStyle}"
                                                     Click="CloseRowDetails_Click"
                                                     ToolTipService.ToolTip="إغلاق التفاصيل">
-                                                <FontIcon Glyph="&#xE711;" Foreground="#64748B"/>
+                                                <FontIcon Glyph="&#xE711;" Foreground="{StaticResource SecondaryTextBrush}"/>
                                             </Button>
                                         </Grid>
 
@@ -334,14 +384,14 @@
                                                     Visibility="{Binding DetailsLoadingVisibility}">
                                             <ProgressRing Width="18" Height="18" IsActive="True"/>
                                             <TextBlock Text="جاري تحميل أسطر القيد..."
-                                                       Foreground="#0F172A"
+                                                       Foreground="{StaticResource PrimaryTextBrush}"
                                                        FontSize="12"/>
                                         </StackPanel>
 
                                         <StackPanel Grid.Row="3" Spacing="8">
                                             <TextBlock Text="لا توجد تفاصيل أسطر متاحة لهذا السند."
                                                        Visibility="{Binding DetailsEmptyVisibility}"
-                                                       Foreground="#64748B"
+                                                       Foreground="{StaticResource SecondaryTextBrush}"
                                                        FontSize="12"/>
 
                                             <ItemsControl ItemsSource="{Binding Details}" Visibility="{Binding DetailsVisibility}">
@@ -352,7 +402,9 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Border Background="White"
+                                                        <Border Background="{StaticResource CardBackgroundBrush}"
+                                                                BorderBrush="{StaticResource BorderBrushStrong}"
+                                                                BorderThickness="1"
                                                                 CornerRadius="10"
                                                                 Padding="12,10">
                                                             <Grid ColumnSpacing="10">
@@ -364,7 +416,7 @@
                                                                 </Grid.ColumnDefinitions>
                                                                 <TextBlock Grid.Column="0"
                                                                            Text="{Binding AccountName}"
-                                                                           Foreground="#0F172A"
+                                                                           Foreground="{StaticResource PrimaryTextBrush}"
                                                                            FontWeight="SemiBold"
                                                                            TextWrapping="WrapWholeWords"/>
                                                                 <TextBlock Grid.Column="1"
@@ -375,13 +427,13 @@
                                                                            Language="en-US"/>
                                                                 <TextBlock Grid.Column="2"
                                                                            Text="{Binding CreditText}"
-                                                                           Foreground="#0F172A"
+                                                                           Foreground="{StaticResource PrimaryTextBrush}"
                                                                            FontSize="13.5"
                                                                            FontWeight="SemiBold"
                                                                            Language="en-US"/>
                                                                 <TextBlock Grid.Column="3"
                                                                            Text="{Binding DescriptionText}"
-                                                                           Foreground="#0F172A"
+                                                                           Foreground="{StaticResource PrimaryTextBrush}"
                                                                            TextWrapping="WrapWholeWords"/>
                                                             </Grid>
                                                         </Border>
@@ -397,8 +449,11 @@
 
                     <Border x:Name="EmptyState" Background="Transparent" Visibility="{Binding EmptyStateVisibility}">
                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-                            <TextBlock Text="لا توجد سندات مطابقة" FontSize="20" FontWeight="Bold"/>
-                            <TextBlock Text="ابدأ بإنشاء سند جديد أو عدّل الفلاتر لإظهار النتائج." Foreground="{StaticResource MutedTextBrush}"/>
+                            <FontIcon Glyph="&#xE14C;" FontSize="28" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="لا توجد سندات مطابقة" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryTextBrush}"/>
+                            <TextBlock Text="ابدأ بإنشاء سند جديد أو عدّل الفلاتر لإظهار النتائج."
+                                       Foreground="{StaticResource SecondaryTextBrush}"
+                                       TextAlignment="Center"/>
                         </StackPanel>
                     </Border>
                 </Grid>

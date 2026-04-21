@@ -4,7 +4,7 @@
     xmlns:controls="using:Microsoft.UI.Xaml.Controls">
 
     <Style x:Key="InputTextBoxStyle" TargetType="TextBox">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="12,8"/>
@@ -18,8 +18,8 @@
     </Style>
 
     <Style x:Key="ReadOnlyTextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputTextBoxStyle}">
-        <Setter Property="Background" Value="#F3F7FC"/>
-        <Setter Property="BorderBrush" Value="#D7E3F2"/>
+        <Setter Property="Background" Value="{StaticResource CardSubtleBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="Foreground" Value="#1D4ED8"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="IsReadOnly" Value="True"/>
@@ -34,7 +34,7 @@
     </Style>
 
     <Style x:Key="InputComboBoxStyle" TargetType="ComboBox">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13.5"/>
@@ -47,7 +47,7 @@
     </Style>
 
     <Style x:Key="InputAutoSuggestBoxStyle" TargetType="AutoSuggestBox">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13.5"/>
@@ -58,7 +58,7 @@
     </Style>
 
     <Style x:Key="InputNumberBoxStyle" TargetType="controls:NumberBox">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="FontSize" Value="13.5"/>

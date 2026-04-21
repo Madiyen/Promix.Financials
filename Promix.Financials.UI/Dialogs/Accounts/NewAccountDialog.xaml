@@ -8,7 +8,6 @@
     xmlns:converters="using:Promix.Financials.UI.Converters"
     mc:Ignorable="d"
     FlowDirection="RightToLeft"
-    RequestedTheme="Light"
     Title=""
     Background="Transparent"
     FullSizeDesired="True"

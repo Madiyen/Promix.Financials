@@ -11,8 +11,8 @@ namespace Promix.Financials.UI.Views;
 public sealed partial class SettingsView : Page
 {
     private const string LanguageSettingKey = "AppLanguage";
-
     private bool _isInitializing;
+    private readonly ResourceLoader _loader = new();
 
     public SettingsView()
     {
@@ -22,7 +22,17 @@ public sealed partial class SettingsView : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+        LoadThemePreference();
         LoadLanguages();
+    }
+
+    private void LoadThemePreference()
+    {
+        _isInitializing = true;
+        ThemeToggle.OnContent = _loader.GetString("Theme_Dark");
+        ThemeToggle.OffContent = _loader.GetString("Theme_Light");
+        ThemeToggle.IsOn = ((App)Microsoft.UI.Xaml.Application.Current).GetStoredTheme() == ElementTheme.Dark;
+        _isInitializing = false;
     }
 
     private void LoadLanguages()
@@ -38,17 +48,15 @@ public sealed partial class SettingsView : Page
 
         LanguageCombo.Items.Clear();
 
-        var loader = new ResourceLoader();
-
         var enItem = new ComboBoxItem
         {
-            Content = loader.GetString("Lang_English"),
+            Content = _loader.GetString("Lang_English"),
             Tag = "en-US"
         };
 
         var arItem = new ComboBoxItem
         {
-            Content = loader.GetString("Lang_Arabic"),
+            Content = _loader.GetString("Lang_Arabic"),
             Tag = "ar-SA"
         };
 
@@ -59,6 +67,14 @@ public sealed partial class SettingsView : Page
             string.Equals(current, "ar-SA", StringComparison.OrdinalIgnoreCase) ? arItem : enItem;
 
         _isInitializing = false;
+    }
+
+    private void ThemeToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializing)
+            return;
+
+        ((App)Microsoft.UI.Xaml.Application.Current).SetPreferredTheme(ThemeToggle.IsOn ? ElementTheme.Dark : ElementTheme.Light);
     }
 
     private async void LanguageCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -80,14 +96,12 @@ public sealed partial class SettingsView : Page
 
         settings.Values[LanguageSettingKey] = selectedLang;
 
-        var loader = new ResourceLoader();
-
         var dlg = new ContentDialog
         {
-            Title = loader.GetString("RestartRequired_Title"),
-            Content = loader.GetString("RestartRequired_Message"),
-            PrimaryButtonText = loader.GetString("RestartNow"),
-            CloseButtonText = loader.GetString("RestartLater"),
+            Title = _loader.GetString("RestartRequired_Title"),
+            Content = _loader.GetString("RestartRequired_Message"),
+            PrimaryButtonText = _loader.GetString("RestartNow"),
+            CloseButtonText = _loader.GetString("RestartLater"),
             XamlRoot = this.XamlRoot
         };
 

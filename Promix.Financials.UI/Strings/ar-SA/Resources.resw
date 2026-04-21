@@ -132,9 +132,16 @@
 
 	<!-- Settings -->
 	<data name="Settings_Title.Text" xml:space="preserve"><value>الإعدادات</value></data>
+	<data name="Settings_Appearance.Text" xml:space="preserve"><value>المظهر</value></data>
+	<data name="Settings_AppearanceDescription.Text" xml:space="preserve"><value>بدّل مظهر التطبيق بين الوضع الفاتح والداكن.</value></data>
+	<data name="Settings_DarkMode.Text" xml:space="preserve"><value>الوضع الداكن</value></data>
+	<data name="Settings_DarkModeDescription.Text" xml:space="preserve"><value>طبّق واجهة داكنة مريحة للعمل الطويل وتقلل السطوع العام.</value></data>
 	<data name="Settings_Language.Text" xml:space="preserve"><value>اللغة</value></data>
+	<data name="Settings_LanguageDescription.Text" xml:space="preserve"><value>اختر لغة الواجهة. تغيير اللغة يتطلب إعادة تشغيل التطبيق.</value></data>
 	<data name="Lang_English" xml:space="preserve"><value>الإنجليزية</value></data>
 	<data name="Lang_Arabic" xml:space="preserve"><value>العربية</value></data>
+	<data name="Theme_Light" xml:space="preserve"><value>فاتح</value></data>
+	<data name="Theme_Dark" xml:space="preserve"><value>داكن</value></data>
 
 	<!-- Restart required -->
 	<data name="RestartRequired_Title" xml:space="preserve"><value>يتطلب إعادة التشغيل</value></data>

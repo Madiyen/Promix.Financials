@@ -354,14 +354,35 @@
   <data name="Settings_Title.Text" xml:space="preserve">
     <value>Settings</value>
   </data>
+  <data name="Settings_Appearance.Text" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Settings_AppearanceDescription.Text" xml:space="preserve">
+    <value>Switch the app between light and dark appearance modes.</value>
+  </data>
+  <data name="Settings_DarkMode.Text" xml:space="preserve">
+    <value>Dark mode</value>
+  </data>
+  <data name="Settings_DarkModeDescription.Text" xml:space="preserve">
+    <value>Use a darker interface that is more comfortable for extended work sessions.</value>
+  </data>
   <data name="Settings_Language.Text" xml:space="preserve">
     <value>Language</value>
+  </data>
+  <data name="Settings_LanguageDescription.Text" xml:space="preserve">
+    <value>Choose the interface language. Changing language requires restarting the app.</value>
   </data>
   <data name="Lang_English" xml:space="preserve">
     <value>English</value>
   </data>
   <data name="Lang_Arabic" xml:space="preserve">
     <value>Arabic</value>
+  </data>
+  <data name="Theme_Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Theme_Dark" xml:space="preserve">
+    <value>Dark</value>
   </data>
   <data name="RestartRequired_Title" xml:space="preserve">
     <value>Restart required</value>

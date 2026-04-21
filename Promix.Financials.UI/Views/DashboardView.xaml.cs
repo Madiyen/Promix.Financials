@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Promix.Financials.Application.Abstractions;
 using Promix.Financials.UI;
 using Promix.Financials.UI.Controls;
@@ -18,7 +17,6 @@ public sealed partial class DashboardView : Page
     private readonly DashboardViewModel _vm;
     private readonly IUserContext _userContext;
     private readonly JournalDialogLauncher _dialogLauncher;
-    private QuickActions? _quickActionsPanel;
 
     public DashboardView()
     {
@@ -33,12 +31,7 @@ public sealed partial class DashboardView : Page
 
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
-
-        _quickActionsPanel = FindDescendant<QuickActions>(this);
-        if (_quickActionsPanel is not null)
-        {
-            _quickActionsPanel.QuickActionRequested += QuickActionsPanel_QuickActionRequested;
-        }
+        QuickActionsPanel.QuickActionRequested += QuickActionsPanel_QuickActionRequested;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -53,21 +46,12 @@ public sealed partial class DashboardView : Page
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        if (_quickActionsPanel is not null)
-        {
-            _quickActionsPanel.QuickActionRequested -= QuickActionsPanel_QuickActionRequested;
-        }
-
+        QuickActionsPanel.QuickActionRequested -= QuickActionsPanel_QuickActionRequested;
         _scope.Dispose();
     }
 
     private async void QuickActionsPanel_QuickActionRequested(object? sender, QuickActionRequestedEventArgs e)
     {
-        if (_userContext.CompanyId is null)
-        {
-            return;
-        }
-
         switch (e.Action)
         {
             case DashboardQuickAction.OpenAccounts:
@@ -76,6 +60,12 @@ public sealed partial class DashboardView : Page
             case DashboardQuickAction.OpenReports:
                 (((App)Microsoft.UI.Xaml.Application.Current).CurrentWindow as MainWindow)?.NavigateTo(SidebarDestination.Reports);
                 return;
+        }
+
+        if (_userContext.CompanyId is null)
+        {
+            await ShowErrorAsync("لا يمكن تنفيذ هذا الإجراء قبل اختيار شركة فعّالة.");
+            return;
         }
 
         JournalDialogLaunchResult result = e.Action switch
@@ -111,26 +101,5 @@ public sealed partial class DashboardView : Page
         };
 
         await dialog.ShowAsync();
-    }
-
-    private static T? FindDescendant<T>(DependencyObject root) where T : DependencyObject
-    {
-        var childrenCount = VisualTreeHelper.GetChildrenCount(root);
-        for (var index = 0; index < childrenCount; index++)
-        {
-            var child = VisualTreeHelper.GetChild(root, index);
-            if (child is T match)
-            {
-                return match;
-            }
-
-            var nested = FindDescendant<T>(child);
-            if (nested is not null)
-            {
-                return nested;
-            }
-        }
-
-        return null;
     }
 }

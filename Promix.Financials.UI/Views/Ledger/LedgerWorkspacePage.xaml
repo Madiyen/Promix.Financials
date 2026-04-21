@@ -5,46 +5,102 @@
     Background="{StaticResource AppBackgroundBrush}"
     FlowDirection="RightToLeft">
 
-    <Grid Padding="24,10,24,20">
-        <Pivot x:Name="LedgerPivot"
-               Background="Transparent"
-               FontSize="14"
-               FontWeight="SemiBold"
-               SelectionChanged="LedgerPivot_SelectionChanged">
-            <Pivot.Resources>
-                <SolidColorBrush x:Key="PivotHeaderForegroundUnselected" Color="#475569"/>
-                <SolidColorBrush x:Key="PivotHeaderForegroundSelected" Color="#0F172A"/>
-                <SolidColorBrush x:Key="PivotHeaderForegroundPointerOver" Color="#0F172A"/>
-                <SolidColorBrush x:Key="PivotHeaderItemBackgroundSelected" Color="Transparent"/>
-                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPointerOver" Color="Transparent"/>
-                <SolidColorBrush x:Key="PivotHeaderItemBackgroundPressed" Color="Transparent"/>
-                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualPrimaryBrush" Color="Transparent"/>
-                <SolidColorBrush x:Key="PivotHeaderItemFocusVisualSecondaryBrush" Color="Transparent"/>
-            </Pivot.Resources>
+    <Page.Resources>
+        <Style x:Key="LedgerNavButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="MinHeight" Value="42"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid Background="Transparent">
+                            <StackPanel Spacing="8" Padding="10,8,10,0">
+                                <TextBlock x:Name="Label"
+                                           Text="{TemplateBinding Content}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           FontWeight="{TemplateBinding FontWeight}"
+                                           HorizontalAlignment="Center"/>
+                                <Border x:Name="Underline"
+                                        Height="2.5"
+                                        CornerRadius="999"
+                                        Background="#3B82F6"
+                                        Opacity="0"/>
+                            </StackPanel>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
-            <PivotItem x:Name="AccountsPivotItem" Header="الحسابات" FontWeight="SemiBold">
-                <Frame x:Name="AccountsFrame"/>
-            </PivotItem>
+    <Grid Padding="20,10,20,20" RowSpacing="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <PivotItem x:Name="JournalsPivotItem" Header="القيود والسندات" FontWeight="SemiBold">
-                <Frame x:Name="JournalsFrame"/>
-            </PivotItem>
+        <Border Grid.Row="0"
+                Background="{StaticResource CardBackgroundBrush}"
+                BorderBrush="{StaticResource BorderBrushStrong}"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="8,6">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Disabled"
+                          ZoomMode="Disabled"
+                          FlowDirection="RightToLeft">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="2"
+                            HorizontalAlignment="Right"
+                            FlowDirection="RightToLeft">
+                    <ToggleButton x:Name="AccountsTabButton"
+                                  Style="{StaticResource LedgerNavButtonStyle}"
+                                  Content="الحسابات"
+                                  Tag="Accounts"
+                                  Click="LedgerTabButton_Click"/>
+                    <ToggleButton x:Name="JournalsTabButton"
+                                  Style="{StaticResource LedgerNavButtonStyle}"
+                                  Content="القيود والسندات"
+                                  Tag="Journals"
+                                  Click="LedgerTabButton_Click"/>
+                    <ToggleButton x:Name="StatementTabButton"
+                                  Style="{StaticResource LedgerNavButtonStyle}"
+                                  Content="كشف الحساب"
+                                  Tag="AccountStatement"
+                                  Click="LedgerTabButton_Click"/>
+                    <ToggleButton x:Name="TrialBalanceTabButton"
+                                  Style="{StaticResource LedgerNavButtonStyle}"
+                                  Content="ميزان المراجعة"
+                                  Tag="TrialBalance"
+                                  Click="LedgerTabButton_Click"/>
+                    <ToggleButton x:Name="ReceivablesTabButton"
+                                  Style="{StaticResource LedgerNavButtonStyle}"
+                                  Content="الذمم"
+                                  Tag="ReceivablesPayables"
+                                  Click="LedgerTabButton_Click"/>
+                    <ToggleButton x:Name="FinancialYearsTabButton"
+                                  Style="{StaticResource LedgerNavButtonStyle}"
+                                  Content="السنة المالية"
+                                  Tag="FinancialYears"
+                                  Margin="0"
+                                  Click="LedgerTabButton_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
 
-            <PivotItem x:Name="StatementPivotItem" Header="كشف الحساب" FontWeight="SemiBold">
-                <Frame x:Name="StatementFrame"/>
-            </PivotItem>
-
-            <PivotItem x:Name="TrialBalancePivotItem" Header="ميزان المراجعة" FontWeight="SemiBold">
-                <Frame x:Name="TrialBalanceFrame"/>
-            </PivotItem>
-
-            <PivotItem x:Name="ReceivablesPivotItem" Header="الذمم" FontWeight="SemiBold">
-                <Frame x:Name="ReceivablesFrame"/>
-            </PivotItem>
-
-            <PivotItem x:Name="FinancialYearsPivotItem" Header="السنة المالية" FontWeight="SemiBold">
-                <Frame x:Name="FinancialYearsFrame"/>
-            </PivotItem>
-        </Pivot>
+        <Grid Grid.Row="1">
+            <Frame x:Name="AccountsFrame" Visibility="Collapsed"/>
+            <Frame x:Name="JournalsFrame" Visibility="Collapsed"/>
+            <Frame x:Name="StatementFrame" Visibility="Collapsed"/>
+            <Frame x:Name="TrialBalanceFrame" Visibility="Collapsed"/>
+            <Frame x:Name="ReceivablesFrame" Visibility="Collapsed"/>
+            <Frame x:Name="FinancialYearsFrame" Visibility="Collapsed"/>
+        </Grid>
     </Grid>
 </Page>

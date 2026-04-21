@@ -6,7 +6,6 @@
     xmlns:converters="using:Promix.Financials.UI.Converters"
     Title=""
     FlowDirection="RightToLeft"
-    RequestedTheme="Light"
     Background="Transparent"
     FullSizeDesired="True"
     HorizontalContentAlignment="Stretch"

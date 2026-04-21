@@ -4,7 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:journalControls="using:Promix.Financials.UI.Controls.Journals"
     Background="{StaticResource AppBackgroundBrush}"
-    FlowDirection="RightToLeft">
+    FlowDirection="RightToLeft"
+    >
 
     <Page.Resources>
         <Style x:Key="SummaryValueTextStyle" TargetType="TextBlock">

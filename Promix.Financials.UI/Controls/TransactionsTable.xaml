@@ -4,33 +4,37 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:journals="using:Promix.Financials.UI.ViewModels.Journals.Models">
 
-    <Border Background="White" CornerRadius="12" Padding="0" Translation="0,2,0">
-        <Border.Shadow>
-            <ThemeShadow />
-        </Border.Shadow>
+    <Border Background="{StaticResource CardBackgroundBrush}"
+            BorderBrush="{StaticResource BorderBrushStrong}"
+            BorderThickness="1"
+            CornerRadius="16">
         <StackPanel>
-            <!-- Table Header Area -->
-            <Grid Padding="24">
+            <Grid Padding="20,18">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Spacing="4">
-                    <TextBlock Text="آخر العمليات" FontSize="18" FontWeight="SemiBold" Foreground="#0F172A"/>
-                    <TextBlock Text="أحدث السندات والقيود المسجلة مؤخراً." FontSize="13" Foreground="#64748B"/>
+                    <TextBlock Text="آخر العمليات" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
+                    <TextBlock Text="آخر السندات والقيود المسجلة لالتقاط الحالة التشغيلية بسرعة." FontSize="13" Foreground="{StaticResource SecondaryTextBrush}"/>
                 </StackPanel>
 
-                <Border Grid.Column="1" Background="#F1F5F9" CornerRadius="6" Padding="12,6" VerticalAlignment="Center">
-                    <TextBlock Text="عرض الكل" FontSize="12" FontWeight="SemiBold" Foreground="#0F172A"/>
+                <Border Grid.Column="1"
+                        Background="{StaticResource CardSubtleBackgroundBrush}"
+                        BorderBrush="{StaticResource BorderBrushStrong}"
+                        BorderThickness="1"
+                        CornerRadius="999"
+                        Padding="10,4"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="آخر 6 عمليات" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}"/>
                 </Border>
             </Grid>
 
-            <!-- Column Labels -->
-            <Border Background="#F8FAFC" BorderBrush="#F1F5F9" BorderThickness="0,1" Padding="24,12">
+            <Border Background="{StaticResource CardSubtleBackgroundBrush}" BorderBrush="{StaticResource BorderBrushStrong}" BorderThickness="0,1" Padding="20,12">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="140"/>
                         <ColumnDefinition Width="120"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="140"/>
@@ -38,23 +42,39 @@
                         <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="رقم السند" FontSize="12" FontWeight="SemiBold" Foreground="#64748B"/>
-                    <TextBlock Grid.Column="1" Text="التاريخ" FontSize="12" FontWeight="SemiBold" Foreground="#64748B"/>
-                    <TextBlock Grid.Column="2" Text="الوصف" FontSize="12" FontWeight="SemiBold" Foreground="#64748B"/>
-                    <TextBlock Grid.Column="3" Text="النوع" FontSize="12" FontWeight="SemiBold" Foreground="#64748B"/>
-                    <TextBlock Grid.Column="4" Text="المبلغ" FontSize="12" FontWeight="SemiBold" Foreground="#64748B" HorizontalAlignment="Right"/>
-                    <TextBlock Grid.Column="5" Text="الحالة" FontSize="12" FontWeight="SemiBold" Foreground="#64748B" HorizontalAlignment="Right"/>
+                    <TextBlock Text="رقم السند" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}"/>
+                    <TextBlock Grid.Column="1" Text="التاريخ" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}"/>
+                    <TextBlock Grid.Column="2" Text="الوصف" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}"/>
+                    <TextBlock Grid.Column="3" Text="النوع" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}"/>
+                    <TextBlock Grid.Column="4" Text="المبلغ" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Right"/>
+                    <TextBlock Grid.Column="5" Text="الحالة" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Right"/>
                 </Grid>
             </Border>
 
-            <!-- Table Rows -->
-            <ItemsControl ItemsSource="{Binding RecentEntries}">
+            <StackPanel Visibility="{Binding LoadingVisibility}"
+                        Spacing="10"
+                        Padding="20,18">
+                <Border Background="{StaticResource CardSubtleBackgroundBrush}" CornerRadius="10" Height="18"/>
+                <Border Background="{StaticResource CardSubtleBackgroundBrush}" CornerRadius="10" Height="18"/>
+                <Border Background="{StaticResource CardSubtleBackgroundBrush}" CornerRadius="10" Height="18"/>
+            </StackPanel>
+
+            <StackPanel Visibility="{Binding EmptyEntriesVisibility}"
+                        Padding="20,28"
+                        Spacing="8"
+                        HorizontalAlignment="Center">
+                <FontIcon Glyph="&#xE14C;" FontSize="28" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center"/>
+                <TextBlock Text="لا توجد عمليات حديثة بعد" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Center"/>
+                <TextBlock Text="ستظهر آخر السندات والقيود هنا بمجرد بدء العمل." FontSize="12" Foreground="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Center"/>
+            </StackPanel>
+
+            <ItemsControl ItemsSource="{Binding RecentEntries}" Visibility="{Binding RecentEntriesVisibility}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="journals:JournalEntryRowVm">
-                        <Border BorderBrush="#F1F5F9" BorderThickness="0,0,0,1" Padding="24,16">
+                        <Border BorderBrush="{StaticResource BorderBrushStrong}" BorderThickness="0,0,0,1" Padding="20,14">
                             <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="140"/>
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="140"/>
@@ -62,30 +82,39 @@
                                     <ColumnDefinition Width="100"/>
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="{x:Bind EntryNumber}" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Bind EntryNumber}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}" VerticalAlignment="Center"/>
                                 
-                                <TextBlock Grid.Column="1" Text="{x:Bind EntryDateText}" FontSize="13" Foreground="#64748B" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{x:Bind EntryDateText}" FontSize="13" Foreground="{StaticResource SecondaryTextBrush}" VerticalAlignment="Center"/>
                                 
-                                <TextBlock Grid.Column="2" Text="{x:Bind Description}" FontSize="13" Foreground="#0F172A" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{x:Bind Description}" FontSize="13" Foreground="{StaticResource PrimaryTextBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
 
-                                <Border Grid.Column="3" Background="{x:Bind TypeBackgroundBrush}" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Bind TypeText}" Foreground="{x:Bind TypeForegroundBrush}" FontSize="11" FontWeight="Bold"/>
+                                <Border Grid.Column="3"
+                                        Style="{StaticResource SoftBadgeStyle}"
+                                        Background="{x:Bind TypeBackgroundBrush}">
+                                    <TextBlock Text="{x:Bind TypeText}" Foreground="{x:Bind TypeForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
                                 </Border>
 
-                                <TextBlock Grid.Column="4" Text="{x:Bind TotalDebitText}" FontSize="13" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Right" VerticalAlignment="Center" Language="en-US"/>
+                                <TextBlock Grid.Column="4" Text="{x:Bind TotalDebitText}" FontSize="13" FontWeight="Bold" Foreground="{StaticResource PrimaryTextBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" Language="en-US"/>
 
-                                <Border Grid.Column="5" Background="{x:Bind StatusBackgroundBrush}" CornerRadius="12" Padding="10,4" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <TextBlock Text="{x:Bind StatusText}" Foreground="{x:Bind StatusForegroundBrush}" FontSize="11" FontWeight="Bold"/>
+                                <Border Grid.Column="5"
+                                        Style="{StaticResource SoftBadgeStyle}"
+                                        Background="{x:Bind StatusBackgroundBrush}"
+                                        HorizontalAlignment="Right">
+                                    <TextBlock Text="{x:Bind StatusText}" Foreground="{x:Bind StatusForegroundBrush}" FontSize="11" FontWeight="SemiBold"/>
                                 </Border>
                             </Grid>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            
-            <!-- Footer Action -->
-            <Border Padding="24" HorizontalAlignment="Center">
-                <Button Content="تحميل المزيد من العمليات" Background="Transparent" BorderThickness="0" Foreground="#64748B" FontSize="13" FontWeight="Medium"/>
+
+            <Border Padding="16" HorizontalAlignment="Center">
+                <Button Content="عرض القائمة الكاملة"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="{StaticResource SecondaryTextBrush}"
+                        FontSize="13"
+                        FontWeight="SemiBold"/>
             </Border>
         </StackPanel>
     </Border>

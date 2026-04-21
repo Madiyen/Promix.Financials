@@ -303,7 +303,9 @@ public sealed partial class JournalEntriesPage : Page
 
     private void CloseRowDetails_Click(object sender, RoutedEventArgs e)
     {
+        _vm.SelectedEntry = null;
         EntriesDataGrid.SelectedItem = null;
+        EntriesDataGrid.SelectedIndex = -1;
         ApplySelectionVisuals();
     }
 
@@ -403,6 +405,12 @@ public sealed partial class JournalEntriesPage : Page
         StatusFilterCombo.SelectedIndex = 0;
         PeriodFilterCombo.SelectedIndex = 0;
         _vm.ClearFilters();
+    }
+
+    private void ApplyFilters_Click(object sender, RoutedEventArgs e)
+    {
+        _vm.ApplyCurrentFilters();
+        ApplySelectionVisuals();
     }
 
     private static string? GetSelectedTag(object sender)

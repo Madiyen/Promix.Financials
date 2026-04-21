@@ -3,7 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     x:Name="Root"
-    RequestedTheme="Light">
+    >
 
     <StackPanel Spacing="6">
         <TextBlock Text="{Binding Header, ElementName=Root}"
@@ -17,8 +17,8 @@
 
             <Border x:Name="InputBorder"
                     Grid.Row="0"
-                    Background="White"
-                    BorderBrush="#94A3B8"
+                    Background="{StaticResource CardBackgroundBrush}"
+                    BorderBrush="{StaticResource BorderBrushStrong}"
                     BorderThickness="1"
                     CornerRadius="10">
                 <TextBox x:Name="SearchBox"

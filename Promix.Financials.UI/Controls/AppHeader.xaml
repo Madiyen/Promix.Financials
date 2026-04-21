@@ -17,7 +17,7 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel VerticalAlignment="Center">
-                <TextBlock x:Name="TitleText"
+            <TextBlock x:Name="TitleText"
                        Text="لوحة القيادة"
                        Foreground="{StaticResource MainTitleTextBrush}"
                        FontWeight="SemiBold"
@@ -25,13 +25,14 @@
             <TextBlock x:Name="SubtitleText"
                        Text="ملخص سريع لأهم المؤشرات والحركات اليومية."
                        Foreground="{StaticResource MutedTextBrush}"
+                       FontWeight="Normal"
                        FontSize="11"
                        Margin="0,3,0,0"/>
         </StackPanel>
 
         <Border Grid.Column="1"
                 VerticalAlignment="Center"
-                Background="#FFFFFF"
+                Background="{StaticResource CardBackgroundBrush}"
                 BorderBrush="{StaticResource BorderBrushSoft}"
                 BorderThickness="1"
                 CornerRadius="10"
@@ -51,7 +52,7 @@
 
         <Border Grid.Column="2"
                 VerticalAlignment="Center"
-                Background="#FFFFFF"
+                Background="{StaticResource CardBackgroundBrush}"
                 BorderBrush="{StaticResource BorderBrushStrong}"
                 BorderThickness="1"
                 CornerRadius="12"

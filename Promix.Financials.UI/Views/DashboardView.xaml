@@ -9,149 +9,210 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <!-- Modern SaaS Theme Palette -->
-        <Color x:Key="SaaSPageBackground">#F1F5F9</Color>
-        <Color x:Key="SaaSCardBackground">#FFFFFF</Color>
-        <Color x:Key="SaaSTextPrimary">#0F172A</Color>
-        <Color x:Key="SaaSTextSecondary">#64748B</Color>
-        <Color x:Key="SaaSBorderFaint">#E2E8F0</Color>
-        
-        <SolidColorBrush x:Key="SaaSPageBackgroundBrush" Color="{StaticResource SaaSPageBackground}"/>
-        <SolidColorBrush x:Key="SaaSCardBackgroundBrush" Color="{StaticResource SaaSCardBackground}"/>
-        <SolidColorBrush x:Key="SaaSTextPrimaryBrush" Color="{StaticResource SaaSTextPrimary}"/>
-        <SolidColorBrush x:Key="SaaSTextSecondaryBrush" Color="{StaticResource SaaSTextSecondary}"/>
-        <SolidColorBrush x:Key="SaaSBorderFaintBrush" Color="{StaticResource SaaSBorderFaint}"/>
-
-        <!-- Functional Minimalism Card Style -->
-        <Style x:Key="SaaSCardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource SaaSCardBackgroundBrush}"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="24"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Shadow">
-                <Setter.Value>
-                    <ThemeShadow />
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SaaSHeaderTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource SaaSTextPrimaryBrush}"/>
-        </Style>
-
-        <Style x:Key="SaaSSubtitleTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="{StaticResource SaaSTextSecondaryBrush}"/>
+        <Style x:Key="DashboardSurfaceStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushStrong}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="20"/>
         </Style>
     </Page.Resources>
 
-    <Grid Background="{StaticResource SaaSPageBackgroundBrush}">
+    <Grid Background="{StaticResource AppBackgroundBrush}">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Spacing="32" Padding="32">
-                <!-- Top Area: Welcome Header -->
+            <StackPanel Spacing="20" Padding="24,24,24,32">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="نظرة عامة على البيانات" Style="{StaticResource SaaSHeaderTextStyle}"/>
-                        <TextBlock Text="مرحباً بك مجدداً، إليك ملخص مالي لأداء الشركة اليوم." Style="{StaticResource SaaSSubtitleTextStyle}"/>
+
+                    <StackPanel Spacing="3">
+                        <TextBlock Text="لوحة التحكم المالية"
+                                   FontSize="28"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource MainTitleTextBrush}"/>
+                        <TextBlock Text="السندات، التدفق النقدي، وآخر الحركات في مساحة عمل واحدة سريعة القراءة."
+                                   FontSize="13"
+                                   Foreground="{StaticResource SecondaryTextBrush}"/>
                     </StackPanel>
-                    
-                    <Border Grid.Column="1" 
-                            Background="{StaticResource SaaSCardBackgroundBrush}"
-                            Padding="16,8"
-                            CornerRadius="8"
+
+                    <Border Grid.Column="1"
+                            Background="{StaticResource CardBackgroundBrush}"
+                            BorderBrush="{StaticResource BorderBrushStrong}"
+                            BorderThickness="1"
+                            Padding="14,8"
+                            CornerRadius="10"
                             VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="&#xE787;" FontSize="14" Foreground="{StaticResource SaaSTextSecondaryBrush}"/>
-                            <TextBlock Text="{Binding CurrentDateText}" Foreground="{StaticResource SaaSTextSecondaryBrush}" FontSize="13" FontWeight="Medium"/>
+                            <FontIcon Glyph="&#xE787;" FontSize="13" Foreground="{StaticResource SecondaryTextBrush}"/>
+                            <TextBlock Text="{Binding CurrentDateText}"
+                                       FontSize="13"
+                                       FontWeight="Medium"
+                                       Foreground="{StaticResource PrimaryTextBrush}"/>
                         </StackPanel>
                     </Border>
                 </Grid>
 
-                <!-- Row 1: KPI Summary Cards -->
                 <controls:KpiCards/>
 
-                <!-- Row 2: Split Layout -->
-                <Grid ColumnSpacing="24">
+                <Grid ColumnSpacing="20">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2.15*"/>
+                        <ColumnDefinition Width="1.15*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Main Chart/Analytics Area -->
-                    <Border Grid.Column="0" Style="{StaticResource SaaSCardStyle}">
-                        <StackPanel Spacing="24">
+                    <Border Grid.Column="0" Style="{StaticResource DashboardSurfaceStyle}">
+                        <Grid RowSpacing="18">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="تحليلات التدفقات النقدية" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource SaaSTextPrimaryBrush}"/>
-                                    <TextBlock Text="مقارنة بين الإيرادات والمصروفات خلال الأسبوع الحالي." Style="{StaticResource SaaSSubtitleTextStyle}"/>
+
+                                <StackPanel Spacing="4" VerticalAlignment="Center">
+                                    <TextBlock Text="حركة النقد هذا الأسبوع"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource PrimaryTextBrush}"/>
+                                    <TextBlock Text="قراءة مباشرة للدخول والخروج خلال آخر سبعة أيام."
+                                               FontSize="13"
+                                               Foreground="{StaticResource SecondaryTextBrush}"/>
                                 </StackPanel>
-                                <Border Grid.Column="1" 
-                                        Background="#F8FAFC" 
-                                        BorderBrush="{StaticResource SaaSBorderFaintBrush}" 
-                                        BorderThickness="1" 
-                                        CornerRadius="6" 
-                                        Padding="12,6">
-                                    <TextBlock Text="آخر 7 أيام" FontSize="12" FontWeight="Medium" Foreground="{StaticResource SaaSTextSecondaryBrush}"/>
+
+                                <StackPanel Grid.Column="1"
+                                            Margin="18,0,0,0"
+                                            Spacing="2"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="إجمالي الداخل"
+                                               FontSize="11"
+                                               Foreground="{StaticResource SecondaryTextBrush}"/>
+                                    <TextBlock Text="{Binding WeeklyCashInflowText}"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="#166534"
+                                               Language="en-US"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2"
+                                            Margin="18,0,0,0"
+                                            Spacing="2"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="إجمالي الخارج"
+                                               FontSize="11"
+                                               Foreground="{StaticResource SecondaryTextBrush}"/>
+                                    <TextBlock Text="{Binding WeeklyCashOutflowText}"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="#B91C1C"
+                                               Language="en-US"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Grid.Row="1"
+                                    Background="{StaticResource CardSubtleBackgroundBrush}"
+                                    CornerRadius="14"
+                                    Padding="18"
+                                    MinHeight="260">
+                                <Grid>
+                                    <Rectangle Height="1"
+                                               VerticalAlignment="Bottom"
+                                               Fill="{StaticResource BorderBrushStrong}"/>
+                                    <ItemsControl ItemsSource="{Binding ActivityBars}" VerticalAlignment="Bottom">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"
+                                                            Spacing="22"
+                                                            HorizontalAlignment="Center"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="journals:JournalActivityBarVm">
+                                                <StackPanel Spacing="10" VerticalAlignment="Bottom">
+                                                    <TextBlock Text="{x:Bind ValueText}"
+                                                               HorizontalAlignment="Center"
+                                                               FontSize="11"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource SecondaryTextBrush}"/>
+                                                    <Border Width="42"
+                                                            Height="{x:Bind BarHeight}"
+                                                            Background="{x:Bind FillBrush}"
+                                                            CornerRadius="8,8,3,3"
+                                                            ToolTipService.ToolTip="{x:Bind ValueText}"/>
+                                                    <TextBlock Text="{x:Bind Label}"
+                                                               HorizontalAlignment="Center"
+                                                               FontSize="11"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource SecondaryTextBrush}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Grid>
+                            </Border>
+
+                            <Grid Grid.Row="2" ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0"
+                                        Background="{StaticResource CardSubtleBackgroundBrush}"
+                                        CornerRadius="12"
+                                        Padding="14,12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="سندات القبض" FontSize="11" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        <TextBlock Text="{Binding ReceiptShareText}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="1"
+                                        Background="{StaticResource CardSubtleBackgroundBrush}"
+                                        CornerRadius="12"
+                                        Padding="14,12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="سندات الصرف" FontSize="11" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        <TextBlock Text="{Binding PaymentShareText}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="2"
+                                        Background="{StaticResource CardSubtleBackgroundBrush}"
+                                        CornerRadius="12"
+                                        Padding="14,12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="القيود اليومية" FontSize="11" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        <TextBlock Text="{Binding DailyShareText}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="3"
+                                        Background="{StaticResource CardSubtleBackgroundBrush}"
+                                        CornerRadius="12"
+                                        Padding="14,12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="حركات أخرى" FontSize="11" Foreground="{StaticResource SecondaryTextBrush}"/>
+                                        <TextBlock Text="{Binding OtherShareText}" FontSize="18" FontWeight="SemiBold" Foreground="{StaticResource PrimaryTextBrush}"/>
+                                    </StackPanel>
                                 </Border>
                             </Grid>
-
-                            <!-- Weekly Cash Flow Visualization -->
-                            <Grid Height="240">
-                                <ItemsControl ItemsSource="{Binding ActivityBars}" VerticalAlignment="Bottom">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" Spacing="24" HorizontalAlignment="Center"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="journals:JournalActivityBarVm">
-                                            <StackPanel Spacing="12" VerticalAlignment="Bottom">
-                                                <Border Width="40" 
-                                                        Height="{x:Bind BarHeight}" 
-                                                        Background="{x:Bind FillBrush}" 
-                                                        CornerRadius="6,6,2,2"
-                                                        ToolTipService.ToolTip="{x:Bind ValueText}">
-                                                </Border>
-                                                <TextBlock Text="{x:Bind Label}" 
-                                                           HorizontalAlignment="Center" 
-                                                           FontSize="11" 
-                                                           Foreground="{StaticResource SaaSTextSecondaryBrush}"
-                                                           FontWeight="Medium"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Grid>
-                            
-                            <!-- Legend -->
-                            <StackPanel Orientation="Horizontal" Spacing="24" HorizontalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Ellipse Width="8" Height="8" Fill="#10B981"/>
-                                    <TextBlock Text="التدفق الداخل" FontSize="12" Foreground="{StaticResource SaaSTextSecondaryBrush}"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Ellipse Width="8" Height="8" Fill="#EF4444"/>
-                                    <TextBlock Text="التدفق الخارج" FontSize="12" Foreground="{StaticResource SaaSTextSecondaryBrush}"/>
-                                </StackPanel>
-                            </StackPanel>
-                        </StackPanel>
+                        </Grid>
                     </Border>
 
-                    <!-- Quick Actions Side Column -->
-                    <controls:QuickActions Grid.Column="1"/>
+                    <controls:QuickActions x:Name="QuickActionsPanel"
+                                           Grid.Column="1"/>
                 </Grid>
 
-                <!-- Activity / Transactions -->
                 <controls:TransactionsTable/>
             </StackPanel>
         </ScrollViewer>
